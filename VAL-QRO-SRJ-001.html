@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VAL-QRO-SRJ-001 — Validacion de Puntos</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1a1a2e}
+.header{background:#1a3a5c;color:white;padding:10px 14px;position:sticky;top:0;z-index:1000}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header h1{font-size:15px;font-weight:800}
+.route-id{font-size:9px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:1px}
+.header p{font-size:10px;opacity:.8;margin-top:2px}
+.prog-wrap{background:rgba(255,255,255,.2);border-radius:20px;height:7px;margin-top:7px}
+.prog-bar{height:100%;background:#27ae60;border-radius:20px;transition:width .4s}
+.prog-txt{font-size:9px;text-align:right;margin-top:2px;opacity:.85}
+.dia-tabs{display:flex;background:#122b45;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dia-tab{flex-shrink:0;padding:8px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.5);
+          border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.dia-tab.act{color:white;border-bottom-color:var(--c)}
+.dia-tab .cnt{font-size:9px;margin-left:4px;background:rgba(255,255,255,.15);padding:1px 5px;border-radius:8px}
+.dia-tab .cnt.done{background:#27ae60;color:white}
+.gps-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:white;border-bottom:1px solid #e0e0e0;font-size:11px}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.gps-dot.on{background:#27ae60;animation:pulse 1.5s infinite}
+.gps-dot.err{background:#e74c3c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#map{height:240px;width:100%}
+.sub-tabs{display:flex;background:white;border-bottom:2px solid #e0e0e0}
+.sub-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:600;color:#888;border:none;background:none;cursor:pointer}
+.sub-tab.act{color:#1a3a5c;border-bottom:3px solid #2e6da4;margin-bottom:-2px}
+#tab-lista{padding:10px}
+.punto-card{background:white;border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;border-left:4px solid #dce8f5;transition:border-color .2s}
+.punto-card.existe{border-left-color:#27ae60}
+.punto-card.no-existe{border-left-color:#e74c3c}
+.p-icon{font-size:18px;flex-shrink:0}
+.p-info{flex:1;min-width:0}
+.p-nombre{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-tipo{font-size:10px;color:#888}
+.p-dist{font-size:9px;color:#bbb}
+.p-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;flex-shrink:0}
+.b-ok{background:#d4edda;color:#155724}
+.b-no{background:#f8d7da;color:#721c24}
+.b-pen{background:#e8f4fd;color:#0c5460}
+.alerta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;background:white;border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.25);padding:18px 18px 28px}
+.alerta.show{display:block}
+.al-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.al-icon{font-size:28px;margin-bottom:4px}
+.al-nombre{font-size:19px;font-weight:800;color:#1a3a5c;margin-bottom:2px}
+.al-tipo{font-size:12px;color:#888;margin-bottom:2px}
+.al-coords{font-size:10px;color:#bbb;margin-bottom:16px}
+.al-btns{display:flex;gap:10px}
+.al-btns button{flex:1;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
+.btn-ok{background:#27ae60;color:white}
+.btn-no{background:#e74c3c;color:white}
+.btn-cerrar{position:absolute;top:14px;right:14px;background:#f0f4f8;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#555}
+#tab-res{padding:12px;display:none}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-c{background:white;border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stat-n{font-size:22px;font-weight:800}
+.stat-l{font-size:10px;color:#888;margin-top:2px}
+.grafica{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.grafica h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.br-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.br-lbl{font-size:10px;width:65px;text-align:right;color:#555}
+.br-bg{flex:1;background:#f0f4f8;border-radius:8px;height:16px;overflow:hidden}
+.br-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:9px;font-weight:700;color:white;transition:width .5s;min-width:24px}
+.br-ok{background:#27ae60}.br-no{background:#e74c3c}
+.por-dia{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.por-dia h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.dia-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dia-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dia-nm{font-size:11px;width:70px;color:#555}
+.dia-br-bg{flex:1;background:#f0f4f8;border-radius:6px;height:14px;overflow:hidden}
+.dia-br-fill{height:100%;border-radius:6px;transition:width .4s;display:flex;align-items:center;padding:0 5px;font-size:8px;font-weight:700;color:white}
+.dia-num{font-size:10px;color:#888;width:40px;text-align:right}
+.btn-exp{width:100%;background:#1a3a5c;color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-rst{width:100%;background:#f8d7da;color:#721c24;border:none;border-radius:12px;padding:11px;font-size:12px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>📍 Validacion de Puntos</h1>
+      <p>Santa Rosa de Jauregui, QRO — Tiendas Independientes — 3 km</p>
+    </div>
+    <span class="route-id">VAL-QRO-SRJ-001</span>
+  </div>
+  <div class="prog-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+  <div class="prog-txt" id="progTxt">0 / 39 validados</div>
+</div>
+<div class="dia-tabs" id="diaTabs">
+  <button class="dia-tab act" style="--c:#2e6da4" onclick="setDia('L')" id="tab-L">Lunes <span class="cnt" id="cnt-L">0/8</span></button>
+  <button class="dia-tab" style="--c:#8e44ad" onclick="setDia('M')" id="tab-M">Martes <span class="cnt" id="cnt-M">0/8</span></button>
+  <button class="dia-tab" style="--c:#27ae60" onclick="setDia('X')" id="tab-X">Miercoles <span class="cnt" id="cnt-X">0/8</span></button>
+  <button class="dia-tab" style="--c:#e67e22" onclick="setDia('J')" id="tab-J">Jueves <span class="cnt" id="cnt-J">0/8</span></button>
+  <button class="dia-tab" style="--c:#c0392b" onclick="setDia('V')" id="tab-V">Viernes <span class="cnt" id="cnt-V">0/7</span></button>
+</div>
+<div class="gps-bar">
+  <div class="gps-dot" id="gpsDot"></div>
+  <span id="gpsMsg">Iniciando GPS...</span>
+</div>
+<div id="map"></div>
+<div class="sub-tabs">
+  <button class="sub-tab act" onclick="setSubTab('lista')">📋 Lista</button>
+  <button class="sub-tab" onclick="setSubTab('res')">📊 Resultados</button>
+</div>
+<div id="tab-lista"></div>
+<div id="tab-res">
+  <div class="stat-grid">
+    <div class="stat-c"><div class="stat-n" style="color:#27ae60" id="r-ok">0</div><div class="stat-l">✅ Existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#e74c3c" id="r-no">0</div><div class="stat-l">❌ No existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#f39c12" id="r-pen">39</div><div class="stat-l">⏳ Pendientes</div></div>
+  </div>
+  <div class="grafica">
+    <h3>Distribucion total</h3>
+    <div class="br-row"><span class="br-lbl">Existen</span><div class="br-bg"><div class="br-fill br-ok" id="g-ok" style="width:0%">0%</div></div></div>
+    <div class="br-row"><span class="br-lbl">No existen</span><div class="br-bg"><div class="br-fill br-no" id="g-no" style="width:0%">0%</div></div></div>
+  </div>
+  <div class="por-dia"><h3>Avance por dia</h3><div id="diasAvance"></div></div>
+  <button class="btn-exp" onclick="exportar()">📤 Exportar reporte completo</button>
+  <button class="btn-rst" onclick="resetear()">🔄 Reiniciar validacion</button>
+</div>
+<div class="alerta" id="alerta">
+  <button class="btn-cerrar" onclick="cerrarAlerta()">✕</button>
+  <div class="al-label">📍 Llegaste al punto</div>
+  <div class="al-icon" id="al-icon">🏪</div>
+  <div class="al-nombre" id="al-nombre"></div>
+  <div class="al-tipo" id="al-tipo"></div>
+  <div class="al-coords" id="al-coords"></div>
+  <div class="al-btns">
+    <button class="btn-ok" onclick="validar(true)">✅ EXISTE</button>
+    <button class="btn-no" onclick="validar(false)">❌ NO EXISTE</button>
+  </div>
+</div>
+<script>
+const ID_RUTA='VAL-QRO-SRJ-001';
+const TOTAL_PTS=39;
+const PUNTOS=[
+  {id:1,lat:20.73770847,lng:-100.39888556,nombre:'Miscelanea Rivera',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:2,lat:20.73692462,lng:-100.39865417,nombre:'Miscelanea Jessi',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:3,lat:20.73663424,lng:-100.39840355,nombre:'Miscelanea Cano',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:4,lat:20.73776289,lng:-100.39838717,nombre:'Venta De Paletas De Hielo Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:5,lat:20.73776488,lng:-100.39834874,nombre:'Miscelanea Veronica Romero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:6,lat:20.73778287,lng:-100.39800162,nombre:'Papeleria Aguilar',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:7,lat:20.73791287,lng:-100.39797197,nombre:'Miscelanea Garcias',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:8,lat:20.73680399,lng:-100.397844,nombre:'Miscelanea Oana',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:9,lat:20.73787294,lng:-100.3975481,nombre:'Materiales Y Ferreteria Garcia',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:10,lat:20.73786906,lng:-100.39729746,nombre:'Dulces Y Frituras Ceci',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:11,lat:20.73775989,lng:-100.39654275,nombre:'Miscelanea Sanchez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:12,lat:20.73936751,lng:-100.39555885,nombre:'Miscelanea Aracely',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:13,lat:20.73930303,lng:-100.39552216,nombre:'Venta De Ropa Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:14,lat:20.73762026,lng:-100.3954674,nombre:'Miscelanea Esther',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:15,lat:20.73923134,lng:-100.39541179,nombre:'Papeleria Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:16,lat:20.7390868,lng:-100.39539453,nombre:'Miscelanea La Guadalupana',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:17,lat:20.73879978,lng:-100.39523907,nombre:'Miscelanea Aguilar',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:18,lat:20.7387549,lng:-100.39523444,nombre:'Venta De Dulces Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:19,lat:20.73760838,lng:-100.39522724,nombre:'Miscelanea Gaby',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:20,lat:20.73792105,lng:-100.39514208,nombre:'Ferreteria Chavita',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:21,lat:20.7390087,lng:-100.39498808,nombre:'Papeleria Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:22,lat:20.73899767,lng:-100.3947574,nombre:'Miscelanea Elena',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:23,lat:20.73899386,lng:-100.39457395,nombre:'Miscelanea Yesi Y Fer',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:24,lat:20.73945622,lng:-100.39455928,nombre:'Miscelanea Sanchez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:25,lat:20.73957477,lng:-100.39454396,nombre:'Venta De Dulces Y Frituras Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:26,lat:20.73889289,lng:-100.39452703,nombre:'Carniceria Bustista',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:27,lat:20.73897757,lng:-100.39450582,nombre:'Miscelanea Alfredo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:28,lat:20.73896786,lng:-100.39446743,nombre:'Ferreteria Morales',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:29,lat:20.73950322,lng:-100.39430793,nombre:'Frituras Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:30,lat:20.73949928,lng:-100.39393185,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:31,lat:20.73944654,lng:-100.39388318,nombre:'Miscelanea Daria',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:32,lat:20.7387816,lng:-100.39340028,nombre:'Tienda De Dulces Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:33,lat:20.73810705,lng:-100.39329714,nombre:'Miscelanea Jose Agustin',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:34,lat:20.73864141,lng:-100.39322936,nombre:'Productos De Limpieza Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:35,lat:20.73864445,lng:-100.39276506,nombre:'Papeleria Mar',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:36,lat:20.73822476,lng:-100.39232804,nombre:'Miscelanea Alvarez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:37,lat:20.73857069,lng:-100.39113668,nombre:'Miscelanea Vivi',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:38,lat:20.73843549,lng:-100.39072874,nombre:'Dany Diconsa',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:39,lat:20.73853741,lng:-100.39012457,nombre:'Dulceria Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'}
+];
+const DIAS_INFO={L:{nom:'Lunes',color:'#2e6da4'},M:{nom:'Martes',color:'#8e44ad'},X:{nom:'Miercoles',color:'#27ae60'},J:{nom:'Jueves',color:'#e67e22'},V:{nom:'Viernes',color:'#c0392b'}};
+const RADIO=100;
+let estado=JSON.parse(localStorage.getItem('val_'+ID_RUTA)||'{}');
+let diaActivo='L',puntoActivo=null,miUbicacion=null,markerYo=null,marcadores={},alertaMostrada=false;
+
+const map=L.map('map').setView([20.716,-100.389],14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+
+function iconM(p){
+  const e=estado[p.id],bg=e?(e.existe?'#27ae60':'#e74c3c'):p.color;
+  return L.divIcon({className:'',html:`<div style="background:${bg};width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 5px rgba(0,0,0,.3)">${p.icon}</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+}
+
+PUNTOS.forEach(p=>{
+  const m=L.marker([p.lat,p.lng],{icon:iconM(p)}).addTo(map)
+    .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>${p.tipo}<br><small>${ID_RUTA}-${p.dia}-${p.id}</small>`)
+    .on('click',()=>abrirAlerta(p.id));
+  marcadores[p.id]=m;
+});
+
+// Circulo de referencia 3 km
+L.circle([20.716,-100.389],{radius:3000,color:'#2e6da4',weight:1,fillOpacity:.03,dashArray:'6,6'}).addTo(map);
+
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+}else{document.getElementById('gpsMsg').textContent='GPS no disponible';document.getElementById('gpsDot').classList.add('err');}
+
+function onPos(pos){
+  const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
+  miUbicacion={lat,lng};
+  document.getElementById('gpsDot').classList.remove('err');document.getElementById('gpsDot').classList.add('on');
+  document.getElementById('gpsMsg').textContent=`GPS activo — precision +-${acc}m`;
+  if(!markerYo)markerYo=L.circleMarker([lat,lng],{radius:10,color:'#e67e22',fillColor:'#f39c12',fillOpacity:.9,weight:3}).addTo(map).bindPopup('📍 Tu estas aqui');
+  else markerYo.setLatLng([lat,lng]);
+  verificarCercania(lat,lng);
+}
+function onErr(err){document.getElementById('gpsDot').classList.add('err');document.getElementById('gpsMsg').textContent='Error GPS: '+(err.code===1?'Permiso denegado':err.code===2?'Sin senal':'Timeout');}
+
+function dist(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
+function verificarCercania(lat,lng){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  let mejor=null,minD=Infinity;
+  hoy.forEach(p=>{const d=dist(lat,lng,p.lat,p.lng);if(d<minD){minD=d;mejor=p;}marcadores[p.id].setIcon(iconM(p));});
+  renderLista();
+  if(mejor&&minD<RADIO&&!estado[mejor.id]&&!alertaMostrada){alertaMostrada=true;abrirAlerta(mejor.id);}
+  if(minD>=RADIO)alertaMostrada=false;
+}
+
+function abrirAlerta(id){
+  const p=PUNTOS.find(x=>x.id===id);puntoActivo=id;
+  document.getElementById('al-icon').textContent=p.icon;
+  document.getElementById('al-nombre').textContent=p.nombre;
+  document.getElementById('al-tipo').textContent=p.tipo;
+  document.getElementById('al-coords').textContent=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ${ID_RUTA}-${p.dia}-${p.id}`;
+  document.getElementById('alerta').classList.add('show');
+  map.setView([p.lat,p.lng],16);
+}
+function cerrarAlerta(){document.getElementById('alerta').classList.remove('show');puntoActivo=null;}
+
+function validar(existe){
+  if(puntoActivo===null)return;
+  estado[puntoActivo]={existe,ts:new Date().toISOString()};
+  localStorage.setItem('val_'+ID_RUTA,JSON.stringify(estado));
+  marcadores[puntoActivo].setIcon(iconM(PUNTOS.find(p=>p.id===puntoActivo)));
+  cerrarAlerta();renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
+}
+
+function renderLista(){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  document.getElementById('tab-lista').innerHTML=hoy.map(p=>{
+    const e=estado[p.id],cls=e?(e.existe?'existe':'no-existe'):'';
+    const badge=e?(e.existe?'<span class="p-badge b-ok">✅ Existe</span>':'<span class="p-badge b-no">❌ No existe</span>'):'<span class="p-badge b-pen">⏳</span>';
+    const dm=miUbicacion?` · ${Math.round(dist(miUbicacion.lat,miUbicacion.lng,p.lat,p.lng))}m`:'';
+    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})"><div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-nombre">${p.nombre}</div><div class="p-tipo">${p.tipo}</div><div class="p-dist">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${dm}</div></div>${badge}</div>`;
+  }).join('');
+}
+
+function actualizarResultados(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length,pen=TOTAL_PTS-vals.length;
+  document.getElementById('r-ok').textContent=ok;document.getElementById('r-no').textContent=no;document.getElementById('r-pen').textContent=pen;
+  const pok=Math.round(ok/TOTAL_PTS*100),pno=Math.round(no/TOTAL_PTS*100);
+  document.getElementById('g-ok').style.width=pok+'%';document.getElementById('g-ok').textContent=pok?pok+'%':'';
+  document.getElementById('g-no').style.width=pno+'%';document.getElementById('g-no').textContent=pno?pno+'%':'';
+  document.getElementById('diasAvance').innerHTML=Object.entries(DIAS_INFO).map(([key,info])=>{
+    const pts=PUNTOS.filter(p=>p.dia===key);if(!pts.length)return '';
+    const v=pts.filter(p=>estado[p.id]).length,pct=Math.round(v/pts.length*100);
+    return `<div class="dia-row"><div class="dia-dot" style="background:${info.color}"></div><span class="dia-nm">${info.nom}</span><div class="dia-br-bg"><div class="dia-br-fill" style="background:${info.color};width:${pct}%">${pct?pct+'%':''}</div></div><span class="dia-num">${v}/${pts.length}</span></div>`;
+  }).join('');
+}
+function actualizarProgreso(){
+  const h=Object.keys(estado).length,pct=Math.round(h/TOTAL_PTS*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=`${h} / ${TOTAL_PTS} validados (${pct}%)`;
+}
+function actualizarTabDias(){
+  ['L','M','X','J','V'].forEach(key=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),el=document.getElementById('cnt-'+key);
+    if(!el||!pts.length)return;
+    const v=pts.filter(p=>estado[p.id]).length;
+    el.textContent=`${v}/${pts.length}`;el.className=v===pts.length?'cnt done':'cnt';
+  });
+}
+function setDia(dia){
+  diaActivo=dia;
+  document.querySelectorAll('.dia-tab').forEach(t=>t.classList.remove('act'));
+  document.getElementById('tab-'+dia).classList.add('act');
+  const pts=PUNTOS.filter(p=>p.dia===dia);
+  if(pts.length){const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lng);map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[30,30]});}
+  renderLista();
+}
+function setSubTab(tab){
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>t.classList.toggle('act',['lista','res'][i]===tab));
+  document.getElementById('tab-lista').style.display=tab==='lista'?'':'none';
+  document.getElementById('tab-res').style.display=tab==='res'?'block':'none';
+  if(tab==='res')actualizarResultados();
+}
+function exportar(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length;
+  let txt=`REPORTE DE VALIDACION\nID Ruta   : ${ID_RUTA}\nID Coord  : VAL-QRO-SRJ-20716_100389\nZona      : Santa Rosa de Jauregui, QRO — Tiendas Independientes — 3 km\nCentro    : 20.716, -100.389\nFecha     : ${new Date().toLocaleDateString('es-MX')}\nFuente    : DENUE INEGI (estrato 0-5)\n\nRESUMEN\nTotal     : ${TOTAL_PTS}\n✅ Existen  : ${ok} (${Math.round(ok/TOTAL_PTS*100)}%)\n❌ No exist : ${no} (${Math.round(no/TOTAL_PTS*100)}%)\n⏳ Pendient : ${TOTAL_PTS-vals.length}\n\n`;
+  ['L','M','X','J','V'].forEach(key=>{
+    const info=DIAS_INFO[key],pts=PUNTOS.filter(p=>p.dia===key);
+    if(!pts.length)return;
+    const v=pts.filter(p=>estado[p.id]).length;
+    txt+=`${info.nom}: ${v}/${pts.length} validados\n`;
+    pts.forEach(p=>{const e=estado[p.id];txt+=`  [${ID_RUTA}-${p.dia}-${p.id}] ${p.nombre} (${p.tipo}): ${e?(e.existe?'EXISTE':'NO EXISTE'):'PENDIENTE'}${e?' — '+new Date(e.ts).toLocaleString('es-MX'):''}\n`;});
+    txt+='\n';
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+  a.download=`${ID_RUTA}_${new Date().toISOString().slice(0,10)}.txt`;a.click();
+}
+function resetear(){if(!confirm('¿Reiniciar toda la validacion?'))return;localStorage.removeItem('val_'+ID_RUTA);estado={};PUNTOS.forEach(p=>marcadores[p.id].setIcon(iconM(p)));renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();}
+
+renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();setDia('L');
+</script>
+</body>
+</html>
