@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VAL-GTO-SMA-001 — Validación de Puntos</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1a1a2e}
+.header{background:#1a3a5c;color:white;padding:10px 14px;position:sticky;top:0;z-index:1000}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header h1{font-size:15px;font-weight:800}
+.route-id{font-size:9px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:1px}
+.header p{font-size:10px;opacity:.8;margin-top:2px}
+.prog-wrap{background:rgba(255,255,255,.2);border-radius:20px;height:7px;margin-top:7px}
+.prog-bar{height:100%;background:#27ae60;border-radius:20px;transition:width .4s}
+.prog-txt{font-size:9px;text-align:right;margin-top:2px;opacity:.85}
+.dia-tabs{display:flex;background:#122b45;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dia-tab{flex-shrink:0;padding:8px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.5);
+          border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.dia-tab.act{color:white;border-bottom-color:var(--c)}
+.dia-tab .cnt{font-size:9px;margin-left:4px;background:rgba(255,255,255,.15);padding:1px 5px;border-radius:8px}
+.dia-tab .cnt.done{background:#27ae60;color:white}
+.gps-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:white;border-bottom:1px solid #e0e0e0;font-size:11px}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.gps-dot.on{background:#27ae60;animation:pulse 1.5s infinite}
+.gps-dot.err{background:#e74c3c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#map{height:240px;width:100%}
+.sub-tabs{display:flex;background:white;border-bottom:2px solid #e0e0e0}
+.sub-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:600;color:#888;border:none;background:none;cursor:pointer}
+.sub-tab.act{color:#1a3a5c;border-bottom:3px solid #2e6da4;margin-bottom:-2px}
+#tab-lista{padding:10px}
+.punto-card{background:white;border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;border-left:4px solid #dce8f5;transition:border-color .2s}
+.punto-card.existe{border-left-color:#27ae60}
+.punto-card.no-existe{border-left-color:#e74c3c}
+.p-icon{font-size:18px;flex-shrink:0}
+.p-info{flex:1;min-width:0}
+.p-nombre{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-tipo{font-size:10px;color:#888}
+.p-dist{font-size:9px;color:#bbb}
+.p-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;flex-shrink:0}
+.b-ok{background:#d4edda;color:#155724}
+.b-no{background:#f8d7da;color:#721c24}
+.b-pen{background:#e8f4fd;color:#0c5460}
+.alerta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;background:white;border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.25);padding:18px 18px 28px}
+.alerta.show{display:block}
+.al-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.al-icon{font-size:28px;margin-bottom:4px}
+.al-nombre{font-size:19px;font-weight:800;color:#1a3a5c;margin-bottom:2px}
+.al-tipo{font-size:12px;color:#888;margin-bottom:2px}
+.al-coords{font-size:10px;color:#bbb;margin-bottom:16px}
+.al-btns{display:flex;gap:10px}
+.al-btns button{flex:1;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
+.btn-ok{background:#27ae60;color:white}
+.btn-no{background:#e74c3c;color:white}
+.btn-cerrar{position:absolute;top:14px;right:14px;background:#f0f4f8;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#555}
+#tab-res{padding:12px;display:none}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-c{background:white;border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stat-n{font-size:22px;font-weight:800}
+.stat-l{font-size:10px;color:#888;margin-top:2px}
+.grafica{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.grafica h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.br-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.br-lbl{font-size:10px;width:65px;text-align:right;color:#555}
+.br-bg{flex:1;background:#f0f4f8;border-radius:8px;height:16px;overflow:hidden}
+.br-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:9px;font-weight:700;color:white;transition:width .5s;min-width:24px}
+.br-ok{background:#27ae60}.br-no{background:#e74c3c}
+.por-dia{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.por-dia h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.dia-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dia-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dia-nm{font-size:11px;width:70px;color:#555}
+.dia-br-bg{flex:1;background:#f0f4f8;border-radius:6px;height:14px;overflow:hidden}
+.dia-br-fill{height:100%;border-radius:6px;transition:width .4s;display:flex;align-items:center;padding:0 5px;font-size:8px;font-weight:700;color:white}
+.dia-num{font-size:10px;color:#888;width:40px;text-align:right}
+.btn-exp{width:100%;background:#1a3a5c;color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-rst{width:100%;background:#f8d7da;color:#721c24;border:none;border-radius:12px;padding:11px;font-size:12px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div><h1>📍 Validación de Puntos</h1><p>San Miguel de Allende, GTO — Comercio al por Menor</p></div>
+    <span class="route-id">VAL-GTO-SMA-001</span>
+  </div>
+  <div class="prog-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+  <div class="prog-txt" id="progTxt">0 / 125 validados</div>
+</div>
+<div class="dia-tabs" id="diaTabs">
+  <button class="dia-tab act" style="--c:#2e6da4" onclick="setDia('L')" id="tab-L">Lunes <span class="cnt" id="cnt-L">0/25</span></button>
+  <button class="dia-tab" style="--c:#8e44ad" onclick="setDia('M')" id="tab-M">Martes <span class="cnt" id="cnt-M">0/25</span></button>
+  <button class="dia-tab" style="--c:#27ae60" onclick="setDia('X')" id="tab-X">Miércoles <span class="cnt" id="cnt-X">0/25</span></button>
+  <button class="dia-tab" style="--c:#e67e22" onclick="setDia('J')" id="tab-J">Jueves <span class="cnt" id="cnt-J">0/25</span></button>
+  <button class="dia-tab" style="--c:#c0392b" onclick="setDia('V')" id="tab-V">Viernes <span class="cnt" id="cnt-V">0/25</span></button>
+</div>
+<div class="gps-bar"><div class="gps-dot" id="gpsDot"></div><span id="gpsMsg">Iniciando GPS...</span></div>
+<div id="map"></div>
+<div class="sub-tabs">
+  <button class="sub-tab act" onclick="setSubTab('lista')">📋 Lista</button>
+  <button class="sub-tab" onclick="setSubTab('res')">📊 Resultados</button>
+</div>
+<div id="tab-lista"></div>
+<div id="tab-res">
+  <div class="stat-grid">
+    <div class="stat-c"><div class="stat-n" style="color:#27ae60" id="r-ok">0</div><div class="stat-l">✅ Existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#e74c3c" id="r-no">0</div><div class="stat-l">❌ No existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#f39c12" id="r-pen">125</div><div class="stat-l">⏳ Pendientes</div></div>
+  </div>
+  <div class="grafica">
+    <h3>Distribución total</h3>
+    <div class="br-row"><span class="br-lbl">Existen</span><div class="br-bg"><div class="br-fill br-ok" id="g-ok" style="width:0%">0%</div></div></div>
+    <div class="br-row"><span class="br-lbl">No existen</span><div class="br-bg"><div class="br-fill br-no" id="g-no" style="width:0%">0%</div></div></div>
+  </div>
+  <div class="por-dia"><h3>Avance por día</h3><div id="diasAvance"></div></div>
+  <button class="btn-exp" onclick="exportar()">📤 Exportar reporte completo</button>
+  <button class="btn-rst" onclick="resetear()">🔄 Reiniciar validación</button>
+</div>
+<div class="alerta" id="alerta">
+  <button class="btn-cerrar" onclick="cerrarAlerta()">✕</button>
+  <div class="al-label">📍 Llegaste al punto</div>
+  <div class="al-icon" id="al-icon">🏪</div>
+  <div class="al-nombre" id="al-nombre"></div>
+  <div class="al-tipo" id="al-tipo"></div>
+  <div class="al-coords" id="al-coords"></div>
+  <div class="al-btns">
+    <button class="btn-ok" onclick="validar(true)">✅ EXISTE</button>
+    <button class="btn-no" onclick="validar(false)">❌ NO EXISTE</button>
+  </div>
+</div>
+<script>
+const ID_RUTA='VAL-GTO-SMA-001';
+const PUNTOS=[
+  {id:1,lat:20.9205187,lng:-100.7661682,nombre:'Abarrotes Mariana',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:2,lat:20.9160224,lng:-100.7632886,nombre:'Cremería Y Abarrotes La Vaquita',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:3,lat:20.9249392,lng:-100.7625327,nombre:'tienda hijole',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:4,lat:20.9094895,lng:-100.7617054,nombre:'Depósito De Cerveza',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:5,lat:20.9090998,lng:-100.7610184,nombre:'FARMACIA SAN MIGUEL ARCANGEL',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:6,lat:20.9232672,lng:-100.7607296,nombre:'FARMACIA SAN PATRICIO',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:7,lat:20.9090337,lng:-100.7604932,nombre:'FARMACIA ALE',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:8,lat:20.9159088,lng:-100.7604413,nombre:'Dulceria, Papelería, Abarrotes (Super Market)',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:9,lat:20.9111842,lng:-100.7601471,nombre:'Farmacia DDR',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:10,lat:20.9091487,lng:-100.7598515,nombre:'Farmacia Familiar',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:11,lat:20.907956,lng:-100.7593247,nombre:'Cafe Verintort',tipo:'Panadería / Tortillería',icon:'🍞',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:12,lat:20.9154124,lng:-100.7586069,nombre:'Farmacias Guadalajara La Estación',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:13,lat:20.9030741,lng:-100.758361,nombre:'Delicassy Repostería',tipo:'Panadería / Tortillería',icon:'🍞',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:14,lat:20.9210086,lng:-100.7581254,nombre:'Panadería Del Carmen',tipo:'Panadería / Tortillería',icon:'🍞',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:15,lat:20.9288767,lng:-100.7576376,nombre:'Deposito PIER',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:16,lat:20.9146738,lng:-100.7574008,nombre:'El Asturiano, La Central',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:17,lat:20.9069278,lng:-100.7573051,nombre:'Anfitrión de México San Miguel de Allende',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:18,lat:20.894413,lng:-100.7572617,nombre:'Shell Malanquín (San Miguel de Allende)',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:19,lat:20.903234,lng:-100.756988,nombre:'La Estrella SMA',tipo:'Minisúper / Tienda',icon:'🛒',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:20,lat:20.9146632,lng:-100.7568288,nombre:'Farmacias Similares',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:21,lat:20.9069497,lng:-100.7567843,nombre:'Pan y crema',tipo:'Panadería / Tortillería',icon:'🍞',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:22,lat:20.9148586,lng:-100.7566548,nombre:'Abarrotes \"San Jorge\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:23,lat:20.9282571,lng:-100.7566016,nombre:'Expendio De Pan',tipo:'Panadería / Tortillería',icon:'🍞',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:24,lat:20.9148967,lng:-100.756482,nombre:'Pastelería Tutú',tipo:'Panadería / Tortillería',icon:'🍞',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:25,lat:20.907305,lng:-100.7562794,nombre:'The Clinic SMA',tipo:'Farmacia',icon:'💊',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:26,lat:20.909067,lng:-100.753168,nombre:'Farmas',tipo:'Farmacia',icon:'💊',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:27,lat:20.8952949,lng:-100.7531087,nombre:'Abarrotes Tony',tipo:'Minisúper / Tienda',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:28,lat:20.9139356,lng:-100.7529688,nombre:'Abarrotes Laurita',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:29,lat:20.9319322,lng:-100.7528886,nombre:'Asturiano',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:30,lat:20.8974,lng:-100.752776,nombre:'GNC MCM San Miguel de Allende',tipo:'Farmacia',icon:'💊',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:31,lat:20.9027114,lng:-100.7525979,nombre:'Joleisa Repostería',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:32,lat:20.89861,lng:-100.7525283,nombre:'WeCare Pharma San Miguel de Allende',tipo:'Farmacia',icon:'💊',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:33,lat:20.9144208,lng:-100.7523994,nombre:'Abarrotes Lupita',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:34,lat:20.9177358,lng:-100.7519569,nombre:'Super Caporal',tipo:'Minisúper / Tienda',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:35,lat:20.9068771,lng:-100.7519228,nombre:'Buonforno',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:36,lat:20.9074595,lng:-100.7518909,nombre:'Abarrotes \"Juana\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:37,lat:20.9177161,lng:-100.751828,nombre:'La Equina',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:38,lat:20.9209769,lng:-100.7518014,nombre:'Tiendas Hijole',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:39,lat:20.914475,lng:-100.7516887,nombre:'Vicky Pastelerias Sucursal',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:40,lat:20.9147376,lng:-100.7516649,nombre:'TAHONA LA FLOR DE MÉXICO',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:41,lat:20.9173411,lng:-100.7516495,nombre:'Abarrotes Aly',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:42,lat:20.8994304,lng:-100.7516187,nombre:'City Market',tipo:'Minisúper / Tienda',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:43,lat:20.9144881,lng:-100.7516181,nombre:'Farmacia ISSEG F179',tipo:'Farmacia',icon:'💊',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:44,lat:20.9142566,lng:-100.7513254,nombre:'Farmacia Santa Julia',tipo:'Farmacia',icon:'💊',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:45,lat:20.9142193,lng:-100.7512394,nombre:'Pollo Qro',tipo:'Minisúper / Tienda',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:46,lat:20.8968445,lng:-100.7511933,nombre:'Modelorama',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:47,lat:20.8970561,lng:-100.7511863,nombre:'Modelorama Np Libramiento A Do',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:48,lat:20.9126776,lng:-100.7511831,nombre:'Pastelería Dulce Corazón',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:49,lat:20.9009458,lng:-100.7510831,nombre:'Sophia Pedrazzi Cake Boutique Sophie Fine Bakery',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:50,lat:20.9066542,lng:-100.7510605,nombre:'Miga Panadería Artesanal',tipo:'Panadería / Tortillería',icon:'🍞',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:51,lat:20.9143266,lng:-100.7492253,nombre:'Tortillería González',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:52,lat:20.9184519,lng:-100.7491953,nombre:'Abarrotes Cervantes',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:53,lat:20.9143078,lng:-100.7490841,nombre:'Mexicanos Vinos y Licores',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:54,lat:20.9142288,lng:-100.7490242,nombre:'Pasteles caseros MIA',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:55,lat:20.9122653,lng:-100.7488819,nombre:'Dulce Ritual cacao',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:56,lat:20.9088388,lng:-100.7488666,nombre:'Arty Cookie',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:57,lat:20.9143104,lng:-100.7488599,nombre:'Panadería La Espiga',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:58,lat:20.904967,lng:-100.7488363,nombre:'Farmacias Similares',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:59,lat:20.9130552,lng:-100.7486573,nombre:'Nahui',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:60,lat:20.9185745,lng:-100.7485889,nombre:'Hermanos Coronel Cremería - Plaza Garibaldi',tipo:'Minisúper / Tienda',icon:'🛒',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:61,lat:20.9170124,lng:-100.7483923,nombre:'Farmacia',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:62,lat:20.9181356,lng:-100.7483564,nombre:'Tienda de Abarrotes “Los Nardos”',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:63,lat:20.9012397,lng:-100.7482743,nombre:'Farmacias Gi - Guadiana',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:64,lat:20.901543,lng:-100.7480826,nombre:'Belen’s Sweet’s',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:65,lat:20.9013115,lng:-100.7480381,nombre:'Abarrotes \"Adelita\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:66,lat:20.9142941,lng:-100.7479978,nombre:'Farmacia canal homeopatia',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:67,lat:20.9144853,lng:-100.7479658,nombre:'FARMACIAS SIMILARES',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:68,lat:20.914349,lng:-100.7478536,nombre:'Díaz',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:69,lat:20.9275686,lng:-100.747837,nombre:'María Palomas',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:70,lat:20.9074359,lng:-100.7478366,nombre:'Farmacia Dermatologica Derma Balance',tipo:'Farmacia',icon:'💊',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:71,lat:20.9078893,lng:-100.7477715,nombre:'Extra',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:72,lat:20.9079186,lng:-100.7476475,nombre:'Super Sierra',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:73,lat:20.9062129,lng:-100.7476117,nombre:'La Casita Feliz',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:74,lat:20.9082733,lng:-100.747603,nombre:'Panadería',tipo:'Panadería / Tortillería',icon:'🍞',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:75,lat:20.9144657,lng:-100.7475079,nombre:'FarmaSana San Miguel de Allende',tipo:'Minisúper / Tienda',icon:'🛒',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:76,lat:20.8993582,lng:-100.7452578,nombre:'Abarrotes Conchita',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:77,lat:20.9168607,lng:-100.7452076,nombre:'Farmacia Santo Niño',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:78,lat:20.9142912,lng:-100.7451721,nombre:'Cava Sautto',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:79,lat:20.9090291,lng:-100.7451501,nombre:'Artesana Boutique',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:80,lat:20.9149296,lng:-100.7451348,nombre:'Panadería La Buena Vida',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:81,lat:20.9143657,lng:-100.7447529,nombre:'The Coffee Canal 16',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:82,lat:20.9169819,lng:-100.7447506,nombre:'Farmacias Similares',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:83,lat:20.9169731,lng:-100.7447426,nombre:'FSI SAN MIGUEL DE ALLENDE 6',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:84,lat:20.91461,lng:-100.744737,nombre:'La Europea San Miguel de Allende',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:85,lat:20.9135727,lng:-100.7445169,nombre:'Reposteria El Petit Four',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:86,lat:20.9194399,lng:-100.7445136,nombre:'Vinatería El Águila',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:87,lat:20.9220297,lng:-100.7444861,nombre:'Abarrotes Cricri. La Estrella Papeleria',tipo:'Minisúper / Tienda',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:88,lat:20.9139819,lng:-100.7444583,nombre:'Café Umarán',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:89,lat:20.9053567,lng:-100.7441857,nombre:'Dulce Belén Patisserie',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:90,lat:20.9192199,lng:-100.7441812,nombre:'Farmacia San Gabriel',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:91,lat:20.9208098,lng:-100.7441042,nombre:'Bakery Sucré, SMA.',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:92,lat:20.9027955,lng:-100.7439739,nombre:'Modelorama Np - Mod Lupita',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:93,lat:20.916541,lng:-100.7437626,nombre:'Farmacia Guanajuato',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:94,lat:20.9156712,lng:-100.7435873,nombre:'Dr. Antonio Francisco García González',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:95,lat:20.9157247,lng:-100.7435864,nombre:'Farmacia y Consult Medico Homeopatico',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:96,lat:20.9149798,lng:-100.7434312,nombre:'LE MACARON',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:97,lat:20.9154932,lng:-100.7432687,nombre:'Botica de Santa Teresita',tipo:'Farmacia',icon:'💊',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:98,lat:20.9152794,lng:-100.7431679,nombre:'La Colmena',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:99,lat:20.9127431,lng:-100.743141,nombre:'Sonríe Bakery',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:100,lat:20.9207396,lng:-100.7430478,nombre:'Panadería San Sebastián',tipo:'Panadería / Tortillería',icon:'🍞',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:101,lat:20.9340279,lng:-100.7392775,nombre:'Farmacia Allende',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:102,lat:20.9355852,lng:-100.7387287,nombre:'La Espiga PANADERÍA',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:103,lat:20.9370001,lng:-100.7385789,nombre:'Panadería Del Carmen',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:104,lat:20.9086142,lng:-100.7381871,nombre:'Talzintan',tipo:'Minisúper / Tienda',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:105,lat:20.9343438,lng:-100.7356113,nombre:'Vinateria La Garrafa',tipo:'Vinería / Abarrotes',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:106,lat:20.9385805,lng:-100.7345661,nombre:'Abarrotes Famac',tipo:'Minisúper / Tienda',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:107,lat:20.9056506,lng:-100.731075,nombre:'Farmacia Isseg',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:108,lat:20.9039757,lng:-100.7284649,nombre:'Farmacia dermatologica BEAUTY DERM SAN MIGUEL',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:109,lat:20.9044574,lng:-100.7283992,nombre:'PANIO Luciernaga',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:110,lat:20.9039505,lng:-100.7273126,nombre:'Plaza La Luciérnaga',tipo:'Minisúper / Tienda',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:111,lat:20.9038986,lng:-100.7255731,nombre:'Panadería Yulka',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:112,lat:20.9050375,lng:-100.7242109,nombre:'BP San Miguel de allende II DOS',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:113,lat:20.9055992,lng:-100.7225125,nombre:'Súper Farmacias Ecofarma',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:114,lat:20.9022115,lng:-100.7218668,nombre:'La Espiga',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:115,lat:20.9129177,lng:-100.7210813,nombre:'Pastelería Dulcinea',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:116,lat:20.9069343,lng:-100.7207989,nombre:'\"Miscelanea Dany\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:117,lat:20.9081459,lng:-100.7203877,nombre:'OXYMEDICA Allende | Farmacia 1 de Mayo',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:118,lat:20.9085775,lng:-100.7203807,nombre:'Farmacia Santa Teresa',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:119,lat:20.908113,lng:-100.7203323,nombre:'Oxymedica 1',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:120,lat:20.9027729,lng:-100.7202438,nombre:'Pastelería Coppelia',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:121,lat:20.9136346,lng:-100.7201898,nombre:'TIENDA DE ABARROTES LUPITA',tipo:'Minisúper / Tienda',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:122,lat:20.9090421,lng:-100.7201712,nombre:'La Espiga PANADERÍA',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:123,lat:20.9118342,lng:-100.7196068,nombre:'Cremería \"La Vaquita\"',tipo:'Minisúper / Tienda',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:124,lat:20.9125216,lng:-100.7194538,nombre:'FARMACIA',tipo:'Farmacia',icon:'💊',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:125,lat:20.9125891,lng:-100.7185974,nombre:'Mini donuts y roles NOAH',tipo:'Panadería / Tortillería',icon:'🍞',dia:'V',diaNom:'Viernes',color:'#c0392b'}
+];
+const DIAS_INFO={L:{nom:'Lunes',color:'#2e6da4'},M:{nom:'Martes',color:'#8e44ad'},X:{nom:'Miércoles',color:'#27ae60'},J:{nom:'Jueves',color:'#e67e22'},V:{nom:'Viernes',color:'#c0392b'}};
+const RADIO=100;
+let estado=JSON.parse(localStorage.getItem('val_'+ID_RUTA)||'{}');
+let diaActivo='L',puntoActivo=null,miUbicacion=null,markerYo=null,marcadores={},alertaMostrada=false;
+
+const map=L.map('map').setView([20.9144,-100.7452],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+
+function iconM(p){
+  const e=estado[p.id],bg=e?(e.existe?'#27ae60':'#e74c3c'):p.color;
+  return L.divIcon({className:'',html:`<div style="background:${bg};width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 5px rgba(0,0,0,.3)">${p.icon}</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+}
+
+PUNTOS.forEach(p=>{
+  const m=L.marker([p.lat,p.lng],{icon:iconM(p)}).addTo(map)
+    .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>${p.tipo}<br><small>${ID_RUTA}-${p.dia}-${p.id}</small>`)
+    .on('click',()=>abrirAlerta(p.id));
+  marcadores[p.id]=m;
+});
+
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+}else{document.getElementById('gpsMsg').textContent='GPS no disponible';document.getElementById('gpsDot').classList.add('err');}
+
+function onPos(pos){
+  const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
+  miUbicacion={lat,lng};
+  document.getElementById('gpsDot').classList.remove('err');document.getElementById('gpsDot').classList.add('on');
+  document.getElementById('gpsMsg').textContent=`GPS activo — precisión ±${acc}m`;
+  if(!markerYo)markerYo=L.circleMarker([lat,lng],{radius:10,color:'#e67e22',fillColor:'#f39c12',fillOpacity:.9,weight:3}).addTo(map).bindPopup('📍 Tú estás aquí');
+  else markerYo.setLatLng([lat,lng]);
+  verificarCercania(lat,lng);
+}
+function onErr(err){document.getElementById('gpsDot').classList.add('err');document.getElementById('gpsMsg').textContent='Error GPS: '+(err.code===1?'Permiso denegado':err.code===2?'Sin señal':'Timeout');}
+
+function dist(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
+function verificarCercania(lat,lng){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  let mejor=null,minD=Infinity;
+  hoy.forEach(p=>{const d=dist(lat,lng,p.lat,p.lng);if(d<minD){minD=d;mejor=p;}marcadores[p.id].setIcon(iconM(p));});
+  renderLista();
+  if(mejor&&minD<RADIO&&!estado[mejor.id]&&!alertaMostrada){alertaMostrada=true;abrirAlerta(mejor.id);}
+  if(minD>=RADIO)alertaMostrada=false;
+}
+
+function abrirAlerta(id){
+  const p=PUNTOS.find(x=>x.id===id);puntoActivo=id;
+  document.getElementById('al-icon').textContent=p.icon;
+  document.getElementById('al-nombre').textContent=p.nombre;
+  document.getElementById('al-tipo').textContent=p.tipo;
+  document.getElementById('al-coords').textContent=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ${ID_RUTA}-${p.dia}-${p.id}`;
+  document.getElementById('alerta').classList.add('show');
+  map.setView([p.lat,p.lng],16);
+}
+function cerrarAlerta(){document.getElementById('alerta').classList.remove('show');puntoActivo=null;}
+
+function validar(existe){
+  if(puntoActivo===null)return;
+  estado[puntoActivo]={existe,ts:new Date().toISOString()};
+  localStorage.setItem('val_'+ID_RUTA,JSON.stringify(estado));
+  marcadores[puntoActivo].setIcon(iconM(PUNTOS.find(p=>p.id===puntoActivo)));
+  cerrarAlerta();renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
+}
+
+function renderLista(){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  document.getElementById('tab-lista').innerHTML=hoy.map(p=>{
+    const e=estado[p.id],cls=e?(e.existe?'existe':'no-existe'):'';
+    const badge=e?(e.existe?'<span class="p-badge b-ok">✅ Existe</span>':'<span class="p-badge b-no">❌ No existe</span>'):'<span class="p-badge b-pen">⏳</span>';
+    const dm=miUbicacion?` · ${Math.round(dist(miUbicacion.lat,miUbicacion.lng,p.lat,p.lng))}m`:'';
+    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})"><div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-nombre">${p.nombre}</div><div class="p-tipo">${p.tipo}</div><div class="p-dist">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${dm}</div></div>${badge}</div>`;
+  }).join('');
+}
+
+function actualizarResultados(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length,pen=125-vals.length;
+  document.getElementById('r-ok').textContent=ok;document.getElementById('r-no').textContent=no;document.getElementById('r-pen').textContent=pen;
+  const pok=Math.round(ok/125*100),pno=Math.round(no/125*100);
+  document.getElementById('g-ok').style.width=pok+'%';document.getElementById('g-ok').textContent=pok?pok+'%':'';
+  document.getElementById('g-no').style.width=pno+'%';document.getElementById('g-no').textContent=pno?pno+'%':'';
+  document.getElementById('diasAvance').innerHTML=Object.entries(DIAS_INFO).map(([key,info])=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length,pct=Math.round(v/pts.length*100);
+    return `<div class="dia-row"><div class="dia-dot" style="background:${info.color}"></div><span class="dia-nm">${info.nom}</span><div class="dia-br-bg"><div class="dia-br-fill" style="background:${info.color};width:${pct}%">${pct?pct+'%':''}</div></div><span class="dia-num">${v}/25</span></div>`;
+  }).join('');
+}
+function actualizarProgreso(){
+  const h=Object.keys(estado).length,pct=Math.round(h/125*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=`${h} / 125 validados (${pct}%)`;
+}
+function actualizarTabDias(){
+  Object.keys(DIAS_INFO).forEach(key=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length;
+    const cnt=document.getElementById('cnt-'+key);cnt.textContent=`${v}/${pts.length}`;cnt.className=v===pts.length?'cnt done':'cnt';
+  });
+}
+function setDia(dia){
+  diaActivo=dia;
+  document.querySelectorAll('.dia-tab').forEach((t,i)=>t.classList.toggle('act',['L','M','X','J','V'][i]===dia));
+  const pts=PUNTOS.filter(p=>p.dia===dia);
+  if(pts.length){const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lng);map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[20,20]});}
+  renderLista();
+}
+function setSubTab(tab){
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>t.classList.toggle('act',['lista','res'][i]===tab));
+  document.getElementById('tab-lista').style.display=tab==='lista'?'':'none';
+  document.getElementById('tab-res').style.display=tab==='res'?'block':'none';
+  if(tab==='res')actualizarResultados();
+}
+function exportar(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length;
+  let txt=`REPORTE DE VALIDACIÓN\nID Ruta   : ${ID_RUTA}\nID Coord  : VAL-GTO-SMA-209144_100745\nZona      : San Miguel de Allende, GTO — Comercio al por Menor\nCentro    : 20.9144, -100.7452\nFecha     : ${new Date().toLocaleDateString('es-MX')}\nFuente    : DENUE INEGI (Comercio por menor, cve 46)\n\nRESUMEN\nTotal     : 125\n✅ Existen  : ${ok} (${Math.round(ok/125*100)}%)\n❌ No exist : ${no} (${Math.round(no/125*100)}%)\n⏳ Pendient : ${125-vals.length}\n\n`;
+  ['L','M','X','J','V'].forEach(key=>{
+    const info=DIAS_INFO[key],pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length;
+    txt+=`${info.nom}: ${v}/25 validados\n`;
+    pts.forEach(p=>{const e=estado[p.id];txt+=`  [${ID_RUTA}-${p.dia}-${p.id}] ${p.nombre} (${p.tipo}): ${e?(e.existe?'EXISTE':'NO EXISTE'):'PENDIENTE'}${e?' — '+new Date(e.ts).toLocaleString('es-MX'):''}\n`;});
+    txt+='\n';
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+  a.download=`${ID_RUTA}_${new Date().toISOString().slice(0,10)}.txt`;a.click();
+}
+function resetear(){if(!confirm('¿Reiniciar toda la validación?'))return;localStorage.removeItem('val_'+ID_RUTA);estado={};PUNTOS.forEach(p=>marcadores[p.id].setIcon(iconM(p)));renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();}
+
+renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();setDia('L');
+</script>
+</body>
+</html>
