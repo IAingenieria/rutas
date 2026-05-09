@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instrucciones Operador — Validación de Puntos</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f0f4f8;
+  color: #1a1a2e;
+}
+
+/* HEADER */
+.header {
+  background: #1a3a5c;
+  color: white;
+  padding: 28px 20px 24px;
+  text-align: center;
+}
+.header h1 { font-size: 22px; font-weight: 800; }
+.header p  { font-size: 13px; opacity: 0.8; margin-top: 6px; }
+.badge-link {
+  display: inline-block; margin-top: 14px;
+  background: #27ae60; color: white;
+  padding: 10px 20px; border-radius: 25px;
+  font-size: 13px; font-weight: 700;
+  text-decoration: none; word-break: break-all;
+}
+
+/* STEPS */
+.steps { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
+.step  {
+  display: flex; gap: 16px; margin-bottom: 28px;
+  background: white; border-radius: 16px;
+  padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #1a3a5c; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; flex-shrink: 0;
+}
+.step-body { flex: 1; }
+.step-body h3 { font-size: 15px; font-weight: 700; color: #1a3a5c; margin-bottom: 6px; }
+.step-body p  { font-size: 13px; color: #555; line-height: 1.5; }
+.step-body .tip {
+  margin-top: 8px; background: #fff8e1; border-left: 3px solid #f39c12;
+  padding: 7px 10px; border-radius: 0 8px 8px 0;
+  font-size: 12px; color: #7d5a00;
+}
+
+/* PHONE MOCKUP */
+.phone-wrap { display: flex; justify-content: center; margin: 14px 0 4px; }
+.phone {
+  width: 200px;
+  background: #111;
+  border-radius: 28px;
+  padding: 10px 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  position: relative;
+}
+.phone-notch {
+  width: 60px; height: 14px; background: #111;
+  border-radius: 0 0 12px 12px;
+  margin: 0 auto 4px;
+  position: relative; z-index: 2;
+}
+.phone-screen {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 320px;
+}
+
+/* SCREEN 1 — PERMISO GPS */
+.s1-overlay {
+  background: rgba(0,0,0,.55);
+  height: 320px;
+  display: flex; align-items: flex-end;
+  padding: 12px;
+}
+.s1-card {
+  background: white; border-radius: 14px; width: 100%; padding: 14px;
+}
+.s1-card .icon { font-size: 22px; text-align: center; margin-bottom: 6px; }
+.s1-card h4 { font-size: 11px; font-weight: 700; text-align: center; color: #111; margin-bottom: 4px; }
+.s1-card p  { font-size: 9px; color: #555; text-align: center; margin-bottom: 10px; line-height: 1.4; }
+.s1-btns { display: flex; gap: 6px; }
+.s1-btns button {
+  flex: 1; border: none; border-radius: 8px;
+  padding: 7px 4px; font-size: 9px; font-weight: 700; cursor: pointer;
+}
+.btn-deny  { background: #f0f0f0; color: #555; }
+.btn-allow { background: #007aff; color: white; }
+
+/* SCREEN 2 — MAPA */
+.s2-header {
+  background: #1a3a5c; color: white; padding: 8px 10px;
+}
+.s2-header h4 { font-size: 9px; font-weight: 700; }
+.s2-header p  { font-size: 7px; opacity: 0.8; }
+.s2-prog { background: #dce8f5; height: 5px; margin: 3px 0; }
+.s2-prog-fill { background: #27ae60; height: 5px; width: 0%; }
+.s2-map {
+  height: 140px; background: #e8f4ea;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid #ccc;
+}
+.s2-map-bg {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 18px,#c8e6c9 18px,#c8e6c9 19px),
+              repeating-linear-gradient(90deg,transparent,transparent 18px,#c8e6c9 18px,#c8e6c9 19px);
+}
+.s2-road-h {
+  position: absolute; left:0; right:0; top:50%; height:6px;
+  background:#fff; transform:translateY(-50%);
+}
+.s2-road-v {
+  position: absolute; top:0; bottom:0; left:60%; width:6px;
+  background:#fff;
+}
+.pin {
+  position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 800; color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,.3);
+}
+.pin-azul  { background: #2e6da4; }
+.pin-verde { background: #27ae60; }
+.pin-rojo  { background: #e74c3c; }
+.pin-yo    { background: #f39c12; border: 2px solid white; }
+.s2-gps {
+  padding: 4px 8px; font-size: 7px; display: flex; gap: 5px;
+  align-items: center; border-bottom: 1px solid #eee;
+}
+.dot-on { width:6px; height:6px; border-radius:50%; background:#27ae60; }
+.s2-tabs { display: flex; border-bottom: 2px solid #eee; }
+.s2-tab  { flex:1; padding: 4px 0; text-align:center; font-size: 7px; color: #888; }
+.s2-tab.act { color:#1a3a5c; border-bottom: 2px solid #2e6da4; margin-bottom:-2px; font-weight:700; }
+.s2-list { padding: 5px 6px; }
+.s2-item {
+  display: flex; gap: 5px; align-items: center; padding: 4px 5px;
+  border-radius: 6px; margin-bottom: 3px; border-left: 3px solid #dce8f5;
+  background: #fafafa;
+}
+.s2-item.ok  { border-left-color: #27ae60; }
+.s2-item.no  { border-left-color: #e74c3c; }
+.s2-num { font-size: 7px; font-weight: 700; color: #2e6da4; width: 14px; }
+.s2-txt { flex:1; font-size: 7px; color: #333; }
+.s2-bdg { font-size: 6px; font-weight: 700; padding: 1px 4px; border-radius: 8px; }
+.bdg-ok  { background:#d4edda; color:#155724; }
+.bdg-no  { background:#f8d7da; color:#721c24; }
+.bdg-pen { background:#e8f4fd; color:#0c5460; }
+
+/* SCREEN 3 — ALERTA */
+.s3-map {
+  height: 130px; background: #e8f4ea;
+  position: relative; overflow: hidden;
+}
+.s3-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.2);
+}
+.s3-card {
+  background: white; border-radius: 14px 14px 0 0;
+  padding: 12px 12px 14px; position: relative;
+}
+.s3-label { font-size: 7px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.s3-nombre { font-size: 13px; font-weight: 800; color: #1a3a5c; margin: 2px 0; }
+.s3-coords { font-size: 7px; color: #aaa; margin-bottom: 10px; }
+.s3-btns { display: flex; gap: 6px; }
+.s3-btns button {
+  flex: 1; border: none; border-radius: 10px;
+  padding: 9px 4px; font-size: 10px; font-weight: 800; cursor: pointer;
+}
+.s3-ok { background: #27ae60; color: white; }
+.s3-no { background: #e74c3c; color: white; }
+
+/* SCREEN 4 — RESULTADOS */
+.s4-header {
+  background: #1a3a5c; color: white; padding: 8px 10px;
+}
+.s4-header h4 { font-size: 9px; font-weight: 700; }
+.s4-header p  { font-size: 7px; opacity: 0.8; }
+.s4-tabs { display: flex; border-bottom: 2px solid #eee; }
+.s4-tab  { flex:1; padding:4px; text-align:center; font-size:7px; color:#888; }
+.s4-tab.act { color:#1a3a5c; border-bottom:2px solid #2e6da4; margin-bottom:-2px; font-weight:700; }
+.s4-body { padding: 8px; }
+.s4-grid { display: grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:8px; }
+.s4-card { background:white; border-radius:8px; padding:6px 4px; text-align:center;
+           box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.s4-num  { font-size:16px; font-weight:800; }
+.s4-lbl  { font-size:6px; color:#888; margin-top:1px; }
+.s4-barra { background:white; border-radius:8px; padding:8px; margin-bottom:7px;
+            box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.s4-barra h5 { font-size:7px; margin-bottom:6px; color:#1a3a5c; }
+.br-row  { display:flex; align-items:center; gap:4px; margin-bottom:4px; }
+.br-lbl  { font-size:6px; width:35px; text-align:right; color:#555; }
+.br-bg   { flex:1; background:#f0f4f8; border-radius:6px; height:10px; overflow:hidden; }
+.br-fill { height:100%; border-radius:6px; display:flex; align-items:center;
+           justify-content:flex-end; padding-right:3px; font-size:6px;
+           font-weight:700; color:white; }
+.br-ok { background:#27ae60; }
+.br-no { background:#e74c3c; }
+.s4-btn { width:100%; background:#1a3a5c; color:white; border:none; border-radius:8px;
+          padding:7px; font-size:8px; font-weight:700; }
+
+/* FOOTER */
+.footer {
+  background: #1a3a5c; color: white; text-align: center;
+  padding: 20px 16px; margin-top: 10px;
+}
+.footer p { font-size: 12px; opacity: 0.8; margin-top: 6px; }
+
+/* ALERTA ESPECIAL */
+.alerta-especial {
+  background: #fff3cd; border-left: 4px solid #f39c12;
+  border-radius: 10px; padding: 14px 16px; margin: 0 16px 20px;
+  max-width: 480px; margin-left: auto; margin-right: auto;
+}
+.alerta-especial h4 { font-size: 14px; color: #856404; margin-bottom: 6px; }
+.alerta-especial p  { font-size: 12px; color: #533f03; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>📍 Validación de Puntos</h1>
+  <p>Guía paso a paso para el operador en campo</p>
+  <a class="badge-link" href="https://iaingenieria.github.io/rutas/validacion_puntos.html">
+    🔗 iaingenieria.github.io/rutas/validacion_puntos.html
+  </a>
+</div>
+
+<div class="steps">
+
+  <!-- PASO 1 -->
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>Abre el link en tu celular</h3>
+      <p>Copia el link que te mandaron por WhatsApp y ábrelo en el navegador de tu celular (Chrome o Safari).</p>
+      <div class="tip">⚡ No necesitas instalar ninguna app. Se abre directo en el navegador.</div>
+    </div>
+  </div>
+
+  <!-- PASO 2 — GPS -->
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Permite el acceso a tu ubicación</h3>
+      <p>El navegador te preguntará si puede usar tu GPS. Toca <strong>"Permitir"</strong> para que la app detecte cuándo llegas a cada punto.</p>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="s1-overlay">
+              <div class="s1-card">
+                <div class="icon">📍</div>
+                <h4>¿Permitir acceso a tu ubicación?</h4>
+                <p>iaingenieria.github.io quiere acceder a tu ubicación mientras usas el navegador</p>
+                <div class="s1-btns">
+                  <button class="btn-deny">Denegar</button>
+                  <button class="btn-allow">✓ PERMITIR</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tip">⚠️ Si tocas "Denegar", la app no podrá detectar automáticamente los puntos. Tendrás que marcarlos tú mismo.</div>
+    </div>
+  </div>
+
+  <!-- PASO 3 — MAPA -->
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Verás el mapa con los 24 puntos</h3>
+      <p>Aparece un mapa con todos los puntos de tu ruta numerados. El círculo naranja <strong>🟠</strong> eres tú. Los puntos azules son los negocios a validar.</p>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="s2-header">
+              <h4>📍 Validación de Puntos</h4>
+              <p>Ruta Sur MTY — 24 puntos</p>
+              <div class="s2-prog"><div class="s2-prog-fill" style="width:12%"></div></div>
+            </div>
+            <div class="s2-gps">
+              <div class="dot-on"></div>
+              <span style="font-size:7px;color:#333">GPS activo — precisión ±8m</span>
+            </div>
+            <div class="s2-map">
+              <div class="s2-map-bg"></div>
+              <div class="s2-road-h"></div>
+              <div class="s2-road-v"></div>
+              <div class="pin pin-verde" style="top:38%;left:22%">2</div>
+              <div class="pin pin-azul"  style="top:30%;left:40%">3</div>
+              <div class="pin pin-azul"  style="top:55%;left:55%">4</div>
+              <div class="pin pin-rojo"  style="top:45%;left:70%">5</div>
+              <div class="pin pin-azul"  style="top:65%;left:32%">6</div>
+              <div class="pin pin-yo"    style="top:50%;left:35%">📍</div>
+            </div>
+            <div class="s2-tabs">
+              <div class="s2-tab act">📋 Puntos</div>
+              <div class="s2-tab">📊 Resultados</div>
+            </div>
+            <div class="s2-list">
+              <div class="s2-item ok">
+                <div class="s2-num">#2</div>
+                <div class="s2-txt">Punto 2</div>
+                <div class="s2-bdg bdg-ok">✅ Existe</div>
+              </div>
+              <div class="s2-item">
+                <div class="s2-num">#3</div>
+                <div class="s2-txt">Punto 3</div>
+                <div class="s2-bdg bdg-pen">⏳ Pendiente</div>
+              </div>
+              <div class="s2-item no">
+                <div class="s2-num">#4</div>
+                <div class="s2-txt">Punto 4</div>
+                <div class="s2-bdg bdg-no">❌ No existe</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tip">💡 Colores: 🔵 Azul = pendiente &nbsp;|&nbsp; 🟢 Verde = existe &nbsp;|&nbsp; 🔴 Rojo = no existe</div>
+    </div>
+  </div>
+
+  <!-- PASO 4 — ALERTA -->
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h3>Al llegar a un punto — aparece la tarjeta</h3>
+      <p>Cuando estés a <strong>menos de 100 metros</strong> del negocio, aparece automáticamente una tarjeta con dos botones. Decide:</p>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="s3-map">
+              <div class="s2-map-bg"></div>
+              <div class="s2-road-h"></div>
+              <div class="s2-road-v"></div>
+              <div class="pin pin-azul" style="top:40%;left:45%">7</div>
+              <div class="pin pin-yo"   style="top:50%;left:48%">📍</div>
+              <div class="s3-overlay"></div>
+            </div>
+            <div class="s3-card">
+              <div class="s3-label">📍 Llegaste al punto</div>
+              <div class="s3-nombre">Punto 7</div>
+              <div class="s3-coords">25.380492, -100.108578</div>
+              <div class="s3-btns">
+                <button class="s3-ok">✅ EXISTE</button>
+                <button class="s3-no">❌ NO EXISTE</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tip">✅ <strong>EXISTE</strong> = hay un negocio físico abierto ahí<br>❌ <strong>NO EXISTE</strong> = no hay negocio (casa, lote, dirección falsa)</div>
+    </div>
+  </div>
+
+  <!-- PASO 5 — MANUAL -->
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <h3>¿No apareció sola la tarjeta?</h3>
+      <p>Si ya estás frente al negocio y la tarjeta no apareció sola, simplemente <strong>toca el número del punto</strong> en la lista y marca desde ahí.</p>
+      <div class="tip">📌 Esto puede pasar si el GPS tiene poca señal (dentro de edificios, etc.)</div>
+    </div>
+  </div>
+
+  <!-- PASO 6 — NO CERRAR -->
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-body">
+      <h3>No cierres el navegador</h3>
+      <p>Puedes bloquear la pantalla del celular sin problema — los datos se guardan automáticamente. <strong>No cierres la pestaña</strong> hasta terminar toda la ruta.</p>
+      <div class="tip">💾 Los resultados se guardan en el celular aunque se vaya la señal de internet.</div>
+    </div>
+  </div>
+
+  <!-- PASO 7 — RESULTADOS -->
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-body">
+      <h3>Al terminar — ve a Resultados</h3>
+      <p>Cuando hayas validado todos los puntos, toca la pestaña <strong>📊 Resultados</strong> para ver el resumen.</p>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="s4-header">
+              <h4>📍 Validación de Puntos</h4>
+              <p>Ruta Sur MTY — 24 puntos</p>
+            </div>
+            <div class="s4-tabs">
+              <div class="s4-tab">📋 Puntos</div>
+              <div class="s4-tab act">📊 Resultados</div>
+            </div>
+            <div class="s4-body">
+              <div class="s4-grid">
+                <div class="s4-card">
+                  <div class="s4-num" style="color:#27ae60">16</div>
+                  <div class="s4-lbl">✅ Existen</div>
+                </div>
+                <div class="s4-card">
+                  <div class="s4-num" style="color:#e74c3c">5</div>
+                  <div class="s4-lbl">❌ No existen</div>
+                </div>
+                <div class="s4-card">
+                  <div class="s4-num" style="color:#f39c12">3</div>
+                  <div class="s4-lbl">⏳ Pendientes</div>
+                </div>
+              </div>
+              <div class="s4-barra">
+                <h5>Distribución</h5>
+                <div class="br-row">
+                  <span class="br-lbl">Existen</span>
+                  <div class="br-bg"><div class="br-fill br-ok" style="width:67%">67%</div></div>
+                </div>
+                <div class="br-row">
+                  <span class="br-lbl">No existen</span>
+                  <div class="br-bg"><div class="br-fill br-no" style="width:21%">21%</div></div>
+                </div>
+              </div>
+              <button class="s4-btn">📤 Exportar resultados</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 8 — EXPORTAR -->
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-body">
+      <h3>Exporta y manda el reporte</h3>
+      <p>Toca <strong>"📤 Exportar resultados"</strong>. Se descarga un archivo <code>.txt</code> en tu celular. Mándalo por WhatsApp al coordinador.</p>
+      <div class="tip">📲 El archivo queda en la carpeta <strong>Descargas</strong> de tu celular.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ALERTA IMPORTANTE -->
+<div class="alerta-especial">
+  <h4>⚠️ Importante para el operador</h4>
+  <p>
+    • Cada punto representa un negocio registrado en Google Maps / DENUE<br>
+    • Llega físicamente a la dirección antes de marcar<br>
+    • Si el local está cerrado temporalmente, márcalo como <strong>Existe</strong><br>
+    • Si no hay ningún negocio en la dirección, márcalo como <strong>No existe</strong>
+  </p>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong>Mr. Ruta — IAingenieria</strong>
+  <p>Validación en campo | Ruta Sur MTY | Mayo 2026</p>
+</div>
+
+</body>
+</html>
