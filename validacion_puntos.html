@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Validación de Puntos — Mr. Ruta</title>
+<title>Validación de Puntos — Ruta Sur MTY</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -117,7 +117,7 @@
 <!-- HEADER -->
 <div class="header">
   <h1>📍 Validación de Puntos</h1>
-  <p>Ruta Sur Monterrey — 24 puntos</p>
+  <p>Ruta Sur MTY (Juárez / Guadalupe) — 24 puntos</p>
   <div class="progress-wrap">
     <div class="progress-bar" id="progBar" style="width:0%"></div>
   </div>
@@ -190,30 +190,30 @@
 <script>
 // ── DATOS DE PUNTOS ──────────────────────────────────────────────
 const PUNTOS = [
-  { id:1,  lat:25.704423,  lng:-100.2834504, nombre:"Punto 1 — Base/Inicio" },
-  { id:2,  lat:25.472844,  lng:-100.188418,  nombre:"Punto 2" },
-  { id:3,  lat:25.470131,  lng:-100.16774,   nombre:"Punto 3" },
-  { id:4,  lat:25.452381,  lng:-100.167126,  nombre:"Punto 4" },
-  { id:5,  lat:25.452423,  lng:-100.166721,  nombre:"Punto 5" },
-  { id:6,  lat:25.450418,  lng:-100.164232,  nombre:"Punto 6" },
-  { id:7,  lat:25.450259,  lng:-100.164566,  nombre:"Punto 7" },
-  { id:8,  lat:25.4496661, lng:-100.1642856, nombre:"Punto 8" },
-  { id:9,  lat:25.4553257, lng:-100.1552128, nombre:"Punto 9" },
-  { id:10, lat:25.441783,  lng:-100.15552,   nombre:"Punto 10" },
-  { id:11, lat:25.429964,  lng:-100.154227,  nombre:"Punto 11" },
-  { id:12, lat:25.4268165, lng:-100.1543474, nombre:"Punto 12" },
-  { id:13, lat:25.4242388, lng:-100.1521521, nombre:"Punto 13" },
-  { id:14, lat:25.42192,   lng:-100.149458,  nombre:"Punto 14" },
-  { id:15, lat:25.420664,  lng:-100.145257,  nombre:"Punto 15" },
-  { id:16, lat:25.4149981, lng:-100.142052,  nombre:"Punto 16" },
-  { id:17, lat:25.406934,  lng:-100.137753,  nombre:"Punto 17" },
-  { id:18, lat:25.406249,  lng:-100.137872,  nombre:"Punto 18" },
-  { id:19, lat:25.40663,   lng:-100.135538,  nombre:"Punto 19" },
-  { id:20, lat:25.405135,  lng:-100.134775,  nombre:"Punto 20" },
-  { id:21, lat:25.403793,  lng:-100.13508,   nombre:"Punto 21" },
-  { id:22, lat:25.4017783, lng:-100.1341496, nombre:"Punto 22" },
-  { id:23, lat:25.396116,  lng:-100.129487,  nombre:"Punto 23" },
-  { id:24, lat:25.410919,  lng:-100.1645034, nombre:"Punto 24" },
+  { id:1,  lat:25.704423,  lng:-100.2834504, nombre:"Punto 1 — Base / Inicio" },
+  { id:2,  lat:25.3957367, lng:-100.140742,  nombre:"Punto 2" },
+  { id:3,  lat:25.394357,  lng:-100.13812,   nombre:"Punto 3" },
+  { id:4,  lat:25.394462,  lng:-100.132887,  nombre:"Punto 4" },
+  { id:5,  lat:25.394144,  lng:-100.126238,  nombre:"Punto 5" },
+  { id:6,  lat:25.393624,  lng:-100.125688,  nombre:"Punto 6" },
+  { id:7,  lat:25.380492,  lng:-100.108578,  nombre:"Punto 7" },
+  { id:8,  lat:25.37334,   lng:-100.11046,   nombre:"Punto 8" },
+  { id:9,  lat:25.367782,  lng:-100.10714,   nombre:"Punto 9" },
+  { id:10, lat:25.36912,   lng:-100.109518,  nombre:"Punto 10" },
+  { id:11, lat:25.372178,  lng:-100.115456,  nombre:"Punto 11" },
+  { id:12, lat:25.372841,  lng:-100.116004,  nombre:"Punto 12" },
+  { id:13, lat:25.37643,   lng:-100.114365,  nombre:"Punto 13" },
+  { id:14, lat:25.376495,  lng:-100.113682,  nombre:"Punto 14" },
+  { id:15, lat:25.377035,  lng:-100.112418,  nombre:"Punto 15" },
+  { id:16, lat:25.382344,  lng:-100.116902,  nombre:"Punto 16" },
+  { id:17, lat:25.387349,  lng:-100.125821,  nombre:"Punto 17" },
+  { id:18, lat:25.388202,  lng:-100.12775,   nombre:"Punto 18" },
+  { id:19, lat:25.390068,  lng:-100.131962,  nombre:"Punto 19" },
+  { id:20, lat:25.391703,  lng:-100.132591,  nombre:"Punto 20" },
+  { id:21, lat:25.389079,  lng:-100.14629,   nombre:"Punto 21" },
+  { id:22, lat:25.381901,  lng:-100.148014,  nombre:"Punto 22" },
+  { id:23, lat:25.380469,  lng:-100.148775,  nombre:"Punto 23" },
+  { id:24, lat:25.377038,  lng:-100.148626,  nombre:"Punto 24" },
 ];
 
 const RADIO_METROS = 100; // distancia para disparar alerta
