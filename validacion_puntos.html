@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Validación de Puntos — Mr. Ruta</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #f0f4f8; color: #1a1a2e; }
+
+  /* HEADER */
+  .header { background: #1a3a5c; color: white; padding: 12px 16px; position: sticky;
+            top: 0; z-index: 1000; }
+  .header h1 { font-size: 17px; font-weight: 700; }
+  .header p  { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { background: #dce8f5; border-radius: 20px; height: 10px;
+                   margin-top: 8px; overflow: hidden; }
+  .progress-bar  { height: 100%; background: linear-gradient(90deg,#27ae60,#2ecc71);
+                   border-radius: 20px; transition: width .4s; }
+  .progress-txt  { font-size: 10px; text-align: right; margin-top: 3px; opacity: 0.9; }
+
+  /* GPS STATUS */
+  .gps-status { display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+                background: #fff; border-bottom: 1px solid #e0e0e0; font-size: 12px; }
+  .gps-dot    { width: 10px; height: 10px; border-radius: 50%; background: #ccc;
+                flex-shrink: 0; }
+  .gps-dot.on  { background: #27ae60; animation: pulse 1.5s infinite; }
+  .gps-dot.err { background: #e74c3c; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* MAP */
+  #map { height: 280px; width: 100%; }
+
+  /* ALERTA LLEGADA */
+  .alerta { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
+            background: white; border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 30px rgba(0,0,0,.25); padding: 20px 20px 30px; }
+  .alerta.show { display: block; }
+  .alerta-titulo { font-size: 13px; color: #888; text-transform: uppercase;
+                   letter-spacing: 1px; margin-bottom: 6px; }
+  .alerta-nombre { font-size: 20px; font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .alerta-coords { font-size: 11px; color: #aaa; margin-bottom: 18px; }
+  .btns-val { display: flex; gap: 12px; }
+  .btn-existe   { flex:1; background:#27ae60; color:#fff; border:none; border-radius:14px;
+                  padding:16px; font-size:17px; font-weight:700; cursor:pointer; }
+  .btn-noexiste { flex:1; background:#e74c3c; color:#fff; border:none; border-radius:14px;
+                  padding:16px; font-size:17px; font-weight:700; cursor:pointer; }
+  .btn-cerrar   { position:absolute; top:16px; right:16px; background:#f0f4f8; border:none;
+                  border-radius:50%; width:32px; height:32px; font-size:18px; cursor:pointer; color:#555; }
+
+  /* TABS */
+  .tabs { display: flex; background: white; border-bottom: 2px solid #e0e0e0; }
+  .tab  { flex:1; padding:12px 0; text-align:center; font-size:13px; font-weight:600;
+          color:#888; cursor:pointer; border:none; background:none; }
+  .tab.active { color:#1a3a5c; border-bottom: 3px solid #2e6da4; margin-bottom:-2px; }
+
+  /* LISTA */
+  #tab-lista { padding: 12px; }
+  .punto-card { background:white; border-radius:12px; padding:13px 14px;
+                margin-bottom:8px; display:flex; align-items:center; gap:12px;
+                box-shadow: 0 1px 4px rgba(0,0,0,.07); cursor:pointer;
+                border-left: 5px solid #dce8f5; transition: border-color .2s; }
+  .punto-card.existe    { border-left-color: #27ae60; }
+  .punto-card.no-existe { border-left-color: #e74c3c; }
+  .punto-card.cercano   { border-left-color: #f39c12; background:#fffbf0; }
+  .punto-num  { font-size:13px; font-weight:700; color:#2e6da4; min-width:26px; }
+  .punto-info { flex:1; }
+  .punto-nom  { font-size:13px; font-weight:600; }
+  .punto-sub  { font-size:11px; color:#aaa; }
+  .punto-badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; }
+  .badge-ok   { background:#d4edda; color:#155724; }
+  .badge-no   { background:#f8d7da; color:#721c24; }
+  .badge-pen  { background:#e8f4fd; color:#0c5460; }
+
+  /* RESULTADOS */
+  #tab-resultados { padding:16px; display:none; }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:18px; }
+  .stat-card { background:white; border-radius:12px; padding:14px; text-align:center;
+               box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .stat-num  { font-size:26px; font-weight:800; }
+  .stat-lbl  { font-size:11px; color:#888; margin-top:3px; }
+  .stat-ok   { color:#27ae60; }
+  .stat-no   { color:#e74c3c; }
+  .stat-pen  { color:#f39c12; }
+  .grafica   { background:white; border-radius:12px; padding:16px; margin-bottom:14px;
+               box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .grafica h3{ font-size:14px; margin-bottom:12px; color:#1a3a5c; }
+  .barra-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .barra-lbl { font-size:11px; width:80px; color:#555; text-align:right; }
+  .barra-bg  { flex:1; background:#f0f4f8; border-radius:10px; height:20px; overflow:hidden; }
+  .barra-fill{ height:100%; border-radius:10px; display:flex; align-items:center;
+               justify-content:flex-end; padding-right:6px; font-size:10px;
+               font-weight:700; color:white; transition:width .5s; }
+  .barra-ok  { background:#27ae60; }
+  .barra-no  { background:#e74c3c; }
+
+  .btn-export { width:100%; background:#1a3a5c; color:white; border:none; border-radius:14px;
+                padding:15px; font-size:15px; font-weight:700; cursor:pointer; margin-bottom:10px; }
+  .btn-reset  { width:100%; background:#f8d7da; color:#721c24; border:none; border-radius:14px;
+                padding:12px; font-size:13px; font-weight:600; cursor:pointer; }
+
+  .detalle-lista { background:white; border-radius:12px; padding:12px;
+                   box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .detalle-lista h3 { font-size:13px; margin-bottom:10px; color:#1a3a5c; }
+  .det-row { display:flex; justify-content:space-between; align-items:center;
+             padding:7px 0; border-bottom:1px solid #f0f4f8; font-size:12px; }
+  .det-row:last-child { border-bottom:none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>📍 Validación de Puntos</h1>
+  <p>Ruta Sur Monterrey — 24 puntos</p>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progBar" style="width:0%"></div>
+  </div>
+  <div class="progress-txt" id="progTxt">0 / 24 validados</div>
+</div>
+
+<!-- GPS STATUS -->
+<div class="gps-status">
+  <div class="gps-dot" id="gpsDot"></div>
+  <span id="gpsMsg">Iniciando GPS...</span>
+</div>
+
+<!-- MAPA -->
+<div id="map"></div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="setTab('lista')">📋 Puntos</button>
+  <button class="tab" onclick="setTab('resultados')">📊 Resultados</button>
+</div>
+
+<!-- TAB LISTA -->
+<div id="tab-lista"></div>
+
+<!-- TAB RESULTADOS -->
+<div id="tab-resultados">
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-num stat-ok" id="r-existe">0</div>
+      <div class="stat-lbl">✅ Existen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num stat-no" id="r-noexiste">0</div>
+      <div class="stat-lbl">❌ No existen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num stat-pen" id="r-pend">24</div>
+      <div class="stat-lbl">⏳ Pendientes</div>
+    </div>
+  </div>
+  <div class="grafica">
+    <h3>Distribución de resultados</h3>
+    <div class="barra-row">
+      <span class="barra-lbl">Existen</span>
+      <div class="barra-bg"><div class="barra-fill barra-ok" id="g-ok" style="width:0%">0%</div></div>
+    </div>
+    <div class="barra-row">
+      <span class="barra-lbl">No existen</span>
+      <div class="barra-bg"><div class="barra-fill barra-no" id="g-no" style="width:0%">0%</div></div>
+    </div>
+  </div>
+  <button class="btn-export" onclick="exportar()">📤 Exportar resultados (texto)</button>
+  <div class="detalle-lista" id="detalleLista"></div>
+  <br>
+  <button class="btn-reset" onclick="resetear()">🔄 Reiniciar validación</button>
+</div>
+
+<!-- ALERTA LLEGADA -->
+<div class="alerta" id="alerta">
+  <button class="btn-cerrar" onclick="cerrarAlerta()">✕</button>
+  <div class="alerta-titulo">📍 Llegaste al punto</div>
+  <div class="alerta-nombre" id="al-nombre">Punto 1</div>
+  <div class="alerta-coords" id="al-coords"></div>
+  <div class="btns-val">
+    <button class="btn-existe"   onclick="validar(true)">✅ EXISTE</button>
+    <button class="btn-noexiste" onclick="validar(false)">❌ NO EXISTE</button>
+  </div>
+</div>
+
+<script>
+// ── DATOS DE PUNTOS ──────────────────────────────────────────────
+const PUNTOS = [
+  { id:1,  lat:25.704423,  lng:-100.2834504, nombre:"Punto 1 — Base/Inicio" },
+  { id:2,  lat:25.472844,  lng:-100.188418,  nombre:"Punto 2" },
+  { id:3,  lat:25.470131,  lng:-100.16774,   nombre:"Punto 3" },
+  { id:4,  lat:25.452381,  lng:-100.167126,  nombre:"Punto 4" },
+  { id:5,  lat:25.452423,  lng:-100.166721,  nombre:"Punto 5" },
+  { id:6,  lat:25.450418,  lng:-100.164232,  nombre:"Punto 6" },
+  { id:7,  lat:25.450259,  lng:-100.164566,  nombre:"Punto 7" },
+  { id:8,  lat:25.4496661, lng:-100.1642856, nombre:"Punto 8" },
+  { id:9,  lat:25.4553257, lng:-100.1552128, nombre:"Punto 9" },
+  { id:10, lat:25.441783,  lng:-100.15552,   nombre:"Punto 10" },
+  { id:11, lat:25.429964,  lng:-100.154227,  nombre:"Punto 11" },
+  { id:12, lat:25.4268165, lng:-100.1543474, nombre:"Punto 12" },
+  { id:13, lat:25.4242388, lng:-100.1521521, nombre:"Punto 13" },
+  { id:14, lat:25.42192,   lng:-100.149458,  nombre:"Punto 14" },
+  { id:15, lat:25.420664,  lng:-100.145257,  nombre:"Punto 15" },
+  { id:16, lat:25.4149981, lng:-100.142052,  nombre:"Punto 16" },
+  { id:17, lat:25.406934,  lng:-100.137753,  nombre:"Punto 17" },
+  { id:18, lat:25.406249,  lng:-100.137872,  nombre:"Punto 18" },
+  { id:19, lat:25.40663,   lng:-100.135538,  nombre:"Punto 19" },
+  { id:20, lat:25.405135,  lng:-100.134775,  nombre:"Punto 20" },
+  { id:21, lat:25.403793,  lng:-100.13508,   nombre:"Punto 21" },
+  { id:22, lat:25.4017783, lng:-100.1341496, nombre:"Punto 22" },
+  { id:23, lat:25.396116,  lng:-100.129487,  nombre:"Punto 23" },
+  { id:24, lat:25.410919,  lng:-100.1645034, nombre:"Punto 24" },
+];
+
+const RADIO_METROS = 100; // distancia para disparar alerta
+
+// ── ESTADO ────────────────────────────────────────────────────────
+let estado = JSON.parse(localStorage.getItem('validacion_mrruta') || '{}');
+// estado[id] = { existe: true/false, ts: timestamp }
+
+let puntoActivo = null;
+let miUbicacion = null;
+let markerYo = null;
+let marcadores = {};
+
+// ── MAPA ──────────────────────────────────────────────────────────
+const map = L.map('map').setView([25.47, -100.16], 12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+function colorMarker(id) {
+  const e = estado[id];
+  if (!e) return '#2e6da4';
+  return e.existe ? '#27ae60' : '#e74c3c';
+}
+
+function iconCircle(id, cercano) {
+  const color = colorMarker(id);
+  const borde = cercano ? '#f39c12' : color;
+  return L.divIcon({
+    className: '',
+    html: `<div style="background:${color};border:3px solid ${borde};width:22px;height:22px;
+           border-radius:50%;display:flex;align-items:center;justify-content:center;
+           color:white;font-size:9px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.3)">${id}</div>`,
+    iconSize: [22, 22], iconAnchor: [11, 11]
+  });
+}
+
+PUNTOS.forEach(p => {
+  const m = L.marker([p.lat, p.lng], { icon: iconCircle(p.id, false) })
+    .addTo(map)
+    .on('click', () => abrirAlerta(p.id));
+  marcadores[p.id] = m;
+});
+
+// ── GPS ───────────────────────────────────────────────────────────
+const gpsDot = document.getElementById('gpsDot');
+const gpsMsg = document.getElementById('gpsMsg');
+
+if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(onPos, onErr, {
+    enableHighAccuracy: true, maximumAge: 5000, timeout: 10000
+  });
+} else {
+  gpsMsg.textContent = 'GPS no disponible en este dispositivo';
+  gpsDot.classList.add('err');
+}
+
+function onPos(pos) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
+  const acc = Math.round(pos.coords.accuracy);
+  miUbicacion = { lat, lng };
+
+  gpsDot.classList.remove('err'); gpsDot.classList.add('on');
+  gpsMsg.textContent = `GPS activo — precisión ±${acc}m`;
+
+  if (!markerYo) {
+    markerYo = L.circleMarker([lat,lng], {
+      radius:10, color:'#e67e22', fillColor:'#f39c12',
+      fillOpacity:0.9, weight:3
+    }).addTo(map).bindPopup('📍 Tú estás aquí');
+  } else {
+    markerYo.setLatLng([lat,lng]);
+  }
+
+  verificarCercania(lat, lng);
+}
+
+function onErr(err) {
+  gpsDot.classList.add('err');
+  gpsMsg.textContent = 'Error GPS: ' + (err.code === 1 ? 'Permiso denegado' :
+                        err.code === 2 ? 'Posición no disponible' : 'Tiempo agotado');
+}
+
+function distancia(lat1,lng1,lat2,lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+let alertaMostrada = false;
+
+function verificarCercania(lat, lng) {
+  let masCercano = null, minDist = Infinity;
+
+  PUNTOS.forEach(p => {
+    const d = distancia(lat, lng, p.lat, p.lng);
+    if (d < minDist) { minDist = d; masCercano = p; }
+    const cercano = d < RADIO_METROS && !estado[p.id];
+    marcadores[p.id].setIcon(iconCircle(p.id, cercano));
+  });
+
+  actualizarLista();
+
+  if (masCercano && minDist < RADIO_METROS && !estado[masCercano.id] && !alertaMostrada) {
+    alertaMostrada = true;
+    abrirAlerta(masCercano.id);
+  }
+  if (minDist >= RADIO_METROS) alertaMostrada = false;
+}
+
+// ── ALERTA ────────────────────────────────────────────────────────
+function abrirAlerta(id) {
+  const p = PUNTOS.find(x => x.id === id);
+  puntoActivo = id;
+  document.getElementById('al-nombre').textContent = p.nombre;
+  document.getElementById('al-coords').textContent =
+    `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;
+  document.getElementById('alerta').classList.add('show');
+
+  map.setView([p.lat, p.lng], 16);
+}
+
+function cerrarAlerta() {
+  document.getElementById('alerta').classList.remove('show');
+  puntoActivo = null;
+}
+
+function validar(existe) {
+  if (puntoActivo === null) return;
+  estado[puntoActivo] = { existe, ts: new Date().toISOString() };
+  localStorage.setItem('validacion_mrruta', JSON.stringify(estado));
+  marcadores[puntoActivo].setIcon(iconCircle(puntoActivo, false));
+  cerrarAlerta();
+  actualizarLista();
+  actualizarResultados();
+  actualizarProgreso();
+}
+
+// ── LISTA ─────────────────────────────────────────────────────────
+function actualizarLista() {
+  const cont = document.getElementById('tab-lista');
+  cont.innerHTML = PUNTOS.map(p => {
+    const e = estado[p.id];
+    const cls = e ? (e.existe ? 'existe' : 'no-existe') : '';
+    const badge = e
+      ? (e.existe
+          ? '<span class="punto-badge badge-ok">✅ Existe</span>'
+          : '<span class="punto-badge badge-no">❌ No existe</span>')
+      : '<span class="punto-badge badge-pen">⏳ Pendiente</span>';
+    const d = miUbicacion
+      ? ` · ${Math.round(distancia(miUbicacion.lat,miUbicacion.lng,p.lat,p.lng))}m`
+      : '';
+    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})">
+      <div class="punto-num">#${p.id}</div>
+      <div class="punto-info">
+        <div class="punto-nom">${p.nombre}</div>
+        <div class="punto-sub">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${d}</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+// ── RESULTADOS ────────────────────────────────────────────────────
+function actualizarResultados() {
+  const vals = Object.values(estado);
+  const ok  = vals.filter(v=>v.existe).length;
+  const no  = vals.filter(v=>!v.existe).length;
+  const pen = PUNTOS.length - vals.length;
+  const tot = PUNTOS.length;
+
+  document.getElementById('r-existe').textContent   = ok;
+  document.getElementById('r-noexiste').textContent = no;
+  document.getElementById('r-pend').textContent     = pen;
+
+  const pok = tot ? Math.round(ok/tot*100) : 0;
+  const pno = tot ? Math.round(no/tot*100) : 0;
+  document.getElementById('g-ok').style.width = pok+'%';
+  document.getElementById('g-ok').textContent = pok ? pok+'%' : '';
+  document.getElementById('g-no').style.width = pno+'%';
+  document.getElementById('g-no').textContent = pno ? pno+'%' : '';
+
+  const det = document.getElementById('detalleLista');
+  const rows = PUNTOS.map(p => {
+    const e = estado[p.id];
+    const badge = e
+      ? (e.existe ? '✅ Existe' : '❌ No existe')
+      : '⏳ Pendiente';
+    const hora = e ? new Date(e.ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}) : '—';
+    return `<div class="det-row">
+      <span><b>#${p.id}</b> ${p.nombre}</span>
+      <span style="color:${e?(e.existe?'#27ae60':'#e74c3c'):'#f39c12'}">${badge} ${hora}</span>
+    </div>`;
+  }).join('');
+  det.innerHTML = `<h3>Detalle por punto</h3>${rows}`;
+}
+
+function actualizarProgreso() {
+  const total = PUNTOS.length;
+  const hecho = Object.keys(estado).length;
+  const pct   = Math.round(hecho/total*100);
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('progTxt').textContent = `${hecho} / ${total} validados (${pct}%)`;
+}
+
+function exportar() {
+  const vals = Object.values(estado);
+  const ok   = vals.filter(v=>v.existe).length;
+  const no   = vals.filter(v=>!v.existe).length;
+  const pen  = PUNTOS.length - vals.length;
+  let txt = `VALIDACIÓN DE PUNTOS — Mr. Ruta\n`;
+  txt += `Fecha: ${new Date().toLocaleDateString('es-MX')}\n`;
+  txt += `Fuentes: Google Maps / DENUE / Apify\n\n`;
+  txt += `RESUMEN\n`;
+  txt += `Total puntos : ${PUNTOS.length}\n`;
+  txt += `✅ Existen    : ${ok} (${Math.round(ok/PUNTOS.length*100)}%)\n`;
+  txt += `❌ No existen : ${no} (${Math.round(no/PUNTOS.length*100)}%)\n`;
+  txt += `⏳ Pendientes : ${pen}\n\n`;
+  txt += `DETALLE\n`;
+  PUNTOS.forEach(p => {
+    const e = estado[p.id];
+    const res = e ? (e.existe ? 'EXISTE' : 'NO EXISTE') : 'PENDIENTE';
+    const hora = e ? ` — ${new Date(e.ts).toLocaleString('es-MX')}` : '';
+    txt += `#${p.id} ${p.nombre}: ${res}${hora}\n`;
+  });
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `validacion_puntos_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+function resetear() {
+  if (!confirm('¿Reiniciar toda la validación? Se perderán los datos guardados.')) return;
+  localStorage.removeItem('validacion_mrruta');
+  estado = {};
+  PUNTOS.forEach(p => marcadores[p.id].setIcon(iconCircle(p.id, false)));
+  actualizarLista();
+  actualizarResultados();
+  actualizarProgreso();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────
+function setTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active', ['lista','resultados'][i] === tab));
+  document.getElementById('tab-lista').style.display       = tab==='lista'      ? '' : 'none';
+  document.getElementById('tab-resultados').style.display  = tab==='resultados' ? 'block' : 'none';
+  if (tab === 'resultados') actualizarResultados();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+actualizarLista();
+actualizarResultados();
+actualizarProgreso();
+</script>
+</body>
+</html>
