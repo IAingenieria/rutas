@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VAL-CARR-GTO-051-APG-SMA-001 — Validacion de Puntos</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1a1a2e}
+.header{background:#1a3a5c;color:white;padding:10px 14px;position:sticky;top:0;z-index:1000}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header h1{font-size:15px;font-weight:800}
+.route-id{font-size:9px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:1px}
+.header p{font-size:10px;opacity:.8;margin-top:2px}
+.prog-wrap{background:rgba(255,255,255,.2);border-radius:20px;height:7px;margin-top:7px}
+.prog-bar{height:100%;background:#27ae60;border-radius:20px;transition:width .4s}
+.prog-txt{font-size:9px;text-align:right;margin-top:2px;opacity:.85}
+.dia-tabs{display:flex;background:#122b45;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dia-tab{flex-shrink:0;padding:8px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.5);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.dia-tab.act{color:white;border-bottom-color:var(--c)}
+.dia-tab .cnt{font-size:9px;margin-left:4px;background:rgba(255,255,255,.15);padding:1px 5px;border-radius:8px}
+.dia-tab .cnt.done{background:#27ae60;color:white}
+.gps-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:white;border-bottom:1px solid #e0e0e0;font-size:11px}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.gps-dot.on{background:#27ae60;animation:pulse 1.5s infinite}
+.gps-dot.err{background:#e74c3c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#map{height:260px;width:100%}
+.sub-tabs{display:flex;background:white;border-bottom:2px solid #e0e0e0}
+.sub-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:600;color:#888;border:none;background:none;cursor:pointer}
+.sub-tab.act{color:#1a3a5c;border-bottom:3px solid #2e6da4;margin-bottom:-2px}
+#tab-lista{padding:10px}
+.punto-card{background:white;border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;border-left:4px solid #dce8f5;transition:border-color .2s}
+.punto-card.existe{border-left-color:#27ae60}
+.punto-card.no-existe{border-left-color:#e74c3c}
+.p-icon{font-size:18px;flex-shrink:0}
+.p-info{flex:1;min-width:0}
+.p-nombre{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-tipo{font-size:10px;color:#888}
+.p-dist{font-size:9px;color:#bbb}
+.p-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;flex-shrink:0}
+.b-ok{background:#d4edda;color:#155724}
+.b-no{background:#f8d7da;color:#721c24}
+.b-pen{background:#e8f4fd;color:#0c5460}
+.alerta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;background:white;border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.25);padding:18px 18px 28px}
+.alerta.show{display:block}
+.al-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.al-icon{font-size:28px;margin-bottom:4px}
+.al-nombre{font-size:19px;font-weight:800;color:#1a3a5c;margin-bottom:2px}
+.al-tipo{font-size:12px;color:#888;margin-bottom:2px}
+.al-coords{font-size:10px;color:#bbb;margin-bottom:16px}
+.al-btns{display:flex;gap:10px}
+.al-btns button{flex:1;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
+.btn-ok{background:#27ae60;color:white}
+.btn-no{background:#e74c3c;color:white}
+.btn-cerrar{position:absolute;top:14px;right:14px;background:#f0f4f8;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#555}
+#tab-res{padding:12px;display:none}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-c{background:white;border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stat-n{font-size:22px;font-weight:800}
+.stat-l{font-size:10px;color:#888;margin-top:2px}
+.grafica{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.grafica h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.br-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.br-lbl{font-size:10px;width:65px;text-align:right;color:#555}
+.br-bg{flex:1;background:#f0f4f8;border-radius:8px;height:16px;overflow:hidden}
+.br-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:9px;font-weight:700;color:white;transition:width .5s;min-width:24px}
+.br-ok{background:#27ae60}.br-no{background:#e74c3c}
+.por-dia{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.por-dia h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.dia-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dia-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dia-nm{font-size:11px;width:70px;color:#555}
+.dia-br-bg{flex:1;background:#f0f4f8;border-radius:6px;height:14px;overflow:hidden}
+.dia-br-fill{height:100%;border-radius:6px;transition:width .4s;display:flex;align-items:center;padding:0 5px;font-size:8px;font-weight:700;color:white}
+.dia-num{font-size:10px;color:#888;width:40px;text-align:right}
+.btn-exp{width:100%;background:#1a3a5c;color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-rst{width:100%;background:#f8d7da;color:#721c24;border:none;border-radius:12px;padding:11px;font-size:12px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>🛣️ Validacion Carretera 51 — GTO</h1>
+      <p>Apaseo el Grande → San Miguel de Allende · ±500m · DENUE 461xxx</p>
+    </div>
+    <span class="route-id">VAL-CARR-GTO-051-APG-SMA-001</span>
+  </div>
+  <div class="prog-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+  <div class="prog-txt" id="progTxt">0 / 764 validados</div>
+</div>
+<div class="dia-tabs" id="diaTabs">
+  <button class="dia-tab act" style="--c:#2e6da4" onclick="setDia('L')" id="tab-L">Lunes <span class="cnt" id="cnt-L">0/128</span></button>
+  <button class="dia-tab" style="--c:#8e44ad" onclick="setDia('M')" id="tab-M">Martes <span class="cnt" id="cnt-M">0/128</span></button>
+  <button class="dia-tab" style="--c:#27ae60" onclick="setDia('X')" id="tab-X">Miercoles <span class="cnt" id="cnt-X">0/127</span></button>
+  <button class="dia-tab" style="--c:#e67e22" onclick="setDia('J')" id="tab-J">Jueves <span class="cnt" id="cnt-J">0/127</span></button>
+  <button class="dia-tab" style="--c:#c0392b" onclick="setDia('V')" id="tab-V">Viernes <span class="cnt" id="cnt-V">0/127</span></button>
+  <button class="dia-tab" style="--c:#16a085" onclick="setDia('S')" id="tab-S">Sabado <span class="cnt" id="cnt-S">0/127</span></button>
+</div>
+<div class="gps-bar">
+  <div class="gps-dot" id="gpsDot"></div>
+  <span id="gpsMsg">Iniciando GPS...</span>
+</div>
+<div id="map"></div>
+<div class="sub-tabs">
+  <button class="sub-tab act" onclick="setSubTab('lista')">📋 Lista</button>
+  <button class="sub-tab" onclick="setSubTab('res')">📊 Resultados</button>
+</div>
+<div id="tab-lista"></div>
+<div id="tab-res">
+  <div class="stat-grid">
+    <div class="stat-c"><div class="stat-n" style="color:#27ae60" id="r-ok">0</div><div class="stat-l">✅ Existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#e74c3c" id="r-no">0</div><div class="stat-l">❌ No existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#f39c12" id="r-pen">764</div><div class="stat-l">⏳ Pendientes</div></div>
+  </div>
+  <div class="grafica">
+    <h3>Distribucion total</h3>
+    <div class="br-row"><span class="br-lbl">Existen</span><div class="br-bg"><div class="br-fill br-ok" id="g-ok" style="width:0%">0%</div></div></div>
+    <div class="br-row"><span class="br-lbl">No existen</span><div class="br-bg"><div class="br-fill br-no" id="g-no" style="width:0%">0%</div></div></div>
+  </div>
+  <div class="por-dia"><h3>Avance por dia</h3><div id="diasAvance"></div></div>
+  <button class="btn-exp" onclick="exportar()">📤 Exportar reporte completo</button>
+  <button class="btn-rst" onclick="resetear()">🔄 Reiniciar validacion</button>
+</div>
+<div class="alerta" id="alerta">
+  <button class="btn-cerrar" onclick="cerrarAlerta()">✕</button>
+  <div class="al-label">📍 Llegaste al punto</div>
+  <div class="al-icon" id="al-icon">🏪</div>
+  <div class="al-nombre" id="al-nombre"></div>
+  <div class="al-tipo" id="al-tipo"></div>
+  <div class="al-coords" id="al-coords"></div>
+  <div class="al-btns">
+    <button class="btn-ok" onclick="validar(true)">✅ EXISTE</button>
+    <button class="btn-no" onclick="validar(false)">❌ NO EXISTE</button>
+  </div>
+</div>
+<script>
+const ID_RUTA='VAL-CARR-GTO-051-APG-SMA-001';
+const TOTAL_PTS=764;
+const PUNTOS=[
+  {id:1,lat:20.52829694,lng:-100.76480358,nombre:'Tienda Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:2,lat:20.54395203,lng:-100.76993873,nombre:'Abarrotes Max',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:3,lat:20.54409236,lng:-100.77732164,nombre:'Carniceria La Chiripa',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:4,lat:20.5442074,lng:-100.77699263,nombre:'Expendio De Mariscos',tipo:'Pescaderia',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:5,lat:20.54447802,lng:-100.77106021,nombre:'Urban Eats',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:6,lat:20.54452681,lng:-100.77105815,nombre:'Bodega Pollo Kentchuki Archy',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:7,lat:20.54455008,lng:-100.76985656,nombre:'Punto Modelo',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:8,lat:20.54455154,lng:-100.76998121,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:9,lat:20.54455409,lng:-100.77002923,nombre:'Pasteleria Polo',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:10,lat:20.54464416,lng:-100.77181929,nombre:'Abarrotes La Avenida',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:11,lat:20.54467909,lng:-100.77353509,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:12,lat:20.544821,lng:-100.77248219,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:13,lat:20.54502726,lng:-100.77689056,nombre:'Cremeria Los Olivos',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:14,lat:20.54570364,lng:-100.77683487,nombre:'Carniceria Lara',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:15,lat:20.54578736,lng:-100.77582567,nombre:'Carniceria',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:16,lat:20.5459219,lng:-100.77129664,nombre:'Abarrotes San Jose',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:17,lat:20.54592286,lng:-100.76934626,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:18,lat:20.54592553,lng:-100.76960195,nombre:'Micelanea San Juditas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:19,lat:20.5460144,lng:-100.77555637,nombre:'Paleteria Glece',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:20,lat:20.5460466,lng:-100.77083413,nombre:'Papeleria Y Ferreteria Papa Conejo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:21,lat:20.54616951,lng:-100.77203621,nombre:'Tienda De Abarrotes La Economica',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:22,lat:20.54622377,lng:-100.7725176,nombre:'Abarrotes Dulce',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:23,lat:20.5462779,lng:-100.76939487,nombre:'Carniceria La Costilla',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:24,lat:20.54628613,lng:-100.76922344,nombre:'Frutas Y Verduras El Cejas',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:25,lat:20.54638605,lng:-100.77415272,nombre:'Tienda De Abarrotes Tere',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:26,lat:20.5464485,lng:-100.77471021,nombre:'Abarrotes Rodriguez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:27,lat:20.54656292,lng:-100.77323953,nombre:'Heladeriael Abuelo',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:28,lat:20.5467207,lng:-100.76925421,nombre:'Deposito Coco',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:29,lat:20.54673758,lng:-100.76908121,nombre:'Postresillos Mireles',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:30,lat:20.54716781,lng:-100.76692393,nombre:'Abarrotes Pinito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:31,lat:20.54734211,lng:-100.77339282,nombre:'El Club Vinos Y Licores',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:32,lat:20.54780034,lng:-100.77286866,nombre:'Pasteleria De Sandy',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:33,lat:20.54788833,lng:-100.76658961,nombre:'La Tienditia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:34,lat:20.54802194,lng:-100.77308663,nombre:'Pollos A La Leña',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:35,lat:20.54810338,lng:-100.77198951,nombre:'Abarrotes Ely',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:36,lat:20.54817795,lng:-100.769957,nombre:'Abarrotes Nueva Ilusion',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:37,lat:20.54818807,lng:-100.76568979,nombre:'Tiendita Xochilt',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:38,lat:20.54833208,lng:-100.77137135,nombre:'Abarrotes Moreno',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:39,lat:20.54833409,lng:-100.76561355,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:40,lat:20.54837954,lng:-100.7679715,nombre:'Abarrotes Heito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:41,lat:20.54854302,lng:-100.76820148,nombre:'Abarrotes El Patron',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:42,lat:20.5486216,lng:-100.76899017,nombre:'Venta De Pollo Fresco',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:43,lat:20.54875124,lng:-100.77158899,nombre:'Polleria Guerrero',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:44,lat:20.54875536,lng:-100.77162804,nombre:'Abarrotes Don Pato',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:45,lat:20.54876546,lng:-100.77184951,nombre:'Panaderia Los Olivos',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:46,lat:20.54878486,lng:-100.77058768,nombre:'Abarrotes Gonzalez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:47,lat:20.54879193,lng:-100.77298582,nombre:'Abarrotes Rafis',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:48,lat:20.54879872,lng:-100.77210878,nombre:'Carniceria Olivos',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:49,lat:20.54883057,lng:-100.7724164,nombre:'Abarrotes Juanita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:50,lat:20.54883856,lng:-100.77249355,nombre:'Fruta Y Verduras',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:51,lat:20.54884115,lng:-100.77116447,nombre:'Dulceria Abastos',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:52,lat:20.5488495,lng:-100.77259926,nombre:'Pollo Fresco',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:53,lat:20.54887369,lng:-100.77147273,nombre:'Rosticeria Los Olivos',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:54,lat:20.54900941,lng:-100.77290515,nombre:'Empanadas Calientitas',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:55,lat:20.5493128,lng:-100.76569844,nombre:'Abarrotes Latina',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:56,lat:20.549424,lng:-100.7658243,nombre:'Fruteria La Envidiosa',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:57,lat:20.54943194,lng:-100.76693728,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:58,lat:20.54945148,lng:-100.77276197,nombre:'Fruteria Dianis',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:59,lat:20.5497029,lng:-100.76685593,nombre:'Abarrotes Alfer',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:60,lat:20.5497067,lng:-100.77162629,nombre:'Abarrotes Sofi',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:61,lat:20.54979712,lng:-100.77265002,nombre:'Cremeria Y Salchichoneria Ranco Grande',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:62,lat:20.55005462,lng:-100.76865993,nombre:'Abarrotes Superzitro',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:63,lat:20.55010757,lng:-100.76959168,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:64,lat:20.55012043,lng:-100.77253281,nombre:'Tienda De Abarrotes Don Bigotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:65,lat:20.55024707,lng:-100.77249307,nombre:'Deposito Jerry S',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:66,lat:20.55024826,lng:-100.76982246,nombre:'Carniceria Pig',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:67,lat:20.55043778,lng:-100.77110651,nombre:'Cremeria Y Desechables',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:68,lat:20.55046451,lng:-100.77242483,nombre:'Paleteria El Rincon',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:69,lat:20.55065653,lng:-100.76903522,nombre:'Tienda De Abarrotes Ely',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:70,lat:20.55081696,lng:-100.77231423,nombre:'Carniceria La Nueva Gely',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:71,lat:20.55116337,lng:-100.77219577,nombre:'Abarrotes Santy',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:72,lat:20.55116704,lng:-100.76791756,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:73,lat:20.55143325,lng:-100.77040944,nombre:'Abarrotes Linda',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:74,lat:20.55160768,lng:-100.76888662,nombre:'Abarrotes Ramirez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:75,lat:20.5516776,lng:-100.76935786,nombre:'Deposito El Toro',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:76,lat:20.55187996,lng:-100.77286088,nombre:'Tienda Super Precios',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:77,lat:20.61197325,lng:-100.76170859,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:78,lat:20.61201015,lng:-100.76374813,nombre:'Botanas Chepis',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:79,lat:20.6162435,lng:-100.76068616,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:80,lat:20.61626403,lng:-100.76216966,nombre:'Abarrotes Alana',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:81,lat:20.61721166,lng:-100.76216491,nombre:'Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:82,lat:20.61851782,lng:-100.76198472,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:83,lat:20.62132473,lng:-100.76137143,nombre:'Abarrotes Juarez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:84,lat:20.6213791,lng:-100.76136148,nombre:'Venta De Fruta Y Jugo Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:85,lat:20.62147758,lng:-100.76134345,nombre:'Nuevo Deposito',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:86,lat:20.62159027,lng:-100.76407937,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:87,lat:20.62162364,lng:-100.7613854,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:88,lat:20.62232984,lng:-100.7611507,nombre:'Deposito-Abarrotes',tipo:'Deposito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:89,lat:20.62252417,lng:-100.76744923,nombre:'Tienda De Abarrotes Yamileth',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:90,lat:20.62261521,lng:-100.76333495,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:91,lat:20.62263549,lng:-100.762034,nombre:'Tienda De Abarrotes Guadalupe',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:92,lat:20.62263685,lng:-100.76208235,nombre:'Miscelanea San Judas Tadeo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:93,lat:20.62279022,lng:-100.76870965,nombre:'Tienda De Abarrotes Guadalupe',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:94,lat:20.62294707,lng:-100.76711893,nombre:'Abarrotes Jose Lozano',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:95,lat:20.62310602,lng:-100.76179687,nombre:'Polleria Lucy',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:96,lat:20.62331458,lng:-100.76178919,nombre:'Tienda De Abarrotes La Estrella',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:97,lat:20.62380408,lng:-100.76175278,nombre:'Carniceria San Judas Tadeo',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:98,lat:20.62381665,lng:-100.76681185,nombre:'Tienda Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:99,lat:20.62382925,lng:-100.76803536,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:100,lat:20.62383918,lng:-100.76846867,nombre:'Botanas Doña Mari',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:101,lat:20.62399337,lng:-100.75998823,nombre:'Fruteria San Juan',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:102,lat:20.62400432,lng:-100.76085863,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:103,lat:20.62404097,lng:-100.7608511,nombre:'Carniceria Delgado',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:104,lat:20.62408331,lng:-100.76068075,nombre:'Cremeria Y Salchichoneria Vargas',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:105,lat:20.62409513,lng:-100.76083997,nombre:'Dulces Momentos',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:106,lat:20.6241123,lng:-100.76172187,nombre:'Dulceria Luna',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:107,lat:20.62414548,lng:-100.76028812,nombre:'Dulceria Mariana',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:108,lat:20.62417962,lng:-100.76332897,nombre:'Abarrotes Y Verduleria',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:109,lat:20.62419319,lng:-100.76165202,nombre:'Polleria San Juan',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:110,lat:20.62423208,lng:-100.76146984,nombre:'Botanas 5 De Mayo',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:111,lat:20.62423208,lng:-100.76146984,nombre:'Mariscos Lety',tipo:'Pescaderia',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:112,lat:20.62428138,lng:-100.76027632,nombre:'Abarrotes Yerena',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:113,lat:20.62437214,lng:-100.76185382,nombre:'Botanas De Anda',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:114,lat:20.62440614,lng:-100.76329828,nombre:'Frutas Y Verduras Beto',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:115,lat:20.62440614,lng:-100.76329828,nombre:'Miscelanea Kevin',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:116,lat:20.62445913,lng:-100.76252748,nombre:'Abarrotes Josefina',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:117,lat:20.62446158,lng:-100.76254642,nombre:'Dulceria Misericordia',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:118,lat:20.624601,lng:-100.76400226,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:119,lat:20.62461695,lng:-100.76024718,nombre:'Carniceria San Juan',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:120,lat:20.62477558,lng:-100.76087013,nombre:'Cremeria Y Salchichoneria Albert',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:121,lat:20.62484393,lng:-100.76587988,nombre:'Abarrotes San Juditas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:122,lat:20.62485802,lng:-100.76085676,nombre:'Abarrotes Lupe',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:123,lat:20.62491254,lng:-100.76084792,nombre:'Frutas Y Verduras Tito',tipo:'Fruteria',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:124,lat:20.62501177,lng:-100.76313257,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:125,lat:20.62502919,lng:-100.76082899,nombre:'Polleria Rey David',tipo:'Carniceria',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:126,lat:20.62512527,lng:-100.76585328,nombre:'Abarrotes Ferrocarril',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:127,lat:20.62522653,lng:-100.76606503,nombre:'Tienda De Abarrotes La Esmeralda',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:128,lat:20.6252466,lng:-100.76178704,nombre:'Pasteleria Arely',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:129,lat:20.62530078,lng:-100.76174961,nombre:'Pescados Y Mariscos Crudos El Carpa',tipo:'Pescaderia',icon:'🐟',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:130,lat:20.62533428,lng:-100.76145811,nombre:'Deposito De Cerveza El Chatin',tipo:'Deposito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:131,lat:20.62541496,lng:-100.76279771,nombre:'Fruteria Galeana',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:132,lat:20.6254293,lng:-100.7631402,nombre:'Tienda De Abarrotes Salazar',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:133,lat:20.62543263,lng:-100.76290377,nombre:'Carnitas San Martin Caballero',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:134,lat:20.62543731,lng:-100.76293185,nombre:'Unidad Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:135,lat:20.62546243,lng:-100.76265379,nombre:'Cremeria Y Salchichoneria San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:136,lat:20.62554731,lng:-100.76303975,nombre:'Carniceria Andrea',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:137,lat:20.62558348,lng:-100.76359633,nombre:'Frutas Y Verduras',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:138,lat:20.62560202,lng:-100.76419288,nombre:'Cerveza El Burro',tipo:'Deposito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:139,lat:20.62566346,lng:-100.76467486,nombre:'Tienda De Abarrotes Mari',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:140,lat:20.62568194,lng:-100.76435627,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:141,lat:20.62569438,lng:-100.76557709,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:142,lat:20.6256965,lng:-100.7649342,nombre:'Miscelanea Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:143,lat:20.62577136,lng:-100.76552158,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:144,lat:20.62586326,lng:-100.76071737,nombre:'De Frutas Y Verdura Romero',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:145,lat:20.62592719,lng:-100.76296585,nombre:'Polleria El Rey',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:146,lat:20.62600801,lng:-100.76064272,nombre:'Cremeria San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:147,lat:20.62605814,lng:-100.76129488,nombre:'Uniceles Y Abarrotes Don Beto',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:148,lat:20.62607616,lng:-100.76676232,nombre:'Abarrotes El Burbujas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:149,lat:20.62611282,lng:-100.7657532,nombre:'Tienda De Abarrotes Don Chato',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:150,lat:20.6261522,lng:-100.76098909,nombre:'Venta De Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:151,lat:20.62617599,lng:-100.76121021,nombre:'Dulceria Don Beto',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:152,lat:20.62619849,lng:-100.76060412,nombre:'Botanas Y Desechables El Original',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:153,lat:20.62636997,lng:-100.76057815,nombre:'Tienda De Abarrotes Chico',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:154,lat:20.62642466,lng:-100.76064368,nombre:'Carniceria San Luis',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:155,lat:20.62648801,lng:-100.7606331,nombre:'Venta De Semillas Y Cereales Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:156,lat:20.62654264,lng:-100.760552,nombre:'Carniceria Miguel Hidalgo',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:157,lat:20.62663376,lng:-100.76060875,nombre:'Pollo Fresco El Cha',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:158,lat:20.62677821,lng:-100.76058465,nombre:'Vinicola Checos',tipo:'Deposito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:159,lat:20.62678517,lng:-100.75986647,nombre:'Tienda De Abarrotes La Tiendita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:160,lat:20.62682371,lng:-100.76286777,nombre:'Fruteria Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:161,lat:20.62682484,lng:-100.76114151,nombre:'Dulceria Abril',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:162,lat:20.62686921,lng:-100.76277557,nombre:'Polleria Allende',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:163,lat:20.62692362,lng:-100.76069258,nombre:'Polleriaarale',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:164,lat:20.62693801,lng:-100.76567396,nombre:'Tienda Abarrotes La Via',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:165,lat:20.62695872,lng:-100.76048403,nombre:'Carniceria Valadez',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:166,lat:20.62696105,lng:-100.76130966,nombre:'Tienda De Abarrotes Balderas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:167,lat:20.62699551,lng:-100.76047945,nombre:'Abarrotes Vero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:168,lat:20.62699628,lng:-100.76725491,nombre:'Tienda De Abarrotes Jiret',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:169,lat:20.62702605,lng:-100.76166584,nombre:'Abarrotes Miselanea Balderas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:170,lat:20.62713098,lng:-100.76271169,nombre:'Tienda De Abarrotes La Esquina',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:171,lat:20.62719638,lng:-100.76259899,nombre:'Expendio De Pan',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:172,lat:20.62722196,lng:-100.76232888,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:173,lat:20.62723769,lng:-100.76284795,nombre:'Expendio De Pan',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:174,lat:20.62736557,lng:-100.76331018,nombre:'Tienda De Abarrotes Chuy',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:175,lat:20.62752122,lng:-100.76040904,nombre:'Abarrotes Plaza',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:176,lat:20.62769293,lng:-100.76407675,nombre:'Deposito Vinicola',tipo:'Deposito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:177,lat:20.6277267,lng:-100.76480067,nombre:'Globos Y Productos Para Fiestas Rossy',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:178,lat:20.62779972,lng:-100.76586946,nombre:'Angeles Martinez Juarez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:179,lat:20.62786073,lng:-100.76705414,nombre:'Tienda De Abarrotes Ramirez Coyote',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:180,lat:20.6278701,lng:-100.76603275,nombre:'Polleria Mary',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:181,lat:20.62803148,lng:-100.76176309,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:182,lat:20.62804758,lng:-100.76209033,nombre:'Tienda De Abarrotes Juan Pablo Ii',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:183,lat:20.62846005,lng:-100.766139,nombre:'Abarrotes Los Padrinos',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:184,lat:20.62846954,lng:-100.76772241,nombre:'Pollos Fresco El Ranchito',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:185,lat:20.62849617,lng:-100.76864802,nombre:'Abarrotes Paco',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:186,lat:20.62850183,lng:-100.76687513,nombre:'Tienda Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:187,lat:20.62851989,lng:-100.76770344,nombre:'Abarrotes La Guadalupana',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:188,lat:20.62853682,lng:-100.766318,nombre:'Polleria San Antonio',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:189,lat:20.62857294,lng:-100.7670863,nombre:'Venta Fruta Y Verdura Abril',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:190,lat:20.62858493,lng:-100.76885917,nombre:'Tienda De Abarrotes Sol',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:191,lat:20.62869666,lng:-100.76773444,nombre:'Tienda De Abarrotes Ely',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:192,lat:20.62872615,lng:-100.76032373,nombre:'Abarrotes Angel',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:193,lat:20.62887718,lng:-100.76545235,nombre:'Venta De Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:194,lat:20.62897002,lng:-100.76660885,nombre:'Abarrotes Hernandez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:195,lat:20.62900382,lng:-100.76543881,nombre:'Tienda De Abarrotes Maryeli',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:196,lat:20.62903241,lng:-100.76775049,nombre:'Frutas Y Verduras Antonia',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:197,lat:20.62905501,lng:-100.76669173,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:198,lat:20.62919421,lng:-100.76541846,nombre:'Tienda De Abarrotes La Providencia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:199,lat:20.62919577,lng:-100.7677583,nombre:'Tienda De Abarrotes San Nicolas Salitrillo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:200,lat:20.62933152,lng:-100.76748438,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:201,lat:20.62933858,lng:-100.76740709,nombre:'Abarrotes San Antonio',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:202,lat:20.62942151,lng:-100.76217824,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:203,lat:20.62953531,lng:-100.76895708,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:204,lat:20.62962863,lng:-100.76636048,nombre:'Tienda De Abarrotes Lalo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:205,lat:20.62996332,lng:-100.76513662,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:206,lat:20.63020555,lng:-100.76816545,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:207,lat:20.63039682,lng:-100.76193752,nombre:'Deposito De Cerveza Sin Nombre',tipo:'Deposito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:208,lat:20.63062016,lng:-100.76000532,nombre:'Abarrotes Angel',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:209,lat:20.63070171,lng:-100.76006772,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:210,lat:20.63120386,lng:-100.76375502,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:211,lat:20.63132692,lng:-100.75994905,nombre:'Tienda De Abarrotes Monse',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:212,lat:20.63132838,lng:-100.76147541,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:213,lat:20.63134401,lng:-100.76536364,nombre:'Abarrotes Y Pan Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:214,lat:20.6321857,lng:-100.75966089,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:215,lat:20.63255538,lng:-100.75950872,nombre:'Venta De Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:216,lat:20.63452603,lng:-100.76403535,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:217,lat:20.66265838,lng:-100.76100238,nombre:'Abarrotes Lupita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:218,lat:20.66273223,lng:-100.76053041,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:219,lat:20.66533572,lng:-100.7580471,nombre:'Super C',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:220,lat:20.68959362,lng:-100.76067709,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:221,lat:20.69049033,lng:-100.76033029,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:222,lat:20.6906355,lng:-100.76033369,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:223,lat:20.69103078,lng:-100.76091628,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:224,lat:20.69110644,lng:-100.76004691,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:225,lat:20.69165548,lng:-100.7597141,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:226,lat:20.69173373,lng:-100.76040497,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:227,lat:20.6920483,lng:-100.76228093,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:228,lat:20.69215713,lng:-100.76228112,nombre:'Abarrotes Martinez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:229,lat:20.69217444,lng:-100.75914643,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:230,lat:20.69232016,lng:-100.76220526,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:231,lat:20.6923467,lng:-100.76099076,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:232,lat:20.69307878,lng:-100.76242555,nombre:'Comercio Al Por Menor En Tiendas De Abarrotes Y Miscelaneas Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:233,lat:20.6936085,lng:-100.76310476,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:234,lat:20.69371413,lng:-100.76078628,nombre:'Polleria Luilli',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:235,lat:20.69385029,lng:-100.76078264,nombre:'Vinos El Puente',tipo:'Deposito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:236,lat:20.69563318,lng:-100.76141592,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:237,lat:20.69616812,lng:-100.76138563,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:238,lat:20.69623693,lng:-100.76078684,nombre:'Polleria Carli',tipo:'Carniceria',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:239,lat:20.69641111,lng:-100.76083781,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:240,lat:20.69687509,lng:-100.76132654,nombre:'Tienda De Abarrotes Pati',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:241,lat:20.69818113,lng:-100.76040597,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:242,lat:20.6983591,lng:-100.76091756,nombre:'Venta De Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:243,lat:20.69891229,lng:-100.76082351,nombre:'Abarrotes Reyna',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:244,lat:20.69939518,lng:-100.75766673,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:245,lat:20.69944676,lng:-100.75842198,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:246,lat:20.70004223,lng:-100.76045155,nombre:'Tienda De Granos Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:247,lat:20.70049089,lng:-100.75853726,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:248,lat:20.70060509,lng:-100.76038307,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:249,lat:20.7007903,lng:-100.7585231,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:250,lat:20.70109478,lng:-100.76036917,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:251,lat:20.70118563,lng:-100.76037705,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:252,lat:20.70134522,lng:-100.7597697,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:253,lat:20.70140419,lng:-100.76039099,nombre:'Venta De Grano E Implementos Para Gallos Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:254,lat:20.70146889,lng:-100.7604036,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:255,lat:20.70152538,lng:-100.76155121,nombre:'Abarrotes Doña Nena',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:256,lat:20.70188533,lng:-100.76048548,nombre:'Abarrotes Elizabeth',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:257,lat:20.70228713,lng:-100.75865564,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:258,lat:20.70249481,lng:-100.76061756,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:259,lat:20.70306806,lng:-100.7608185,nombre:'Miscelanea Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:260,lat:20.70328544,lng:-100.76086658,nombre:'Pollo Fresco San Martin',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:261,lat:20.70338515,lng:-100.76079626,nombre:'Tienda De Abarrotes San Agustin',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:262,lat:20.70350381,lng:-100.76090016,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:263,lat:20.70398342,lng:-100.76090915,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:264,lat:20.7041374,lng:-100.75930057,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:265,lat:20.70417865,lng:-100.75934833,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:266,lat:20.70425494,lng:-100.76080207,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:267,lat:20.70446322,lng:-100.76074392,nombre:'Abarrotes Llanito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:268,lat:20.70463483,lng:-100.76071056,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:269,lat:20.70479766,lng:-100.76067891,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:270,lat:20.7054487,lng:-100.7605548,nombre:'Carniceria San Agustin',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:271,lat:20.70546661,lng:-100.76047992,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:272,lat:20.70620023,lng:-100.76027817,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:273,lat:20.70659828,lng:-100.76016597,nombre:'Abarrotes Melanie',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:274,lat:20.70720612,lng:-100.76008026,nombre:'Tienda De Abarrotes Rosy',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:275,lat:20.70748716,lng:-100.76004049,nombre:'Modelorama Arista',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:276,lat:20.70974877,lng:-100.75779648,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:277,lat:20.70996779,lng:-100.76046219,nombre:'Abarrotes Olvera',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:278,lat:20.71037464,lng:-100.75804332,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:279,lat:20.71102776,lng:-100.76039214,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:280,lat:20.71155122,lng:-100.75889495,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:281,lat:20.7116262,lng:-100.7603699,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:282,lat:20.7127108,lng:-100.7586727,nombre:'Vinos Fiesta',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:283,lat:20.71288717,lng:-100.7588765,nombre:'Abarrotes Juarez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:284,lat:20.7135131,lng:-100.75905536,nombre:'Abarrotes Garcia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:285,lat:20.71384309,lng:-100.7606239,nombre:'Abarrotes Centeno',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:286,lat:20.7142502,lng:-100.75936695,nombre:'Tienda De Abarrotes Martha',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:287,lat:20.71455667,lng:-100.75550224,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:288,lat:20.71485761,lng:-100.75844125,nombre:'Abarrotes Nicole',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:289,lat:20.71492345,lng:-100.76081648,nombre:'Cremeria Lulu',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:290,lat:20.71504168,lng:-100.76083349,nombre:'Carniceria Doncarlos',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:291,lat:20.71504919,lng:-100.75951445,nombre:'El Rey Del Pollo',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:292,lat:20.715151,lng:-100.76084922,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:293,lat:20.7152125,lng:-100.75843706,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:294,lat:20.71530487,lng:-100.75965454,nombre:'Abarrotes Juarez',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:295,lat:20.71537848,lng:-100.76074998,nombre:'Venta De Carne De Pollo Cuquita',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:296,lat:20.71545482,lng:-100.76032467,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:297,lat:20.71552572,lng:-100.76032365,nombre:'Verduras Y Fruta',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:298,lat:20.71563885,lng:-100.75973449,nombre:'Abarrotes Covarrubias',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:299,lat:20.71574709,lng:-100.75872286,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:300,lat:20.71582984,lng:-100.75850364,nombre:'Tienda De Abarrotes El Changarrito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:301,lat:20.71607809,lng:-100.76192157,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:302,lat:20.71618648,lng:-100.75877243,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:303,lat:20.71629253,lng:-100.75853737,nombre:'Deposito La Galeana',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:304,lat:20.71636884,lng:-100.76108853,nombre:'Polleria Amlo 41',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:305,lat:20.71647499,lng:-100.75857619,nombre:'Venta De Fruta Y Verdura Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:306,lat:20.71660734,lng:-100.75898661,nombre:'Tienda De Abarrotes La Bajada Del Calvario',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:307,lat:20.7167895,lng:-100.75243551,nombre:'Tienda De Abarrotes Tita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:308,lat:20.71684824,lng:-100.75986247,nombre:'Tienda De Abarrotes El Nuevo Triunfo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:309,lat:20.71702119,lng:-100.76115861,nombre:'Tienda De Abarrotes Elenita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:310,lat:20.71707185,lng:-100.7581322,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:311,lat:20.71720829,lng:-100.75790159,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:312,lat:20.71726285,lng:-100.7538966,nombre:'Frutas Y Verduras San Francisco',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:313,lat:20.71729888,lng:-100.76348268,nombre:'Vinicola Del Centro Ii',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:314,lat:20.71734305,lng:-100.76274534,nombre:'Miscelanea Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:315,lat:20.71740235,lng:-100.76344964,nombre:'Expendio De Pan Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:316,lat:20.71746109,lng:-100.76021442,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:317,lat:20.71750872,lng:-100.76285708,nombre:'Abarrotes Frutas Y Verduras La Cobacha',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:318,lat:20.71754037,lng:-100.76319055,nombre:'Abarrotes Don Corne',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:319,lat:20.71759097,lng:-100.76293832,nombre:'Vinateria El Cabus',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:320,lat:20.71759506,lng:-100.75891776,nombre:'Abarrotes El Guerito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:321,lat:20.71759506,lng:-100.75891776,nombre:'Polleria Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:322,lat:20.71760197,lng:-100.75884563,nombre:'Tienda De Abarrotes Alejandro',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:323,lat:20.71763677,lng:-100.76284212,nombre:'Expendio De Mariscos Sin Nombre',tipo:'Pescaderia',icon:'🐟',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:324,lat:20.7177198,lng:-100.75561757,nombre:'Estanquillo De Pepsi Sin Nombre',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:325,lat:20.71807931,lng:-100.75603747,nombre:'Venta De Refresco Sin Nombre',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:326,lat:20.71815404,lng:-100.76327895,nombre:'Venta De Bebidas Refrescantes',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:327,lat:20.71815611,lng:-100.76326544,nombre:'Cremeia',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:328,lat:20.71815611,lng:-100.76326544,nombre:'Venta De Refresco Y Dulces',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:329,lat:20.71816015,lng:-100.76326797,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:330,lat:20.71817142,lng:-100.76432957,nombre:'Bodega',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:331,lat:20.71831739,lng:-100.76184436,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:332,lat:20.71853585,lng:-100.76200786,nombre:'Tienda De Articulos Para Fiesta Acelebrar',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:333,lat:20.71868413,lng:-100.75760208,nombre:'La Casa Del Globo',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:334,lat:20.71869344,lng:-100.76208718,nombre:'Carniceria Karla',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:335,lat:20.71873748,lng:-100.76210935,nombre:'Tienda De Abarrotes Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:336,lat:20.71875869,lng:-100.75943636,nombre:'Vinos Y Licores Zapatas',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:337,lat:20.71879144,lng:-100.76207021,nombre:'Chicharroneria Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:338,lat:20.71885833,lng:-100.76127977,nombre:'Carniceria Maki',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:339,lat:20.7188987,lng:-100.76328228,nombre:'Tienda De Abarrotes Sin Numero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:340,lat:20.71897286,lng:-100.76129427,nombre:'Abarrotes Y Desechables Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:341,lat:20.71897286,lng:-100.76129427,nombre:'Chiles Secos Semillas Y Cereales',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:342,lat:20.71897286,lng:-100.76129427,nombre:'Frutas Y Verduras Jonatha',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:343,lat:20.71897286,lng:-100.76129427,nombre:'Frutas Y Verduras La Escondida',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:344,lat:20.71897286,lng:-100.76129427,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:345,lat:20.71897286,lng:-100.76129427,nombre:'Tienda De Refrescos Sin Nombre',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:346,lat:20.71897286,lng:-100.76129427,nombre:'Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:347,lat:20.71911569,lng:-100.75843786,nombre:'Cosifiestas',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:348,lat:20.71917698,lng:-100.76143022,nombre:'Carniceria Marcelo',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:349,lat:20.71918695,lng:-100.75940409,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:350,lat:20.71919747,lng:-100.75833053,nombre:'Six Comonfort',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:351,lat:20.7192857,lng:-100.760215,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:352,lat:20.7193413,lng:-100.75956048,nombre:'Expendio De Mariscos Mundo Marino',tipo:'Pescaderia',icon:'🐟',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:353,lat:20.71935597,lng:-100.76192031,nombre:'Tienda De Abarrotes Pequeñeñe',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:354,lat:20.71945901,lng:-100.75908889,nombre:'Tienda Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:355,lat:20.71967378,lng:-100.76256693,nombre:'Venta De Miel De Abeja',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:356,lat:20.71978244,lng:-100.76052572,nombre:'Cremaria El Sauz',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:357,lat:20.71985365,lng:-100.75617762,nombre:'Abarrotes Rubi',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:358,lat:20.71990721,lng:-100.76006179,nombre:'Bodega De Abarrotes Super Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:359,lat:20.71991213,lng:-100.76018695,nombre:'Super Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:360,lat:20.71991304,lng:-100.76027468,nombre:'Mariscos Mira Mar',tipo:'Pescaderia',icon:'🐟',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:361,lat:20.71991364,lng:-100.76190936,nombre:'Fruteria Galvan',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:362,lat:20.71992179,lng:-100.75970005,nombre:'Venta Fruta Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:363,lat:20.72000714,lng:-100.76196168,nombre:'Modelorama Rama',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:364,lat:20.72002508,lng:-100.76197172,nombre:'Carniceria Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:365,lat:20.72011131,lng:-100.76190153,nombre:'Cremeria La Canasta',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:366,lat:20.7201481,lng:-100.76155799,nombre:'Paleteria La Michoacana',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:367,lat:20.7201666,lng:-100.76176689,nombre:'Carniceria La Providencia',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:368,lat:20.72021163,lng:-100.76192965,nombre:'Cremeria San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:369,lat:20.72023173,lng:-100.76187261,nombre:'Carniceria San Antonio',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:370,lat:20.72024933,lng:-100.75983336,nombre:'Vinicola San Marcos',tipo:'Deposito',icon:'🍺',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:371,lat:20.72026896,lng:-100.76176695,nombre:'Polleria Pollo Fresco Martin',tipo:'Carniceria',icon:'🥩',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:372,lat:20.72033527,lng:-100.76295936,nombre:'Nieves Doña Mago',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:373,lat:20.72034042,lng:-100.75985044,nombre:'Tienda De Abarrotes El Super Ideal',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:374,lat:20.72042724,lng:-100.76141791,nombre:'Materias Primas Jr',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:375,lat:20.72050322,lng:-100.76104927,nombre:'Frutas Y Semillas Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:376,lat:20.72051305,lng:-100.76131081,nombre:'Helados Y Paletas Glace',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:377,lat:20.72051923,lng:-100.76101905,nombre:'Tienda De Abarrotes El Cisne',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:378,lat:20.72052392,lng:-100.75526576,nombre:'Tienda De Abarrotes Olvera',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:379,lat:20.72053088,lng:-100.75979702,nombre:'Venta De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:380,lat:20.72058905,lng:-100.76284027,nombre:'Fruteria Y Verduleria',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:381,lat:20.72058905,lng:-100.76284027,nombre:'Semillas Y Cereales',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:382,lat:20.72059065,lng:-100.76284202,nombre:'Abarrotes Martitha',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:383,lat:20.72059065,lng:-100.76284202,nombre:'Fruteria Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'X',diaNom:'Miercoles',color:'#27ae60'},
+  {id:384,lat:20.72072888,lng:-100.76075863,nombre:'Cremeria Sagrado Corazon',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:385,lat:20.72074744,lng:-100.7626051,nombre:'Mariscal',tipo:'Pescaderia',icon:'🐟',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:386,lat:20.72079721,lng:-100.75709341,nombre:'Abarrotes La Placita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:387,lat:20.72083725,lng:-100.76033486,nombre:'Abarrotes La Nueva Historia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:388,lat:20.72084574,lng:-100.76031528,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:389,lat:20.72090265,lng:-100.76036403,nombre:'Frutas Y Vegetales Jaime',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:390,lat:20.72092733,lng:-100.76030484,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:391,lat:20.7209983,lng:-100.75683747,nombre:'Tienda De Abarrotes El Puente',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:392,lat:20.72106809,lng:-100.75993514,nombre:'Cremeria San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:393,lat:20.72107111,lng:-100.75363056,nombre:'Miscelanea Don Guero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:394,lat:20.72110405,lng:-100.76002782,nombre:'Paleteria La Michoacana',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:395,lat:20.72111021,lng:-100.75967515,nombre:'Tienda De Abarrotes Tellez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:396,lat:20.72114308,lng:-100.75971553,nombre:'Rostiseria Mega Pollo',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:397,lat:20.72115848,lng:-100.75953167,nombre:'Tienda De Abarrotes Aguilar',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:398,lat:20.72118456,lng:-100.7594541,nombre:'Polleria Allende',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:399,lat:20.72118689,lng:-100.75997341,nombre:'Dulceria El Globo',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:400,lat:20.7213025,lng:-100.76002009,nombre:'Carniceria San Judas Tadeo',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:401,lat:20.72132153,lng:-100.7600168,nombre:'Polleria Gamez',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:402,lat:20.72135364,lng:-100.75895149,nombre:'Carniceria La Cruz',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:403,lat:20.72145057,lng:-100.75881496,nombre:'Venta De Comida',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:404,lat:20.72159316,lng:-100.75771172,nombre:'Carniceria La Fe',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:405,lat:20.72160945,lng:-100.75867522,nombre:'Dulceria Lupita',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:406,lat:20.72167485,lng:-100.75875623,nombre:'Carniceria Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:407,lat:20.72168755,lng:-100.75779377,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:408,lat:20.72174239,lng:-100.75784144,nombre:'Tienda De Vinos Licores Y Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:409,lat:20.72194648,lng:-100.75882581,nombre:'Cremeria San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:410,lat:20.72194665,lng:-100.75871327,nombre:'Delypop',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:411,lat:20.72209684,lng:-100.75832582,nombre:'Tienda De Abarrotes El Molino',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:412,lat:20.72218858,lng:-100.76160543,nombre:'Abarrotes Ocampo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:413,lat:20.72227357,lng:-100.75786098,nombre:'Carniceria La Estrellita',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:414,lat:20.7223223,lng:-100.75524754,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:415,lat:20.72233064,lng:-100.7486343,nombre:'Tienda De Abarrotes Conchita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:416,lat:20.72233306,lng:-100.75564274,nombre:'Dulceria La 20',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:417,lat:20.72236947,lng:-100.75406123,nombre:'Muebleria',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:418,lat:20.72237236,lng:-100.75772514,nombre:'Carniceria Y Abarrotes La Paz',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:419,lat:20.72237301,lng:-100.75081181,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:420,lat:20.72240506,lng:-100.75550705,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:421,lat:20.72240982,lng:-100.75342452,nombre:'Fruteria Estrella',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:422,lat:20.72242249,lng:-100.75226717,nombre:'Tienda De Abarrotes Abts Olalde',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:423,lat:20.72242321,lng:-100.75320309,nombre:'Polleria 20 De Noviembre',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:424,lat:20.72243189,lng:-100.75417688,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:425,lat:20.72243395,lng:-100.75301936,nombre:'Abarrotes Lucero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:426,lat:20.72244546,lng:-100.75393552,nombre:'Tienda De Abarrotes Maricruz',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:427,lat:20.72245342,lng:-100.75846362,nombre:'Vinos Y Abarrotes',tipo:'Deposito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:428,lat:20.72245869,lng:-100.75059905,nombre:'Deposito De Refresco',tipo:'Deposito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:429,lat:20.72246267,lng:-100.75117718,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:430,lat:20.72247061,lng:-100.75728132,nombre:'Carniceria La Criollita',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:431,lat:20.72247468,lng:-100.75622823,nombre:'Carnitas Maldonado Labrada',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:432,lat:20.72249123,lng:-100.75236309,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:433,lat:20.72250689,lng:-100.75713669,nombre:'Abarrotes Y Legumbres Anita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:434,lat:20.72251469,lng:-100.75728054,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:435,lat:20.72251652,lng:-100.7570983,nombre:'Micelanea Wander S',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:436,lat:20.72251699,lng:-100.74986303,nombre:'Tienda De Abarrotes Alejandro',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:437,lat:20.72255746,lng:-100.75657502,nombre:'Miscelanea Lupita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:438,lat:20.72257361,lng:-100.75856673,nombre:'Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:439,lat:20.72260779,lng:-100.75678582,nombre:'Abarrotes La Veinte',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:440,lat:20.72278988,lng:-100.76113409,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:441,lat:20.72287778,lng:-100.76092914,nombre:'Dulces Y Refrescos',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:442,lat:20.72290065,lng:-100.75886549,nombre:'Carniceria Guadalupana',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:443,lat:20.72291003,lng:-100.75887478,nombre:'Abarrotes El Guero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:444,lat:20.72297985,lng:-100.75434558,nombre:'Abarrotes Nenuno',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:445,lat:20.72310241,lng:-100.75295647,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:446,lat:20.72314422,lng:-100.75771962,nombre:'Abarrotes Coli',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:447,lat:20.72319378,lng:-100.75227057,nombre:'Abarrotes Bety',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:448,lat:20.72322396,lng:-100.75204783,nombre:'Abarrotes San Juditas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:449,lat:20.72333905,lng:-100.76047463,nombre:'Carniceria Por Tradicion',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:450,lat:20.72340948,lng:-100.75283752,nombre:'Abarrotes Toñita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:451,lat:20.72348472,lng:-100.75889318,nombre:'Mariscos Congelados La Bodega',tipo:'Pescaderia',icon:'🐟',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:452,lat:20.72354429,lng:-100.75085077,nombre:'Abarrotes Beatriz',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:453,lat:20.72360983,lng:-100.75789444,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:454,lat:20.72364564,lng:-100.75157213,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:455,lat:20.7237815,lng:-100.76250484,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:456,lat:20.72382791,lng:-100.75962164,nombre:'Vinos Y Licores',tipo:'Deposito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:457,lat:20.72387865,lng:-100.76005392,nombre:'Carniceria El Compadre',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:458,lat:20.72392372,lng:-100.75970389,nombre:'Abarrotes La Estacion',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:459,lat:20.72405273,lng:-100.75984347,nombre:'Paleteria La Michoacana',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:460,lat:20.72418168,lng:-100.75789739,nombre:'Venta De Refresco',tipo:'Deposito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:461,lat:20.72432011,lng:-100.7586513,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:462,lat:20.72434079,lng:-100.75935959,nombre:'Abarrotes San Jose',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:463,lat:20.72441976,lng:-100.75144017,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:464,lat:20.72451239,lng:-100.75834426,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:465,lat:20.72455059,lng:-100.75001663,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:466,lat:20.7245757,lng:-100.7582477,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:467,lat:20.72458302,lng:-100.75954542,nombre:'Carniceria Don Abel',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:468,lat:20.72475762,lng:-100.75726111,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:469,lat:20.72482271,lng:-100.75833975,nombre:'Abarrotes Si Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:470,lat:20.72488167,lng:-100.75781146,nombre:'Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:471,lat:20.72499245,lng:-100.75848933,nombre:'Comercio Al Por Menor En Tiendas De Abarrotes, Ultramarinos Y Misceláneas Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:472,lat:20.72514866,lng:-100.75980308,nombre:'Fruteria',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:473,lat:20.72557007,lng:-100.75790022,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:474,lat:20.72571886,lng:-100.76053942,nombre:'Tienda Liconsa',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:475,lat:20.72578599,lng:-100.75929902,nombre:'Expendio De Pan',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:476,lat:20.72581469,lng:-100.75861063,nombre:'Abarrotes La Privada',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:477,lat:20.72609928,lng:-100.75978322,nombre:'Abarrotes Doña Carmen',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:478,lat:20.72616526,lng:-100.75916835,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:479,lat:20.72627729,lng:-100.76041461,nombre:'Abarrotes Gonzales',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:480,lat:20.7262946,lng:-100.75577146,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:481,lat:20.72637309,lng:-100.75761341,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:482,lat:20.72657762,lng:-100.75894279,nombre:'Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:483,lat:20.72665913,lng:-100.760455,nombre:'Fruteria Estrella',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:484,lat:20.72697171,lng:-100.75800959,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:485,lat:20.72701113,lng:-100.75901958,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:486,lat:20.72708902,lng:-100.75951667,nombre:'Abarrotes Adelita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:487,lat:20.72719861,lng:-100.75756689,nombre:'Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:488,lat:20.72729769,lng:-100.75746966,nombre:'Abarrotes La Rinconada',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:489,lat:20.72753108,lng:-100.76058134,nombre:'Abarrotes Mendoza',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:490,lat:20.72783881,lng:-100.76063498,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:491,lat:20.72790194,lng:-100.75937495,nombre:'Abarrotes Azteca',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:492,lat:20.72836591,lng:-100.75959576,nombre:'Vinos Y Abarrotes Sin Nombre',tipo:'Deposito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:493,lat:20.72842034,lng:-100.75945317,nombre:'Venta De Frutas Y Verduras',tipo:'Fruteria',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:494,lat:20.72852258,lng:-100.75815383,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:495,lat:20.72893307,lng:-100.75751229,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:496,lat:20.72894646,lng:-100.75953977,nombre:'Abarrotes Garcia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:497,lat:20.7296194,lng:-100.75979684,nombre:'Abarrotes Landin',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:498,lat:20.72977766,lng:-100.7587362,nombre:'Abarotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:499,lat:20.72997116,lng:-100.75715975,nombre:'Abarrotes Soriano',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:500,lat:20.73047845,lng:-100.75867161,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:501,lat:20.73078271,lng:-100.76003613,nombre:'Carniceria San Jose',tipo:'Carniceria',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:502,lat:20.73114377,lng:-100.76098385,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:503,lat:20.73150216,lng:-100.76019566,nombre:'Tienda Botanas Y Bebidas',tipo:'Deposito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:504,lat:20.73203588,lng:-100.76018808,nombre:'Abarrotes Guerrero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:505,lat:20.7322904,lng:-100.75857094,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:506,lat:20.73269599,lng:-100.75929023,nombre:'Frituras Y Bebidas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:507,lat:20.73280399,lng:-100.75910315,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:508,lat:20.73305948,lng:-100.75997979,nombre:'Abarrotes Los Laureles',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:509,lat:20.73315705,lng:-100.75997103,nombre:'Abarrotes Valle',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:510,lat:20.73316234,lng:-100.76043019,nombre:'Abarrotes Parra',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:511,lat:20.73319116,lng:-100.75812826,nombre:'Tienda De Abarrotes Dany',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:512,lat:20.73339085,lng:-100.76063011,nombre:'Carniceria Don Joel',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:513,lat:20.7334896,lng:-100.76050388,nombre:'Deposito Los Molcajetes',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:514,lat:20.73397234,lng:-100.76075015,nombre:'La Granjita',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:515,lat:20.73403703,lng:-100.76076291,nombre:'Abarrotes Mosqueda',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:516,lat:20.73414689,lng:-100.75943994,nombre:'Tienda De Abarrotes Doña Concepcion',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:517,lat:20.73424314,lng:-100.76065102,nombre:'Deposito Camacho',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:518,lat:20.73452263,lng:-100.76011532,nombre:'Tienda De Abarrotes La Consentida',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:519,lat:20.73508945,lng:-100.76082194,nombre:'Panaderia Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:520,lat:20.73525498,lng:-100.75879269,nombre:'Abarrotes La Concentida 2',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:521,lat:20.7353724,lng:-100.76102148,nombre:'Vinos Y Licores Sebastian',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:522,lat:20.7356594,lng:-100.75813307,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:523,lat:20.73574316,lng:-100.76082292,nombre:'Abarrotes Angelina',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:524,lat:20.73583569,lng:-100.75919319,nombre:'Abarrotes Teresita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:525,lat:20.73607052,lng:-100.76099647,nombre:'Abarrotes Doña Viki',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:526,lat:20.73687632,lng:-100.76108793,nombre:'Pollo Fresco Del Dia Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:527,lat:20.73699755,lng:-100.75898619,nombre:'Abarrotes Remedios',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:528,lat:20.73727559,lng:-100.76101641,nombre:'Tienda De Abarrotes San Juditas',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:529,lat:20.7378132,lng:-100.76039898,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:530,lat:20.73801906,lng:-100.76090789,nombre:'Mini Super Lyk',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:531,lat:20.73819011,lng:-100.76064773,nombre:'Carniceria Rojas',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:532,lat:20.738278,lng:-100.76060236,nombre:'Frutas Y Verduras Vargas',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:533,lat:20.73883088,lng:-100.76033167,nombre:'Abarrotes Abi',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:534,lat:20.73908318,lng:-100.76031638,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:535,lat:20.73937202,lng:-100.76005469,nombre:'Vinos La Aduana',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:536,lat:20.73947252,lng:-100.7575296,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:537,lat:20.73960849,lng:-100.75993072,nombre:'Abarrotes Valeria',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:538,lat:20.73998492,lng:-100.75983205,nombre:'Abarrotes Perez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:539,lat:20.74000271,lng:-100.75747232,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:540,lat:20.74012114,lng:-100.75908593,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:541,lat:20.74013592,lng:-100.75854582,nombre:'Abarrotes Naomi',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:542,lat:20.74015525,lng:-100.75839172,nombre:'Abarrotes Leo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:543,lat:20.74017844,lng:-100.75875604,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:544,lat:20.74023997,lng:-100.75824556,nombre:'Polleria',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:545,lat:20.74027371,lng:-100.7579752,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:546,lat:20.74074162,lng:-100.75557271,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:547,lat:20.74089628,lng:-100.75919972,nombre:'Frutas Y Verduras Hernandez',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:548,lat:20.74137366,lng:-100.7588188,nombre:'Carniceria San Martin',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:549,lat:20.74174649,lng:-100.75851168,nombre:'Abarrotes La Montaña',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:550,lat:20.74177702,lng:-100.75674607,nombre:'Abarrotes La Tiendita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:551,lat:20.74306147,lng:-100.75713061,nombre:'Abarrotes Dany',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:552,lat:20.74392495,lng:-100.75524195,nombre:'Habartotes Sol',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:553,lat:20.88879043,lng:-100.75101207,nombre:'Abarrotes Jalisco',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:554,lat:20.88894952,lng:-100.75015278,nombre:'Tienda De Abarrotes Mora',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:555,lat:20.89286922,lng:-100.74879952,nombre:'Tienda De Abarrotes Romina',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:556,lat:20.89331162,lng:-100.74979805,nombre:'Tienda De Abarrotes Geovanni',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:557,lat:20.89371648,lng:-100.7496442,nombre:'Abarrotes Sanchez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:558,lat:20.89429507,lng:-100.74917005,nombre:'Carniceria Gonzalez',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:559,lat:20.89431796,lng:-100.74915349,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:560,lat:20.89458289,lng:-100.7490099,nombre:'Tienda De Abarrotes El Masa',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:561,lat:20.89505307,lng:-100.74892424,nombre:'Forrajes',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:562,lat:20.89508955,lng:-100.74891328,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:563,lat:20.89512401,lng:-100.74617872,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:564,lat:20.89598231,lng:-100.74773541,nombre:'Abarrotes Juanita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:565,lat:20.89601773,lng:-100.74903819,nombre:'Carniceria La Palmita',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:566,lat:20.89624594,lng:-100.74930788,nombre:'Tienda De Forrajes',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:567,lat:20.89648157,lng:-100.74965834,nombre:'Tienda Barrera',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:568,lat:20.89676938,lng:-100.7488467,nombre:'Polleria Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:569,lat:20.89679733,lng:-100.74885254,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:570,lat:20.89702,lng:-100.74714062,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:571,lat:20.89709111,lng:-100.75120781,nombre:'Modelorama La Lejona',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:572,lat:20.8971741,lng:-100.75068909,nombre:'Tienda De Abarrotes El Pirul',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:573,lat:20.89726547,lng:-100.75146691,nombre:'Minisuper Allende',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:574,lat:20.89778551,lng:-100.74747966,nombre:'Tienda De Abarrotes Frutas Y Verduras Yareth',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:575,lat:20.89859487,lng:-100.74495412,nombre:'Tienda Miscelanea La Loma',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:576,lat:20.89870767,lng:-100.74915643,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:577,lat:20.89910844,lng:-100.74775928,nombre:'Tienda De Abarrotes Eric',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:578,lat:20.89919445,lng:-100.74898276,nombre:'Tienda Abarrotes Hernandez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:579,lat:20.89928143,lng:-100.74769363,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:580,lat:20.89939047,lng:-100.74883665,nombre:'Abarrotes Paula',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:581,lat:20.89964708,lng:-100.744974,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:582,lat:20.90016614,lng:-100.74497652,nombre:'Papeleria Y Tienda El Tiko',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:583,lat:20.90023447,lng:-100.7458383,nombre:'Tienda La Providencia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:584,lat:20.90031265,lng:-100.74847212,nombre:'Fruteria Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:585,lat:20.90031265,lng:-100.74847212,nombre:'Polleria Pilgrims',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:586,lat:20.90035833,lng:-100.74540243,nombre:'Tienda De Abarrotes El Pico.Com',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:587,lat:20.90065654,lng:-100.74653976,nombre:'Carniceria Brianna',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:588,lat:20.90078549,lng:-100.74688687,nombre:'Tienda De Abarrotes Bety',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:589,lat:20.90080209,lng:-100.74492871,nombre:'Abarrotes Uvalle',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:590,lat:20.90102619,lng:-100.7473962,nombre:'Polleria Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:591,lat:20.9011752,lng:-100.74771256,nombre:'Abarrotes Carito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:592,lat:20.90120043,lng:-100.74823089,nombre:'Tienda De Abarrotes Felicita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:593,lat:20.90124532,lng:-100.74821041,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:594,lat:20.90126416,lng:-100.74563691,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:595,lat:20.90132559,lng:-100.74807027,nombre:'Tienda De Abarrotes Dany',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:596,lat:20.90143301,lng:-100.74800022,nombre:'Expendio De Pan Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:597,lat:20.90146853,lng:-100.74807445,nombre:'Abarrotes El Mezquite',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:598,lat:20.90170024,lng:-100.748381,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:599,lat:20.90172467,lng:-100.74576987,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:600,lat:20.90186072,lng:-100.74253219,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:601,lat:20.90190369,lng:-100.74326669,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:602,lat:20.90195002,lng:-100.74775754,nombre:'Carniceria Santa Fe',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:603,lat:20.90203935,lng:-100.74754473,nombre:'Fruteria Allende',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:604,lat:20.90219468,lng:-100.74335214,nombre:'Tienda',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:605,lat:20.90231182,lng:-100.74639132,nombre:'Tienda Cooperativa',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:606,lat:20.90235383,lng:-100.74359661,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:607,lat:20.90265003,lng:-100.74716777,nombre:'Miscelanea Mary',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:608,lat:20.90279862,lng:-100.74964924,nombre:'Modelorama Corona',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:609,lat:20.90293865,lng:-100.74725271,nombre:'Fruteria Y Verduleria El Jairo',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:610,lat:20.90293961,lng:-100.75014144,nombre:'Venta De Refrescos Y Sabritas',tipo:'Deposito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:611,lat:20.90298299,lng:-100.74733058,nombre:'Polleria La Santa Cruz',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:612,lat:20.90317931,lng:-100.74780995,nombre:'Super 5 De Mayo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:613,lat:20.90324692,lng:-100.74778743,nombre:'Fruteria Frutilandia',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:614,lat:20.90333421,lng:-100.74793451,nombre:'Carniceria La Esperanza Tres',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:615,lat:20.90335833,lng:-100.74797516,nombre:'Venta Frutas Y Verduras',tipo:'Fruteria',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:616,lat:20.9034698,lng:-100.74635045,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:617,lat:20.90372577,lng:-100.74972917,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:618,lat:20.90373654,lng:-100.74904954,nombre:'Polleria El Infiernito',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:619,lat:20.9037486,lng:-100.74871273,nombre:'Atiza Marquet',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:620,lat:20.90397245,lng:-100.74798434,nombre:'Tendejon',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:621,lat:20.90417389,lng:-100.74332667,nombre:'Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:622,lat:20.90424402,lng:-100.74882485,nombre:'Dulcefiesta',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:623,lat:20.90440024,lng:-100.74900818,nombre:'Fish Market',tipo:'Pescaderia',icon:'🐟',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:624,lat:20.90442744,lng:-100.7489985,nombre:'Rancho El 17',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:625,lat:20.90463417,lng:-100.74762621,nombre:'Rica Polleria',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:626,lat:20.90464825,lng:-100.74497035,nombre:'Tienda De Abarrotes Men',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:627,lat:20.90474082,lng:-100.74862552,nombre:'Mr Tofu',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:628,lat:20.90503587,lng:-100.74341113,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:629,lat:20.90511097,lng:-100.74368776,nombre:'Tendejon',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:630,lat:20.90515035,lng:-100.7487385,nombre:'Carniceria Allende',tipo:'Carniceria',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:631,lat:20.90516857,lng:-100.74351922,nombre:'Miscelanea Erika',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:632,lat:20.9053428,lng:-100.74427022,nombre:'Abarrotes Guerrero',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:633,lat:20.90548671,lng:-100.74396004,nombre:'Pescados Y Mariscos La Langosta Azul',tipo:'Pescaderia',icon:'🐟',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:634,lat:20.9055031,lng:-100.74860023,nombre:'Thrifty',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:635,lat:20.90561074,lng:-100.74855803,nombre:'Su Sazon Carne Brunett',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:636,lat:20.90615989,lng:-100.74920322,nombre:'La Factoria',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:637,lat:20.90627173,lng:-100.74818066,nombre:'Neveria La Reyna De Michoacan',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:638,lat:20.90638851,lng:-100.74826158,nombre:'The Mushroom Boutique De Nombre Simbiosis',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:639,lat:20.90701855,lng:-100.74409532,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:640,lat:20.9071035,lng:-100.74796684,nombre:'Fruteria Lucho',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:641,lat:20.907291,lng:-100.74412203,nombre:'Venta De Frituras Y Chicharrones',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:642,lat:20.90786231,lng:-100.74767683,nombre:'Tienda De Abarrotes Super Sierra',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:643,lat:20.90809772,lng:-100.74758852,nombre:'Tienda De Dulces Tipicos El Tumbagon',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:644,lat:20.90845534,lng:-100.74881875,nombre:'Venta De Dulces Papas Y Refrescos Doña Mary',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:645,lat:20.90873826,lng:-100.74927537,nombre:'Carniceria San Jose',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:646,lat:20.90887684,lng:-100.74141012,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:647,lat:20.9092172,lng:-100.74260573,nombre:'Estanquillo',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:648,lat:20.9093976,lng:-100.74692791,nombre:'Carne Vino',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:649,lat:20.90946638,lng:-100.74299911,nombre:'Estanquillo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:650,lat:20.90951745,lng:-100.74703542,nombre:'Cavalico Fine Liquors',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:651,lat:20.90957505,lng:-100.74318305,nombre:'Tienda De Abarrotes Golpe De Vista',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:652,lat:20.90966552,lng:-100.74333749,nombre:'Venta De Churritos Y Refreso',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:653,lat:20.91063348,lng:-100.74348957,nombre:'Tienda Sin Nombre',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:654,lat:20.91113592,lng:-100.7399866,nombre:'Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:655,lat:20.91113592,lng:-100.7399866,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:656,lat:20.91113592,lng:-100.7399866,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:657,lat:20.91113592,lng:-100.7399866,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:658,lat:20.91113592,lng:-100.7399866,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:659,lat:20.9111501,lng:-100.74031424,nombre:'Tienda De Abarrotes Don Chanito',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:660,lat:20.91115754,lng:-100.74277616,nombre:'Minisuper Supertodo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:661,lat:20.91148288,lng:-100.74195883,nombre:'Tienda Abarrotes Ruiz',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:662,lat:20.91164631,lng:-100.74562554,nombre:'Octagono Vino Ancestral Catas De Vinos Naturales Y Mezcal',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:663,lat:20.9125317,lng:-100.74051231,nombre:'Neveria Barranca',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:664,lat:20.91264171,lng:-100.74643068,nombre:'Smoke Shop Santa Maria',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:665,lat:20.91295125,lng:-100.74511075,nombre:'Internacional Cigars',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:666,lat:20.91337029,lng:-100.74202836,nombre:'Instituto Cultural De Agave Y Vino Icavi',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:667,lat:20.91355533,lng:-100.7459152,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:668,lat:20.91368645,lng:-100.74296188,nombre:'Dulceria Colores Mexicanos',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:669,lat:20.91374941,lng:-100.74290417,nombre:'La Casa Del Habano',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:670,lat:20.91377194,lng:-100.7445413,nombre:'Chocolates Johfrej',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:671,lat:20.91379687,lng:-100.7420541,nombre:'Tabacos Boutique International Cigars',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:672,lat:20.91400023,lng:-100.74620627,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:673,lat:20.9140163,lng:-100.74264361,nombre:'Tienda De Vinos Cuna De Tierra',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:674,lat:20.91401714,lng:-100.74262435,nombre:'Tienda De Aceites Olio Fino',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:675,lat:20.91418202,lng:-100.73904993,nombre:'Tienda De Abarrotes El Trujo',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:676,lat:20.91440849,lng:-100.74483194,nombre:'Dulceria Dulce Catrina',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:677,lat:20.9144562,lng:-100.74220485,nombre:'Nieves Santa Clara 1924',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:678,lat:20.91447132,lng:-100.74022866,nombre:'Tienda Modelorama',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:679,lat:20.91449762,lng:-100.74467418,nombre:'La Europea San Miguel De Allende',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:680,lat:20.91461018,lng:-100.74055211,nombre:'Tienda De Ventas Organicas Casa Organica',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:681,lat:20.91466816,lng:-100.74660907,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:682,lat:20.91503999,lng:-100.74326589,nombre:'Venta De Aceites Y Balsanicos Olio Fino',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:683,lat:20.91514688,lng:-100.74189154,nombre:'Dulceria El Papalote',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:684,lat:20.9153112,lng:-100.7419905,nombre:'Tienda De Abarrotes La Nueva Lucha',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:685,lat:20.91537473,lng:-100.74315634,nombre:'Dulceria Dulce Catrina San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:686,lat:20.91542824,lng:-100.74187543,nombre:'Tiend De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:687,lat:20.9154437,lng:-100.74800017,nombre:'Tienda De Abarrotes San Juan De Dios',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:688,lat:20.91548025,lng:-100.74127777,nombre:'Fruteria Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:689,lat:20.91548076,lng:-100.74120062,nombre:'Tienda De Accesorios Para Fumar Smoke Shop Leo',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:690,lat:20.91548115,lng:-100.7396171,nombre:'Tienda De Abarrotes',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:691,lat:20.91548295,lng:-100.74187229,nombre:'Paleteria La Michoacana',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:692,lat:20.91548774,lng:-100.74167353,nombre:'Pasteleria Fertin',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:693,lat:20.91552988,lng:-100.74365263,nombre:'Dulceria Dulce Catrina',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:694,lat:20.91558984,lng:-100.74088086,nombre:'Polleria El Pio Pio',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:695,lat:20.91559058,lng:-100.74093878,nombre:'Panaderia La Espiga',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:696,lat:20.91560384,lng:-100.74274431,nombre:'Frutas Y Verduras Alondra',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:697,lat:20.91560803,lng:-100.74212639,nombre:'Polleria El Infierno',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:698,lat:20.91560986,lng:-100.74181731,nombre:'Polleria El Venado',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:699,lat:20.91562193,lng:-100.7422619,nombre:'Carniceria La Lonja',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:700,lat:20.91567644,lng:-100.74226082,nombre:'Vinos Y Licores Pepe Llanos',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:701,lat:20.91568169,lng:-100.74179675,nombre:'Cremeria El Venado',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:702,lat:20.91573902,lng:-100.74118105,nombre:'Cremeria Don Jamon',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:703,lat:20.91573902,lng:-100.74118105,nombre:'Venta De Botanas',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:704,lat:20.91575433,lng:-100.74179669,nombre:'Cortes El Conejo',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:705,lat:20.91583019,lng:-100.74116484,nombre:'Distribuidora Gemma',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:706,lat:20.91584605,lng:-100.74523248,nombre:'Tienda De Abarrotes Miscelanea Maria Isabel',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:707,lat:20.91599147,lng:-100.74415905,nombre:'Hotel Meson Hidalgo',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:708,lat:20.91600028,lng:-100.74523118,nombre:'San Miguel Tasting Room',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:709,lat:20.91609349,lng:-100.74111802,nombre:'Super Carniceria La Paloma',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:710,lat:20.91611324,lng:-100.74242092,nombre:'Super Carniceria Cervantes',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:711,lat:20.91612755,lng:-100.74415848,nombre:'Dulceria El Papalote Dulces Regionales',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:712,lat:20.91612824,lng:-100.74315313,nombre:'Tienda De Dulces El Papalote Dulce Regionales',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:713,lat:20.91614792,lng:-100.74110834,nombre:'Polleria Dany',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:714,lat:20.91617443,lng:-100.74110362,nombre:'Carniceria La Nueva Lonja',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:715,lat:20.91622886,lng:-100.74109395,nombre:'Carniceria La Nueva Blanca',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:716,lat:20.91626424,lng:-100.74314211,nombre:'Dulceria Dulce Catrina San Miguel',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:717,lat:20.91632888,lng:-100.74107618,nombre:'Dulceria Dulcifiesta Tellez',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:718,lat:20.916378,lng:-100.74088256,nombre:'Deposito De Cerveza Don Quijote',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:719,lat:20.91638917,lng:-100.74058402,nombre:'Semillas Y Abarrotes Corazon De Maria',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:720,lat:20.91641508,lng:-100.74073712,nombre:'Dulceria Goretti',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:721,lat:20.91642966,lng:-100.74086306,nombre:'Materiales Primas Frituras Y Botanas La Divina Providencia',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:722,lat:20.91648078,lng:-100.74027487,nombre:'Semillas Y Abarrotes Elvira Gomez',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:723,lat:20.91648838,lng:-100.74048662,nombre:'Fruteria San Juan',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:724,lat:20.91655173,lng:-100.7402838,nombre:'Venta De Vaporizadores Vaelba',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:725,lat:20.91656348,lng:-100.74024616,nombre:'Polleria Merino',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:726,lat:20.91656747,lng:-100.7467909,nombre:'Tienda De Abarrotes Efren',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:727,lat:20.91671258,lng:-100.74262083,nombre:'Tienda Dulces Tipicos Sin Nombre',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:728,lat:20.9168742,lng:-100.74665057,nombre:'Carniceria La Carniceria',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:729,lat:20.91689,lng:-100.74096509,nombre:'Dulces Tipicos Tradicionales',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:730,lat:20.9169083,lng:-100.74139835,nombre:'Carniceria Las Tres Huaztecas',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:731,lat:20.91701321,lng:-100.74153647,nombre:'Carniceria El Becerro De Oro',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:732,lat:20.91701321,lng:-100.74153647,nombre:'Carniceria El Pavo',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:733,lat:20.91701321,lng:-100.74153647,nombre:'Carniceria El Torito',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:734,lat:20.91701321,lng:-100.74153647,nombre:'Carniceria La Chuleta',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:735,lat:20.91701321,lng:-100.74153647,nombre:'Carniceria La Esperanza',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:736,lat:20.91701321,lng:-100.74153647,nombre:'Carniceria La Huasteca',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:737,lat:20.91701321,lng:-100.74153647,nombre:'Cereales Granos Y Semillas Muñoz',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:738,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:739,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras Don Chayo',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:740,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras Gonzalez',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:741,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:742,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:743,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras Sin Nombre',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:744,lat:20.91701321,lng:-100.74153647,nombre:'Frutas Y Verduras Vero',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:745,lat:20.91701321,lng:-100.74153647,nombre:'Fruteria Gonzalez',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:746,lat:20.91701321,lng:-100.74153647,nombre:'Fruteria Y Verduleria Las Gueras',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:747,lat:20.91701321,lng:-100.74153647,nombre:'Fruteria Yañez',tipo:'Fruteria',icon:'🥦',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:748,lat:20.91701321,lng:-100.74153647,nombre:'Hielera Hielo Cristal',tipo:'Deposito',icon:'🍺',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:749,lat:20.91701321,lng:-100.74153647,nombre:'Pescaderia Peinado',tipo:'Pescaderia',icon:'🐟',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:750,lat:20.91701321,lng:-100.74153647,nombre:'Polleria La Nueva',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:751,lat:20.91701321,lng:-100.74153647,nombre:'Polleria Las Conchitas',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:752,lat:20.91701321,lng:-100.74153647,nombre:'Polleria Sin Nombre',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:753,lat:20.91701321,lng:-100.74153647,nombre:'Tienda De Abarrotes Las Rosas Del Tepeyac',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:754,lat:20.91701321,lng:-100.74153647,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:755,lat:20.91701321,lng:-100.74153647,nombre:'Tienda De Semillas Cereales Y Miel',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:756,lat:20.91706501,lng:-100.74635096,nombre:'Tienda De Abarrotes Amelia',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:757,lat:20.91711265,lng:-100.74660152,nombre:'Polleria Mary',tipo:'Carniceria',icon:'🥩',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:758,lat:20.91712669,lng:-100.74625404,nombre:'Super Sammys',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:759,lat:20.91718067,lng:-100.74423634,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:760,lat:20.91720845,lng:-100.74170214,nombre:'Venta De Refresco Estanquillo Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:761,lat:20.91747599,lng:-100.74638485,nombre:'Tienda De Abarrotes El Callejon',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:762,lat:20.91762763,lng:-100.74237671,nombre:'Tienda De Abarrotes Lupita',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:763,lat:20.91801305,lng:-100.7428575,nombre:'Tienda De Abarrotes Sin Nombre',tipo:'Abarrotes / Miscelanea',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'},
+  {id:764,lat:20.91826097,lng:-100.74259941,nombre:'Dulces La Parroquia',tipo:'Tienda Independiente',icon:'🏪',dia:'S',diaNom:'Sabado',color:'#16a085'}
+];
+const DIAS_INFO={'L':{nom:'Lunes',color:'#2e6da4'},'M':{nom:'Martes',color:'#8e44ad'},'X':{nom:'Miercoles',color:'#27ae60'},'J':{nom:'Jueves',color:'#e67e22'},'V':{nom:'Viernes',color:'#c0392b'},'S':{nom:'Sabado',color:'#16a085'}};
+const DIAS_KEYS=["L", "M", "X", "J", "V", "S"];
+const CORREDOR_POLY=[[20.5481, -100.7244], [20.545, -100.773], [20.527, -100.769], [20.566, -100.768], [20.672, -100.762], [20.697, -100.762], [20.715, -100.762], [20.7208, -100.7524], [20.718, -100.759], [20.732, -100.759], [20.742, -100.759], [20.75, -100.76], [20.754, -100.765], [20.766, -100.765], [20.78, -100.765], [20.8, -100.764], [20.82, -100.76], [20.848, -100.756], [20.865, -100.749], [20.8853, -100.749], [20.9139, -100.7436]];
+const RADIO=100;
+let estado=JSON.parse(localStorage.getItem('val_'+ID_RUTA)||'{}');
+let diaActivo='L',puntoActivo=null,miUbicacion=null,markerYo=null,marcadores={},alertaMostrada=false;
+
+const map=L.map('map').setView([20.7204,-100.7487],11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+
+L.polyline(CORREDOR_POLY,{color:'#2e6da4',weight:16,opacity:.12}).addTo(map);
+L.polyline(CORREDOR_POLY,{color:'#2e6da4',weight:3,opacity:.9,dashArray:'10,5'}).addTo(map);
+
+function iconM(p){
+  const e=estado[p.id],bg=e?(e.existe?'#27ae60':'#e74c3c'):p.color;
+  return L.divIcon({className:'',html:`<div style="background:${bg};width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 5px rgba(0,0,0,.3)">${p.icon}</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+}
+
+PUNTOS.forEach(p=>{
+  const m=L.marker([p.lat,p.lng],{icon:iconM(p)}).addTo(map)
+    .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>${p.tipo}<br><small>${ID_RUTA}-${p.dia}-${p.id}</small>`)
+    .on('click',()=>abrirAlerta(p.id));
+  marcadores[p.id]=m;
+});
+
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+}else{document.getElementById('gpsMsg').textContent='GPS no disponible';document.getElementById('gpsDot').classList.add('err');}
+
+function onPos(pos){
+  const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
+  miUbicacion={lat,lng};
+  document.getElementById('gpsDot').classList.remove('err');document.getElementById('gpsDot').classList.add('on');
+  document.getElementById('gpsMsg').textContent=`GPS activo — precision +-${acc}m`;
+  if(!markerYo)markerYo=L.circleMarker([lat,lng],{radius:10,color:'#e67e22',fillColor:'#f39c12',fillOpacity:.9,weight:3}).addTo(map).bindPopup('📍 Tu estas aqui');
+  else markerYo.setLatLng([lat,lng]);
+  verificarCercania(lat,lng);
+}
+function onErr(err){document.getElementById('gpsDot').classList.add('err');document.getElementById('gpsMsg').textContent='Error GPS: '+(err.code===1?'Permiso denegado':err.code===2?'Sin senal':'Timeout');}
+
+function dist(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
+function verificarCercania(lat,lng){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  let mejor=null,minD=Infinity;
+  hoy.forEach(p=>{const d=dist(lat,lng,p.lat,p.lng);if(d<minD){minD=d;mejor=p;}marcadores[p.id].setIcon(iconM(p));});
+  renderLista();
+  if(mejor&&minD<RADIO&&!estado[mejor.id]&&!alertaMostrada){alertaMostrada=true;abrirAlerta(mejor.id);}
+  if(minD>=RADIO)alertaMostrada=false;
+}
+
+function abrirAlerta(id){
+  const p=PUNTOS.find(x=>x.id===id);puntoActivo=id;
+  document.getElementById('al-icon').textContent=p.icon;
+  document.getElementById('al-nombre').textContent=p.nombre;
+  document.getElementById('al-tipo').textContent=p.tipo;
+  document.getElementById('al-coords').textContent=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ${ID_RUTA}-${p.dia}-${p.id}`;
+  document.getElementById('alerta').classList.add('show');
+  map.setView([p.lat,p.lng],16);
+}
+function cerrarAlerta(){document.getElementById('alerta').classList.remove('show');puntoActivo=null;}
+
+function validar(existe){
+  if(puntoActivo===null)return;
+  estado[puntoActivo]={existe,ts:new Date().toISOString()};
+  localStorage.setItem('val_'+ID_RUTA,JSON.stringify(estado));
+  marcadores[puntoActivo].setIcon(iconM(PUNTOS.find(p=>p.id===puntoActivo)));
+  cerrarAlerta();renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
+}
+
+function renderLista(){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  document.getElementById('tab-lista').innerHTML=hoy.map(p=>{
+    const e=estado[p.id],cls=e?(e.existe?'existe':'no-existe'):'';
+    const badge=e?(e.existe?'<span class="p-badge b-ok">✅ Existe</span>':'<span class="p-badge b-no">❌ No existe</span>'):'<span class="p-badge b-pen">⏳</span>';
+    const dm=miUbicacion?` · ${Math.round(dist(miUbicacion.lat,miUbicacion.lng,p.lat,p.lng))}m`:'';
+    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})"><div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-nombre">${p.nombre}</div><div class="p-tipo">${p.tipo}</div><div class="p-dist">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${dm}</div></div>${badge}</div>`;
+  }).join('');
+}
+
+function actualizarResultados(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length,pen=TOTAL_PTS-vals.length;
+  document.getElementById('r-ok').textContent=ok;document.getElementById('r-no').textContent=no;document.getElementById('r-pen').textContent=pen;
+  const pok=Math.round(ok/TOTAL_PTS*100),pno=Math.round(no/TOTAL_PTS*100);
+  document.getElementById('g-ok').style.width=pok+'%';document.getElementById('g-ok').textContent=pok?pok+'%':'';
+  document.getElementById('g-no').style.width=pno+'%';document.getElementById('g-no').textContent=pno?pno+'%':'';
+  document.getElementById('diasAvance').innerHTML=DIAS_KEYS.map(key=>{
+    const info=DIAS_INFO[key],pts=PUNTOS.filter(p=>p.dia===key);if(!pts.length)return '';
+    const v=pts.filter(p=>estado[p.id]).length,pct=Math.round(v/pts.length*100);
+    return `<div class="dia-row"><div class="dia-dot" style="background:${info.color}"></div><span class="dia-nm">${info.nom}</span><div class="dia-br-bg"><div class="dia-br-fill" style="background:${info.color};width:${pct}%">${pct?pct+'%':''}</div></div><span class="dia-num">${v}/${pts.length}</span></div>`;
+  }).join('');
+}
+function actualizarProgreso(){
+  const h=Object.keys(estado).length,pct=Math.round(h/TOTAL_PTS*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=`${h} / ${TOTAL_PTS} validados (${pct}%)`;
+}
+function actualizarTabDias(){
+  DIAS_KEYS.forEach(key=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),el=document.getElementById('cnt-'+key);
+    if(!el||!pts.length)return;
+    const v=pts.filter(p=>estado[p.id]).length;
+    el.textContent=`${v}/${pts.length}`;el.className=v===pts.length?'cnt done':'cnt';
+  });
+}
+function setDia(dia){
+  diaActivo=dia;
+  document.querySelectorAll('.dia-tab').forEach(t=>t.classList.remove('act'));
+  document.getElementById('tab-'+dia).classList.add('act');
+  const pts=PUNTOS.filter(p=>p.dia===dia);
+  if(pts.length){const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lng);map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[30,30]});}
+  renderLista();
+}
+function setSubTab(tab){
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>t.classList.toggle('act',['lista','res'][i]===tab));
+  document.getElementById('tab-lista').style.display=tab==='lista'?'':'none';
+  document.getElementById('tab-res').style.display=tab==='res'?'block':'none';
+  if(tab==='res')actualizarResultados();
+}
+function exportar(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length;
+  let txt=`REPORTE DE VALIDACION\nID Ruta   : ${ID_RUTA}\nRuta      : Carr. Fed. 51 Apaseo el Grande → San Miguel de Allende, GTO\nCorredor  : ±500m de la carretera\nFecha     : ${new Date().toLocaleDateString('es-MX')}\nFuente    : DENUE INEGI (SCIAN 461xxx, estrato 0-5)\n\nRESUMEN\nTotal     : ${TOTAL_PTS}\n✅ Existen  : ${ok} (${Math.round(ok/TOTAL_PTS*100)}%)\n❌ No exist : ${no} (${Math.round(no/TOTAL_PTS*100)}%)\n⏳ Pendient : ${TOTAL_PTS-vals.length}\n\n`;
+  DIAS_KEYS.forEach(key=>{
+    const info=DIAS_INFO[key],pts=PUNTOS.filter(p=>p.dia===key);
+    if(!pts.length)return;
+    const v=pts.filter(p=>estado[p.id]).length;
+    txt+=`${info.nom}: ${v}/${pts.length} validados\n`;
+    pts.forEach(p=>{const e=estado[p.id];txt+=`  [${ID_RUTA}-${p.dia}-${p.id}] ${p.nombre} (${p.tipo}): ${e?(e.existe?'EXISTE':'NO EXISTE'):'PENDIENTE'}${e?' — '+new Date(e.ts).toLocaleString('es-MX'):''}\n`;});
+    txt+='\n';
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+  a.download=`${ID_RUTA}_${new Date().toISOString().slice(0,10)}.txt`;a.click();
+}
+function resetear(){if(!confirm('¿Reiniciar toda la validacion?'))return;localStorage.removeItem('val_'+ID_RUTA);estado={};PUNTOS.forEach(p=>marcadores[p.id].setIcon(iconM(p)));renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();}
+
+renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();setDia('L');
+</script>
+</body>
+</html>
