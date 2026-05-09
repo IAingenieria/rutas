@@ -9,7 +9,6 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1a1a2e}
-
 .header{background:#1a3a5c;color:white;padding:10px 14px;position:sticky;top:0;z-index:1000}
 .header-top{display:flex;justify-content:space-between;align-items:flex-start}
 .header h1{font-size:15px;font-weight:800}
@@ -18,34 +17,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prog-wrap{background:rgba(255,255,255,.2);border-radius:20px;height:7px;margin-top:7px}
 .prog-bar{height:100%;background:#27ae60;border-radius:20px;transition:width .4s}
 .prog-txt{font-size:9px;text-align:right;margin-top:2px;opacity:.85}
-
 .dia-tabs{display:flex;background:#122b45;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .dia-tab{flex-shrink:0;padding:8px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.5);
           border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
 .dia-tab.act{color:white;border-bottom-color:var(--c)}
-.dia-tab .cnt{font-size:9px;margin-left:4px;background:rgba(255,255,255,.15);
-               padding:1px 5px;border-radius:8px}
+.dia-tab .cnt{font-size:9px;margin-left:4px;background:rgba(255,255,255,.15);padding:1px 5px;border-radius:8px}
 .dia-tab .cnt.done{background:#27ae60;color:white}
-
-.gps-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;
-          background:white;border-bottom:1px solid #e0e0e0;font-size:11px}
+.gps-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:white;border-bottom:1px solid #e0e0e0;font-size:11px}
 .gps-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
 .gps-dot.on{background:#27ae60;animation:pulse 1.5s infinite}
 .gps-dot.err{background:#e74c3c}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
 #map{height:240px;width:100%}
-
 .sub-tabs{display:flex;background:white;border-bottom:2px solid #e0e0e0}
-.sub-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:600;
-          color:#888;border:none;background:none;cursor:pointer}
+.sub-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:600;color:#888;border:none;background:none;cursor:pointer}
 .sub-tab.act{color:#1a3a5c;border-bottom:3px solid #2e6da4;margin-bottom:-2px}
-
 #tab-lista{padding:10px}
-.punto-card{background:white;border-radius:10px;padding:11px 12px;margin-bottom:7px;
-             display:flex;align-items:center;gap:10px;
-             box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;
-             border-left:4px solid #dce8f5;transition:border-color .2s}
+.punto-card{background:white;border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;border-left:4px solid #dce8f5;transition:border-color .2s}
 .punto-card.existe{border-left-color:#27ae60}
 .punto-card.no-existe{border-left-color:#e74c3c}
 .punto-card.cercano{border-left-color:#f39c12;background:#fffbf0}
@@ -53,15 +41,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .p-info{flex:1;min-width:0}
 .p-nombre{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-tipo{font-size:10px;color:#888}
-.p-coords{font-size:9px;color:#bbb}
+.p-dist{font-size:9px;color:#bbb}
 .p-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;flex-shrink:0}
 .b-ok{background:#d4edda;color:#155724}
 .b-no{background:#f8d7da;color:#721c24}
 .b-pen{background:#e8f4fd;color:#0c5460}
-
-.alerta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;
-         background:white;border-radius:20px 20px 0 0;
-         box-shadow:0 -4px 30px rgba(0,0,0,.25);padding:18px 18px 28px}
+.alerta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;background:white;border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.25);padding:18px 18px 28px}
 .alerta.show{display:block}
 .al-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
 .al-icon{font-size:28px;margin-bottom:4px}
@@ -69,93 +54,57 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .al-tipo{font-size:12px;color:#888;margin-bottom:2px}
 .al-coords{font-size:10px;color:#bbb;margin-bottom:16px}
 .al-btns{display:flex;gap:10px}
-.al-btns button{flex:1;border:none;border-radius:14px;padding:15px;
-                 font-size:16px;font-weight:800;cursor:pointer}
+.al-btns button{flex:1;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
 .btn-ok{background:#27ae60;color:white}
 .btn-no{background:#e74c3c;color:white}
-.btn-cerrar{position:absolute;top:14px;right:14px;background:#f0f4f8;border:none;
-             border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#555}
-
+.btn-cerrar{position:absolute;top:14px;right:14px;background:#f0f4f8;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#555}
 #tab-res{padding:12px;display:none}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.stat-c{background:white;border-radius:10px;padding:12px 6px;text-align:center;
-         box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stat-c{background:white;border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .stat-n{font-size:22px;font-weight:800}
 .stat-l{font-size:10px;color:#888;margin-top:2px}
-.grafica{background:white;border-radius:10px;padding:12px;margin-bottom:12px;
-          box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.grafica{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .grafica h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
 .br-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .br-lbl{font-size:10px;width:65px;text-align:right;color:#555}
 .br-bg{flex:1;background:#f0f4f8;border-radius:8px;height:16px;overflow:hidden}
-.br-fill{height:100%;border-radius:8px;display:flex;align-items:center;
-          justify-content:flex-end;padding-right:5px;font-size:9px;font-weight:700;
-          color:white;transition:width .5s;min-width:24px}
+.br-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:9px;font-weight:700;color:white;transition:width .5s;min-width:24px}
 .br-ok{background:#27ae60}.br-no{background:#e74c3c}
-
-.por-dia{background:white;border-radius:10px;padding:12px;margin-bottom:12px;
-          box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.por-dia{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .por-dia h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
 .dia-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .dia-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .dia-nm{font-size:11px;width:70px;color:#555}
 .dia-br-bg{flex:1;background:#f0f4f8;border-radius:6px;height:14px;overflow:hidden}
-.dia-br-fill{height:100%;border-radius:6px;transition:width .4s;display:flex;align-items:center;
-              padding:0 5px;font-size:8px;font-weight:700;color:white}
+.dia-br-fill{height:100%;border-radius:6px;transition:width .4s;display:flex;align-items:center;padding:0 5px;font-size:8px;font-weight:700;color:white}
 .dia-num{font-size:10px;color:#888;width:40px;text-align:right}
-
-.btn-exp{width:100%;background:#1a3a5c;color:white;border:none;border-radius:12px;
-          padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
-.btn-rst{width:100%;background:#f8d7da;color:#721c24;border:none;border-radius:12px;
-          padding:11px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-exp{width:100%;background:#1a3a5c;color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-rst{width:100%;background:#f8d7da;color:#721c24;border:none;border-radius:12px;padding:11px;font-size:12px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-top">
-    <div>
-      <h1>📍 Validación de Puntos</h1>
-      <p>Monterrey NL — Tiendas y Abarrotes — 5 km</p>
-    </div>
+    <div><h1>📍 Validación de Puntos</h1><p>San Nicolás de los Garza, NL — Tiendas Independientes — 5 km</p></div>
     <span class="route-id">VAL-NL-MTY-001</span>
   </div>
   <div class="prog-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
   <div class="prog-txt" id="progTxt">0 / 125 validados</div>
 </div>
-
 <div class="dia-tabs" id="diaTabs">
-  <button class="dia-tab act" style="--c:#2e6da4" onclick="setDia('L')" id="tab-L">
-    Lunes <span class="cnt" id="cnt-L">0/25</span>
-  </button>
-  <button class="dia-tab" style="--c:#8e44ad" onclick="setDia('M')" id="tab-M">
-    Martes <span class="cnt" id="cnt-M">0/25</span>
-  </button>
-  <button class="dia-tab" style="--c:#27ae60" onclick="setDia('X')" id="tab-X">
-    Miércoles <span class="cnt" id="cnt-X">0/25</span>
-  </button>
-  <button class="dia-tab" style="--c:#e67e22" onclick="setDia('J')" id="tab-J">
-    Jueves <span class="cnt" id="cnt-J">0/25</span>
-  </button>
-  <button class="dia-tab" style="--c:#c0392b" onclick="setDia('V')" id="tab-V">
-    Viernes <span class="cnt" id="cnt-V">0/25</span>
-  </button>
+  <button class="dia-tab act" style="--c:#2e6da4" onclick="setDia('L')" id="tab-L">Lunes <span class="cnt" id="cnt-L">0/25</span></button>
+  <button class="dia-tab" style="--c:#8e44ad" onclick="setDia('M')" id="tab-M">Martes <span class="cnt" id="cnt-M">0/25</span></button>
+  <button class="dia-tab" style="--c:#27ae60" onclick="setDia('X')" id="tab-X">Miércoles <span class="cnt" id="cnt-X">0/25</span></button>
+  <button class="dia-tab" style="--c:#e67e22" onclick="setDia('J')" id="tab-J">Jueves <span class="cnt" id="cnt-J">0/25</span></button>
+  <button class="dia-tab" style="--c:#c0392b" onclick="setDia('V')" id="tab-V">Viernes <span class="cnt" id="cnt-V">0/25</span></button>
 </div>
-
-<div class="gps-bar">
-  <div class="gps-dot" id="gpsDot"></div>
-  <span id="gpsMsg">Iniciando GPS...</span>
-</div>
-
+<div class="gps-bar"><div class="gps-dot" id="gpsDot"></div><span id="gpsMsg">Iniciando GPS...</span></div>
 <div id="map"></div>
-
 <div class="sub-tabs">
   <button class="sub-tab act" onclick="setSubTab('lista')">📋 Lista</button>
   <button class="sub-tab" onclick="setSubTab('res')">📊 Resultados</button>
 </div>
-
 <div id="tab-lista"></div>
-
 <div id="tab-res">
   <div class="stat-grid">
     <div class="stat-c"><div class="stat-n" style="color:#27ae60" id="r-ok">0</div><div class="stat-l">✅ Existen</div></div>
@@ -164,19 +113,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div class="grafica">
     <h3>Distribución total</h3>
-    <div class="br-row"><span class="br-lbl">Existen</span>
-      <div class="br-bg"><div class="br-fill br-ok" id="g-ok" style="width:0%">0%</div></div></div>
-    <div class="br-row"><span class="br-lbl">No existen</span>
-      <div class="br-bg"><div class="br-fill br-no" id="g-no" style="width:0%">0%</div></div></div>
+    <div class="br-row"><span class="br-lbl">Existen</span><div class="br-bg"><div class="br-fill br-ok" id="g-ok" style="width:0%">0%</div></div></div>
+    <div class="br-row"><span class="br-lbl">No existen</span><div class="br-bg"><div class="br-fill br-no" id="g-no" style="width:0%">0%</div></div></div>
   </div>
-  <div class="por-dia">
-    <h3>Avance por día</h3>
-    <div id="diasAvance"></div>
-  </div>
+  <div class="por-dia"><h3>Avance por día</h3><div id="diasAvance"></div></div>
   <button class="btn-exp" onclick="exportar()">📤 Exportar reporte completo</button>
   <button class="btn-rst" onclick="resetear()">🔄 Reiniciar validación</button>
 </div>
-
 <div class="alerta" id="alerta">
   <button class="btn-cerrar" onclick="cerrarAlerta()">✕</button>
   <div class="al-label">📍 Llegaste al punto</div>
@@ -189,397 +132,260 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="btn-no" onclick="validar(false)">❌ NO EXISTE</button>
   </div>
 </div>
-
 <script>
-const ID_RUTA = 'VAL-NL-MTY-001';
-const PUNTOS = [
-  {id:1,lat:25.7212743,lng:-100.325989,nombre:'Bodega Aurrera Express',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:2,lat:25.6963197,lng:-100.317119,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:3,lat:25.701235,lng:-100.316326,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:4,lat:25.701363,lng:-100.316289,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:5,lat:25.7061856,lng:-100.314082,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:6,lat:25.7442816,lng:-100.312986,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:7,lat:25.6868111,lng:-100.308209,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:8,lat:25.7241931,lng:-100.3078981,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:9,lat:25.7244107,lng:-100.3073085,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:10,lat:25.7368033,lng:-100.3049586,nombre:'PastelerÃ­a Lety',tipo:'Panadería',icon:'🥐',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:11,lat:25.7456257,lng:-100.302493,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:12,lat:25.7421736,lng:-100.301468,nombre:'Waldo\'s',tipo:'Supermercado',icon:'🛒',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:13,lat:25.7465635,lng:-100.300637,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:14,lat:25.735805,lng:-100.3000541,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:15,lat:25.6822054,lng:-100.299148,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:16,lat:25.6845039,lng:-100.298568,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:17,lat:25.7547612,lng:-100.29761,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:18,lat:25.7542104,lng:-100.2970014,nombre:'El Camaroncito',tipo:'Marisquería',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:19,lat:25.6873128,lng:-100.296604,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:20,lat:25.7534012,lng:-100.2964603,nombre:'Mariscos Beto\'s',tipo:'Marisquería',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:21,lat:25.7599371,lng:-100.2952224,nombre:'Six Universidad',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:22,lat:25.7597614,lng:-100.2951834,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:23,lat:25.7125609,lng:-100.2951113,nombre:'Toro Bueno',tipo:'Carnicería',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:24,lat:25.7517315,lng:-100.2950133,nombre:'El Roble',tipo:'Panadería',icon:'🥐',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:25,lat:25.7547634,lng:-100.2948711,nombre:'Fish World',tipo:'Marisquería',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
-  {id:26,lat:25.7550121,lng:-100.2937564,nombre:'Mr Pay',tipo:'Panadería',icon:'🥐',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:27,lat:25.7557949,lng:-100.2910701,nombre:'La Ideal',tipo:'Panadería',icon:'🥐',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:28,lat:25.7562022,lng:-100.2903196,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:29,lat:25.7363931,lng:-100.2886412,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:30,lat:25.7495477,lng:-100.288391,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:31,lat:25.7620811,lng:-100.2877904,nombre:'Oxxo Cedeco',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:32,lat:25.7034374,lng:-100.287597,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:33,lat:25.7469073,lng:-100.287136,nombre:'7-Eleven',tipo:'Supermercado',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:34,lat:25.7570265,lng:-100.2869695,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:35,lat:25.7160966,lng:-100.283765,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:36,lat:25.749766,lng:-100.279032,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:37,lat:25.6953352,lng:-100.2780433,nombre:'Negocio #37',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:38,lat:25.7505242,lng:-100.2777126,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:39,lat:25.6916,lng:-100.277529,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:40,lat:25.7288379,lng:-100.277161,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:41,lat:25.7547202,lng:-100.276531,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:42,lat:25.728156,lng:-100.276219,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:43,lat:25.7611989,lng:-100.274548,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:44,lat:25.7541903,lng:-100.274195,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:45,lat:25.7414799,lng:-100.274149,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:46,lat:25.7625024,lng:-100.27305,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:47,lat:25.6848335,lng:-100.272883,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:48,lat:25.7321021,lng:-100.2721156,nombre:'Gm super carnes',tipo:'Supermercado',icon:'🛒',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:49,lat:25.759098,lng:-100.271065,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:50,lat:25.75347,lng:-100.270951,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
-  {id:51,lat:25.7410867,lng:-100.270805,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:52,lat:25.7345594,lng:-100.270755,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:53,lat:25.7607732,lng:-100.270216,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:54,lat:25.7351575,lng:-100.269849,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:55,lat:25.7503691,lng:-100.269536,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:56,lat:25.7509738,lng:-100.269497,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:57,lat:25.7505448,lng:-100.268988,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:58,lat:25.7606515,lng:-100.268166,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:59,lat:25.687253,lng:-100.268021,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:60,lat:25.70317,lng:-100.267666,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:61,lat:25.7180872,lng:-100.266163,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:62,lat:25.7559173,lng:-100.2660041,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:63,lat:25.7186249,lng:-100.265952,nombre:'PastelerÃ­a Lety',tipo:'Panadería',icon:'🥐',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:64,lat:25.7188448,lng:-100.265677,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:65,lat:25.7578098,lng:-100.265638,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:66,lat:25.6793718,lng:-100.2651646,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:67,lat:25.7410742,lng:-100.264815,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:68,lat:25.7347782,lng:-100.264658,nombre:'Bodega Aurrera',tipo:'Supermercado',icon:'🛒',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:69,lat:25.759781,lng:-100.264233,nombre:'Super Carnes GM',tipo:'Carnicería',icon:'🥩',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:70,lat:25.703415,lng:-100.262615,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:71,lat:25.7424856,lng:-100.262601,nombre:'Bodega Aurrera',tipo:'Supermercado',icon:'🛒',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:72,lat:25.7351801,lng:-100.2621976,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:73,lat:25.7446614,lng:-100.2618013,nombre:'Negocio #73',tipo:'Panadería',icon:'🥐',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:74,lat:25.7104355,lng:-100.260812,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:75,lat:25.6885264,lng:-100.2605377,nombre:'Waldo\'s Mart',tipo:'Supermercado',icon:'🛒',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
-  {id:76,lat:25.7117616,lng:-100.2596625,nombre:'Plaza Las Galias',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:77,lat:25.7517926,lng:-100.258942,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:78,lat:25.7028857,lng:-100.258511,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:79,lat:25.72568,lng:-100.258442,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:80,lat:25.7516257,lng:-100.2583645,nombre:'NorteÃ±o Santo Domingo',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:81,lat:25.6918211,lng:-100.258102,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:82,lat:25.6883647,lng:-100.2580551,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:83,lat:25.7503241,lng:-100.257136,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:84,lat:25.7503362,lng:-100.257134,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:85,lat:25.7228511,lng:-100.2563756,nombre:'Oxxo Los Mezquites',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:86,lat:25.7489769,lng:-100.256345,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:87,lat:25.7491893,lng:-100.256254,nombre:'SuKarne',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:88,lat:25.7504793,lng:-100.2561755,nombre:'Punto 36',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:89,lat:25.6883499,lng:-100.255866,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:90,lat:25.6951517,lng:-100.254927,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:91,lat:25.7387951,lng:-100.254633,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:92,lat:25.6927831,lng:-100.254401,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:93,lat:25.689787,lng:-100.253632,nombre:'CarnicerÃ­a San Juan',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:94,lat:25.7289251,lng:-100.253365,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:95,lat:25.690397,lng:-100.252599,nombre:'Multipack Lindavista',tipo:'Tienda General',icon:'🏬',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:96,lat:25.7158604,lng:-100.252327,nombre:'Waldo\'s',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:97,lat:25.7137639,lng:-100.251451,nombre:'Bodega Aurrera',tipo:'Supermercado',icon:'🛒',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:98,lat:25.7536636,lng:-100.25117,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:99,lat:25.7133997,lng:-100.24838,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:100,lat:25.7143279,lng:-100.248377,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
-  {id:101,lat:25.7531831,lng:-100.248054,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:102,lat:25.6907664,lng:-100.247865,nombre:'H-E-B',tipo:'Supermercado',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:103,lat:25.7164484,lng:-100.2475276,nombre:'H-E-B',tipo:'Supermercado',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:104,lat:25.7164412,lng:-100.24736,nombre:'H-E-B',tipo:'Supermercado',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:105,lat:25.755005,lng:-100.247243,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:106,lat:25.7100162,lng:-100.2468738,nombre:'Negocio #106',tipo:'Marisquería',icon:'🐟',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:107,lat:25.6875993,lng:-100.2461422,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:108,lat:25.7499155,lng:-100.245347,nombre:'Bodega Aurrera',tipo:'Supermercado',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:109,lat:25.6927661,lng:-100.24282,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:110,lat:25.703238,lng:-100.2413732,nombre:'SAM',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:111,lat:25.7280201,lng:-100.2408655,nombre:'OXXO',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:112,lat:25.7159352,lng:-100.240861,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:113,lat:25.7302458,lng:-100.240403,nombre:'CÃ¡rdenas',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:114,lat:25.7495553,lng:-100.240175,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:115,lat:25.7156247,lng:-100.240058,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:116,lat:25.7496278,lng:-100.240003,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:117,lat:25.7034241,lng:-100.238994,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:118,lat:25.7326746,lng:-100.2388719,nombre:'Negocio #118',tipo:'Panadería',icon:'🥐',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:119,lat:25.7401785,lng:-100.2388565,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:120,lat:25.7012828,lng:-100.238738,nombre:'Soriana',tipo:'Supermercado',icon:'🛒',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:121,lat:25.7187395,lng:-100.236272,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:122,lat:25.7178249,lng:-100.235552,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:123,lat:25.7068658,lng:-100.2355237,nombre:'Abarrotes Hernandez',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:124,lat:25.7171483,lng:-100.235455,nombre:'7-Eleven',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
-  {id:125,lat:25.7325842,lng:-100.234783,nombre:'Oxxo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'}
+const ID_RUTA='VAL-NL-MTY-001';
+const PUNTOS=[
+  {id:1,lat:25.7289565,lng:-100.3355015,nombre:'Depósito Eloy',tipo:'Depósito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:2,lat:25.7358313,lng:-100.3204916,nombre:'Frutería Progreso',tipo:'Carnicería',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:3,lat:25.7497733,lng:-100.3124674,nombre:'Frutería Villa Frut',tipo:'Frutería',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:4,lat:25.7477643,lng:-100.3057253,nombre:'Única Frutería y mas',tipo:'Frutería',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:5,lat:25.7368033,lng:-100.3049586,nombre:'PastelerÃ­a Lety',tipo:'Panadería',icon:'🥐',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:6,lat:25.7022006,lng:-100.3042506,nombre:'Deposito A3',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:7,lat:25.7051155,lng:-100.3026124,nombre:'Mini Súper La Tiendita De La Esquina',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:8,lat:25.7644518,lng:-100.2995983,nombre:'Miscelánea la Providencia',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:9,lat:25.7542104,lng:-100.2970014,nombre:'El Camaroncito',tipo:'Pescadería',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:10,lat:25.6862296,lng:-100.2967006,nombre:'Papelería y Ciber Casa Oyervides',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:11,lat:25.7534012,lng:-100.2964603,nombre:'Mariscos Beto\'s',tipo:'Pescadería',icon:'🐟',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:12,lat:25.750434,lng:-100.295903,nombre:'Depósito Juárez',tipo:'Depósito',icon:'🍺',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:13,lat:25.7599371,lng:-100.2952224,nombre:'Six Universidad',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:14,lat:25.7516179,lng:-100.2952183,nombre:'Abarrotes y depósito garza',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:15,lat:25.7125609,lng:-100.2951113,nombre:'Toro Bueno',tipo:'Carnicería',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:16,lat:25.7550086,lng:-100.2946703,nombre:'Frutería Javi',tipo:'Frutería',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:17,lat:25.7550121,lng:-100.2937564,nombre:'Mr Pay',tipo:'Panadería',icon:'🥐',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:18,lat:25.711158,lng:-100.2933518,nombre:'Abastecedora de Carnes San Gabriel central de abastos',tipo:'Carnicería',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:19,lat:25.6973122,lng:-100.2925975,nombre:',',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:20,lat:25.6982707,lng:-100.2913716,nombre:'Carnicería La Hacienda',tipo:'Carnicería',icon:'🥩',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:21,lat:25.6953765,lng:-100.2911704,nombre:'Depósito y Abarrotes Magnolia',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:22,lat:25.7130726,lng:-100.2911539,nombre:'BROCCOLINE',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:23,lat:25.7557949,lng:-100.2910701,nombre:'La Ideal',tipo:'Panadería',icon:'🥐',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:24,lat:25.7141219,lng:-100.2910054,nombre:'Vegetales RAM',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:25,lat:25.7464053,lng:-100.2871362,nombre:'Fruteria Lupita',tipo:'Frutería',icon:'🥦',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:26,lat:25.7563962,lng:-100.2860213,nombre:'Carnicería Cárdenas',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:27,lat:25.6979143,lng:-100.2852764,nombre:'Frutas y Verduras El Tejaban de Memo',tipo:'Frutería',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:28,lat:25.7656895,lng:-100.2850878,nombre:'Abarrotes Valle Dorado',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:29,lat:25.7129942,lng:-100.2850429,nombre:'Frutas y Verduras \"EL EDEN\"',tipo:'Frutería',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:30,lat:25.7430319,lng:-100.2848701,nombre:'Carnes Ramos',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:31,lat:25.6966068,lng:-100.2842589,nombre:'Abarrotes y deposito Moderna',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:32,lat:25.6995971,lng:-100.2838077,nombre:'Bebidas tropicales Esqueda',tipo:'Depósito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:33,lat:25.7188351,lng:-100.2834199,nombre:'Deposito de Cerveza Forastero',tipo:'Depósito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:34,lat:25.7168502,lng:-100.283272,nombre:'Fernández Market Sucursal Diego Díaz',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:35,lat:25.7370791,lng:-100.283076,nombre:'Carnicería Diego\'s El Rey 👑',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:36,lat:25.7345432,lng:-100.2822828,nombre:'Abarrotes Y Carniceria Leo Jr',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:37,lat:25.7355725,lng:-100.2820701,nombre:'frutería y carnicería nelly',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:38,lat:25.7121001,lng:-100.2820491,nombre:'Carnicería Valle del Nogalar',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:39,lat:25.7390505,lng:-100.2802793,nombre:'Depósito El Osito',tipo:'Depósito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:40,lat:25.7095488,lng:-100.280234,nombre:'Carnicería Cárdenas',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:41,lat:25.7348675,lng:-100.2798061,nombre:'Frutería Jardines',tipo:'Frutería',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:42,lat:25.7419389,lng:-100.2796571,nombre:'Frutería la Huerta',tipo:'Frutería',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:43,lat:25.7394305,lng:-100.2794834,nombre:'Meat & Grill - Carnicería en San Nicolás',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:44,lat:25.684091,lng:-100.279386,nombre:'ABARROTES Y DEPOSITO LA Y GRIEGA',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:45,lat:25.7348901,lng:-100.2792821,nombre:'Abarrotes La Red',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:46,lat:25.7167895,lng:-100.2791292,nombre:'Zurich',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:47,lat:25.7215605,lng:-100.2790894,nombre:'Carnicería y Abarrotes Luna',tipo:'Carnicería',icon:'🥩',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:48,lat:25.7017375,lng:-100.2784051,nombre:'Deposito Garza',tipo:'Depósito',icon:'🍺',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:49,lat:25.6961698,lng:-100.2780325,nombre:'CASA RAMÍREZ',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:50,lat:25.7388935,lng:-100.2779067,nombre:'FRUTERÍA \"LA CANASTA\"',tipo:'Frutería',icon:'🥦',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:51,lat:25.6892501,lng:-100.2777987,nombre:'Frutería La Escondida',tipo:'Frutería',icon:'🥦',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:52,lat:25.7236821,lng:-100.2771996,nombre:'Mini Súper Carnes San José',tipo:'Carnicería',icon:'🥩',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:53,lat:25.7182734,lng:-100.2760014,nombre:'tiendita',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:54,lat:25.7334445,lng:-100.2755314,nombre:'Shop Shop USA',tipo:'Tienda General',icon:'🏬',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:55,lat:25.7284533,lng:-100.2744538,nombre:'Abarrotes \"Rodríguez\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:56,lat:25.7292996,lng:-100.274333,nombre:'Frutería \"Mike\"',tipo:'Frutería',icon:'🥦',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:57,lat:25.7194043,lng:-100.2739636,nombre:'Abarrotes Lucy',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:58,lat:25.7251064,lng:-100.2739538,nombre:'Frutería \"Emmanuel\"',tipo:'Frutería',icon:'🥦',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:59,lat:25.7223445,lng:-100.2738612,nombre:'Fruteria Mony',tipo:'Frutería',icon:'🥦',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:60,lat:25.7224087,lng:-100.2736735,nombre:'Abarrotes Don Victor',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:61,lat:25.72344,lng:-100.2736511,nombre:'Depósito Chavira',tipo:'Depósito',icon:'🍺',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:62,lat:25.7273449,lng:-100.2734271,nombre:'Abarrotes Lugo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:63,lat:25.7283369,lng:-100.273182,nombre:'Abarrotes Lugo!',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:64,lat:25.7229079,lng:-100.2730117,nombre:'Dulceria y Abarrotes \"Castro\"',tipo:'Panadería',icon:'🥐',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:65,lat:25.7277187,lng:-100.2729945,nombre:'Depósito Rubi',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:66,lat:25.7222775,lng:-100.2726671,nombre:'Abarrotes Rodriguez',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:67,lat:25.7331244,lng:-100.2725538,nombre:'Frutería la Regina',tipo:'Frutería',icon:'🥦',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:68,lat:25.7203532,lng:-100.2723947,nombre:'Abarrotes \"Don Doro\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:69,lat:25.7320998,lng:-100.2721374,nombre:'GM Super Carnes - Diego Diaz',tipo:'Carnicería',icon:'🥩',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:70,lat:25.7410357,lng:-100.2715726,nombre:'Carnicería Ibarra',tipo:'Carnicería',icon:'🥩',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:71,lat:25.726669,lng:-100.2714606,nombre:'Abarrotes Hernández',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:72,lat:25.7223221,lng:-100.2713297,nombre:'depósito Tamez',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:73,lat:25.7264109,lng:-100.2710314,nombre:'Abarrotes Nichito',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:74,lat:25.7258116,lng:-100.2709927,nombre:'Depósito López',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:75,lat:25.7294603,lng:-100.2701803,nombre:'Abarrotes y Frutería Martínez',tipo:'Frutería',icon:'🥦',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:76,lat:25.745394,lng:-100.2690971,nombre:'FRUTERÍA LA HUERTA',tipo:'Frutería',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:77,lat:25.7467437,lng:-100.2688578,nombre:'Carnicería Santa Martha',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:78,lat:25.7460635,lng:-100.2687232,nombre:'Carnicería El Rey Norteño',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:79,lat:25.7221729,lng:-100.2685849,nombre:'Abarrotes Los Cuates',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:80,lat:25.7099982,lng:-100.2683827,nombre:'Carnicería “El Rodeo”',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:81,lat:25.7217877,lng:-100.2682927,nombre:'Carnicería y Abarrotes SAN JUAN',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:82,lat:25.742485,lng:-100.2680917,nombre:'MISCELÁNEA NANCY',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:83,lat:25.7280806,lng:-100.2679675,nombre:'Dulce Abarrotes Y Depósito',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:84,lat:25.7195958,lng:-100.26767,nombre:'Abarrotes LA ECONÓMICA',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:85,lat:25.7251991,lng:-100.2676435,nombre:'Abarrotes y Deposito \"Los 2 Hermanos\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:86,lat:25.7254805,lng:-100.2676267,nombre:'Abarrotes Y Depósito \"PANCHO\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:87,lat:25.7108861,lng:-100.2675721,nombre:'Abarrotes AMIGO',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:88,lat:25.7372707,lng:-100.2673856,nombre:'\"Carnicería Carlos\"',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:89,lat:25.7129234,lng:-100.2673328,nombre:'Tienda de abarrotes EL MANA',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:90,lat:25.7388629,lng:-100.2672076,nombre:'Carnicería Cárdenas',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:91,lat:25.7205732,lng:-100.2666173,nombre:'Frutería “Cisneros”',tipo:'Frutería',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:92,lat:25.7186249,lng:-100.265952,nombre:'PastelerÃ­a Lety',tipo:'Panadería',icon:'🥐',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:93,lat:25.7308752,lng:-100.2659448,nombre:'Minisuper La Frutería',tipo:'Frutería',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:94,lat:25.7101248,lng:-100.2651812,nombre:'Abarrotes Almaguer',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:95,lat:25.759781,lng:-100.264233,nombre:'Super Carnes GM',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:96,lat:25.7347352,lng:-100.2635818,nombre:'DEPOSITO \"EL RODEO\"',tipo:'Depósito',icon:'🍺',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:97,lat:25.7432269,lng:-100.2625588,nombre:'FRUTERÍA JS',tipo:'Frutería',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:98,lat:25.7127849,lng:-100.2616542,nombre:'Frutería Ramírez',tipo:'Frutería',icon:'🥦',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:99,lat:25.7180952,lng:-100.2613973,nombre:'Carnicería Michoacán 2',tipo:'Carnicería',icon:'🥩',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:100,lat:25.7117616,lng:-100.2596625,nombre:'Plaza Las Galias',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:101,lat:25.718821,lng:-100.2595748,nombre:'Abarrotes y depósito 4Hermanos',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:102,lat:25.7104802,lng:-100.2583695,nombre:'Carnicería Don Panchito',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:103,lat:25.7516257,lng:-100.2583645,nombre:'NorteÃ±o Santo Domingo',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:104,lat:25.7491893,lng:-100.256254,nombre:'SuKarne',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:105,lat:25.7504793,lng:-100.2561755,nombre:'Punto 36',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:106,lat:25.7482567,lng:-100.2555237,nombre:'S-Mart',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:107,lat:25.723774,lng:-100.254744,nombre:'Depósito Popo',tipo:'Depósito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:108,lat:25.7454776,lng:-100.2546802,nombre:'Depósito Fer',tipo:'Depósito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:109,lat:25.694029,lng:-100.254545,nombre:'FRUTERÍA Santiago',tipo:'Frutería',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:110,lat:25.689787,lng:-100.253632,nombre:'CarnicerÃ­a San Juan',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:111,lat:25.707438,lng:-100.2530745,nombre:'Frutería y Abarrotes López',tipo:'Frutería',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:112,lat:25.690397,lng:-100.252599,nombre:'Multipack Lindavista',tipo:'Tienda General',icon:'🏬',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:113,lat:25.7172716,lng:-100.2523268,nombre:'DEPÓSITO Y ABARROTES MYRTHALA',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:114,lat:25.7068085,lng:-100.2467081,nombre:'DEPOSITO OCAÑAS',tipo:'Depósito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:115,lat:25.7540048,lng:-100.2466282,nombre:'Deposito y Abarrotes ASTORGA',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:116,lat:25.6995895,lng:-100.2462831,nombre:'Deposito y Abarrotes Las Americas',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:117,lat:25.6937451,lng:-100.2436838,nombre:'Depósito y Abarrotes El Recreo',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:118,lat:25.7281695,lng:-100.2423607,nombre:'Frutería La Mejor',tipo:'Frutería',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:119,lat:25.703238,lng:-100.2413732,nombre:'SAM',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:120,lat:25.7302458,lng:-100.240403,nombre:'CÃ¡rdenas',tipo:'Carnicería',icon:'🥩',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:121,lat:25.7261156,lng:-100.23772,nombre:'Depósito Súper \'S',tipo:'Depósito',icon:'🍺',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:122,lat:25.7068658,lng:-100.2355237,nombre:'Abarrotes Hernandez',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:123,lat:25.7228321,lng:-100.2333722,nombre:'MISCELÁNEA \"SAN ÁNGEL\"',tipo:'Abarrotes / Miscelánea',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:124,lat:25.7323378,lng:-100.2321744,nombre:'Frutería El Maga',tipo:'Frutería',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:125,lat:25.7069156,lng:-100.2307524,nombre:'LA FRUTERÍA',tipo:'Frutería',icon:'🥦',dia:'V',diaNom:'Viernes',color:'#c0392b'}
 ];
+const DIAS_INFO={L:{nom:'Lunes',color:'#2e6da4'},M:{nom:'Martes',color:'#8e44ad'},X:{nom:'Miércoles',color:'#27ae60'},J:{nom:'Jueves',color:'#e67e22'},V:{nom:'Viernes',color:'#c0392b'}};
+const RADIO=100;
+let estado=JSON.parse(localStorage.getItem('val_'+ID_RUTA)||'{}');
+let diaActivo='L',puntoActivo=null,miUbicacion=null,markerYo=null,marcadores={},alertaMostrada=false;
 
-const DIAS_INFO = {
-  L:{nom:'Lunes',   color:'#2e6da4'},
-  M:{nom:'Martes',  color:'#8e44ad'},
-  X:{nom:'Miércoles',color:'#27ae60'},
-  J:{nom:'Jueves',  color:'#e67e22'},
-  V:{nom:'Viernes', color:'#c0392b'},
-};
-
-const RADIO = 100;
-let estado = JSON.parse(localStorage.getItem('val_'+ID_RUTA) || '{}');
-let diaActivo = 'L';
-let puntoActivo = null;
-let miUbicacion = null;
-let markerYo = null;
-let marcadores = {};
-let alertaMostrada = false;
-
-// ── MAPA ──────────────────────────────────────────────────────────
-const map = L.map('map').setView([25.721313,-100.278816],13);
+const map=L.map('map').setView([25.721313,-100.278816],13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
 
-function iconM(p) {
-  const e = estado[p.id];
-  const bg = e ? (e.existe ? '#27ae60' : '#e74c3c') : p.color;
-  return L.divIcon({
-    className:'',
-    html:`<div style="background:${bg};width:20px;height:20px;border-radius:50%;
-          border:2px solid white;display:flex;align-items:center;justify-content:center;
-          color:white;font-size:8px;font-weight:800;box-shadow:0 2px 5px rgba(0,0,0,.3)">${p.id}</div>`,
-    iconSize:[20,20],iconAnchor:[10,10]
-  });
+function iconM(p){
+  const e=estado[p.id],bg=e?(e.existe?'#27ae60':'#e74c3c'):p.color;
+  return L.divIcon({className:'',html:`<div style="background:${bg};width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 5px rgba(0,0,0,.3)">${p.icon}</div>`,iconSize:[22,22],iconAnchor:[11,11]});
 }
 
-PUNTOS.forEach(p => {
-  const m = L.marker([p.lat,p.lng],{icon:iconM(p)}).addTo(map)
-    .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>${p.tipo}<br><small>ID: ${ID_RUTA}-${p.dia}-${p.id}</small>`)
+PUNTOS.forEach(p=>{
+  const m=L.marker([p.lat,p.lng],{icon:iconM(p)}).addTo(map)
+    .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>${p.tipo}<br><small>${ID_RUTA}-${p.dia}-${p.id}</small>`)
     .on('click',()=>abrirAlerta(p.id));
-  marcadores[p.id] = m;
+  marcadores[p.id]=m;
 });
 
-// ── GPS ───────────────────────────────────────────────────────────
-if('geolocation' in navigator) {
-  navigator.geolocation.watchPosition(onPos, onErr,
-    {enableHighAccuracy:true,maximumAge:5000,timeout:10000});
-} else {
-  document.getElementById('gpsMsg').textContent='GPS no disponible';
-  document.getElementById('gpsDot').classList.add('err');
-}
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+}else{document.getElementById('gpsMsg').textContent='GPS no disponible';document.getElementById('gpsDot').classList.add('err');}
 
-function onPos(pos) {
-  const lat=pos.coords.latitude, lng=pos.coords.longitude;
-  const acc=Math.round(pos.coords.accuracy);
+function onPos(pos){
+  const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
   miUbicacion={lat,lng};
-  document.getElementById('gpsDot').classList.remove('err');
-  document.getElementById('gpsDot').classList.add('on');
+  document.getElementById('gpsDot').classList.remove('err');document.getElementById('gpsDot').classList.add('on');
   document.getElementById('gpsMsg').textContent=`GPS activo — precisión ±${acc}m`;
-  if(!markerYo) {
-    markerYo = L.circleMarker([lat,lng],{radius:10,color:'#e67e22',
-      fillColor:'#f39c12',fillOpacity:.9,weight:3}).addTo(map).bindPopup('📍 Tú estás aquí');
-  } else markerYo.setLatLng([lat,lng]);
+  if(!markerYo)markerYo=L.circleMarker([lat,lng],{radius:10,color:'#e67e22',fillColor:'#f39c12',fillOpacity:.9,weight:3}).addTo(map).bindPopup('📍 Tú estás aquí');
+  else markerYo.setLatLng([lat,lng]);
   verificarCercania(lat,lng);
 }
+function onErr(err){document.getElementById('gpsDot').classList.add('err');document.getElementById('gpsMsg').textContent='Error GPS: '+(err.code===1?'Permiso denegado':err.code===2?'Sin señal':'Timeout');}
 
-function onErr(err) {
-  document.getElementById('gpsDot').classList.add('err');
-  document.getElementById('gpsMsg').textContent='Error GPS: '+(err.code===1?'Permiso denegado':err.code===2?'Sin señal':'Timeout');
-}
+function dist(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 
-function dist(lat1,lon1,lat2,lon2) {
-  const R=6371000,dL=(lat2-lat1)*Math.PI/180,dG=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dG/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-function verificarCercania(lat,lng) {
-  const puntosHoy = PUNTOS.filter(p=>p.dia===diaActivo);
-  let masCercano=null, minD=Infinity;
-  puntosHoy.forEach(p=>{
-    const d=dist(lat,lng,p.lat,p.lng);
-    if(d<minD){minD=d;masCercano=p;}
-    marcadores[p.id].setIcon(iconM(p));
-  });
+function verificarCercania(lat,lng){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  let mejor=null,minD=Infinity;
+  hoy.forEach(p=>{const d=dist(lat,lng,p.lat,p.lng);if(d<minD){minD=d;mejor=p;}marcadores[p.id].setIcon(iconM(p));});
   renderLista();
-  if(masCercano && minD<RADIO && !estado[masCercano.id] && !alertaMostrada) {
-    alertaMostrada=true;
-    abrirAlerta(masCercano.id);
-  }
-  if(minD>=RADIO) alertaMostrada=false;
+  if(mejor&&minD<RADIO&&!estado[mejor.id]&&!alertaMostrada){alertaMostrada=true;abrirAlerta(mejor.id);}
+  if(minD>=RADIO)alertaMostrada=false;
 }
 
-// ── ALERTA ────────────────────────────────────────────────────────
-function abrirAlerta(id) {
-  const p=PUNTOS.find(x=>x.id===id);
-  puntoActivo=id;
+function abrirAlerta(id){
+  const p=PUNTOS.find(x=>x.id===id);puntoActivo=id;
   document.getElementById('al-icon').textContent=p.icon;
   document.getElementById('al-nombre').textContent=p.nombre;
   document.getElementById('al-tipo').textContent=p.tipo;
-  document.getElementById('al-coords').textContent=
-    `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ID: ${ID_RUTA}-${p.dia}-${p.id}`;
+  document.getElementById('al-coords').textContent=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ${ID_RUTA}-${p.dia}-${p.id}`;
   document.getElementById('alerta').classList.add('show');
   map.setView([p.lat,p.lng],16);
 }
+function cerrarAlerta(){document.getElementById('alerta').classList.remove('show');puntoActivo=null;}
 
-function cerrarAlerta() {
-  document.getElementById('alerta').classList.remove('show');
-  puntoActivo=null;
-}
-
-function validar(existe) {
+function validar(existe){
   if(puntoActivo===null)return;
   estado[puntoActivo]={existe,ts:new Date().toISOString()};
   localStorage.setItem('val_'+ID_RUTA,JSON.stringify(estado));
   marcadores[puntoActivo].setIcon(iconM(PUNTOS.find(p=>p.id===puntoActivo)));
-  cerrarAlerta();
-  renderLista();
-  actualizarResultados();
-  actualizarProgreso();
-  actualizarTabDias();
+  cerrarAlerta();renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
 }
 
-// ── LISTA ─────────────────────────────────────────────────────────
-function renderLista() {
-  const puntosHoy = PUNTOS.filter(p=>p.dia===diaActivo);
-  const cont = document.getElementById('tab-lista');
-  cont.innerHTML = puntosHoy.map(p=>{
-    const e=estado[p.id];
-    const cls=e?(e.existe?'existe':'no-existe'):'';
-    const badge=e?(e.existe?'<span class="p-badge b-ok">✅ Existe</span>':'<span class="p-badge b-no">❌ No existe</span>')
-                 :'<span class="p-badge b-pen">⏳</span>';
+function renderLista(){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  document.getElementById('tab-lista').innerHTML=hoy.map(p=>{
+    const e=estado[p.id],cls=e?(e.existe?'existe':'no-existe'):'';
+    const badge=e?(e.existe?'<span class="p-badge b-ok">✅ Existe</span>':'<span class="p-badge b-no">❌ No existe</span>'):'<span class="p-badge b-pen">⏳</span>';
     const dm=miUbicacion?` · ${Math.round(dist(miUbicacion.lat,miUbicacion.lng,p.lat,p.lng))}m`:'';
-    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})">
-      <div class="p-icon">${p.icon}</div>
-      <div class="p-info">
-        <div class="p-nombre">${p.nombre}</div>
-        <div class="p-tipo">${p.tipo}</div>
-        <div class="p-coords">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${dm}</div>
-      </div>
-      ${badge}
-    </div>`;
+    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})"><div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-nombre">${p.nombre}</div><div class="p-tipo">${p.tipo}</div><div class="p-dist">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${dm}</div></div>${badge}</div>`;
   }).join('');
 }
 
-// ── RESULTADOS ────────────────────────────────────────────────────
-function actualizarResultados() {
-  const vals=Object.values(estado);
-  const ok=vals.filter(v=>v.existe).length;
-  const no=vals.filter(v=>!v.existe).length;
-  const pen=125-vals.length;
-  document.getElementById('r-ok').textContent=ok;
-  document.getElementById('r-no').textContent=no;
-  document.getElementById('r-pen').textContent=pen;
-  const pok=Math.round(ok/125*100), pno=Math.round(no/125*100);
-  document.getElementById('g-ok').style.width=pok+'%';
-  document.getElementById('g-ok').textContent=pok?pok+'%':'';
-  document.getElementById('g-no').style.width=pno+'%';
-  document.getElementById('g-no').textContent=pno?pno+'%':'';
-
-  const div=document.getElementById('diasAvance');
-  div.innerHTML=Object.entries(DIAS_INFO).map(([key,info])=>{
-    const pts=PUNTOS.filter(p=>p.dia===key);
-    const validados=pts.filter(p=>estado[p.id]).length;
-    const pct=Math.round(validados/pts.length*100);
-    return `<div class="dia-row">
-      <div class="dia-dot" style="background:${info.color}"></div>
-      <span class="dia-nm">${info.nom}</span>
-      <div class="dia-br-bg">
-        <div class="dia-br-fill" style="background:${info.color};width:${pct}%">
-          ${pct?pct+'%':''}
-        </div>
-      </div>
-      <span class="dia-num">${validados}/25</span>
-    </div>`;
+function actualizarResultados(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length,pen=125-vals.length;
+  document.getElementById('r-ok').textContent=ok;document.getElementById('r-no').textContent=no;document.getElementById('r-pen').textContent=pen;
+  const pok=Math.round(ok/125*100),pno=Math.round(no/125*100);
+  document.getElementById('g-ok').style.width=pok+'%';document.getElementById('g-ok').textContent=pok?pok+'%':'';
+  document.getElementById('g-no').style.width=pno+'%';document.getElementById('g-no').textContent=pno?pno+'%':'';
+  document.getElementById('diasAvance').innerHTML=Object.entries(DIAS_INFO).map(([key,info])=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length,pct=Math.round(v/pts.length*100);
+    return `<div class="dia-row"><div class="dia-dot" style="background:${info.color}"></div><span class="dia-nm">${info.nom}</span><div class="dia-br-bg"><div class="dia-br-fill" style="background:${info.color};width:${pct}%">${pct?pct+'%':''}</div></div><span class="dia-num">${v}/25</span></div>`;
   }).join('');
 }
-
-function actualizarProgreso() {
-  const hecho=Object.keys(estado).length;
-  const pct=Math.round(hecho/125*100);
+function actualizarProgreso(){
+  const h=Object.keys(estado).length,pct=Math.round(h/125*100);
   document.getElementById('progBar').style.width=pct+'%';
-  document.getElementById('progTxt').textContent=`${hecho} / 125 validados (${pct}%)`;
+  document.getElementById('progTxt').textContent=`${h} / 125 validados (${pct}%)`;
 }
-
-function actualizarTabDias() {
+function actualizarTabDias(){
   Object.keys(DIAS_INFO).forEach(key=>{
-    const pts=PUNTOS.filter(p=>p.dia===key);
-    const validados=pts.filter(p=>estado[p.id]).length;
-    const cnt=document.getElementById('cnt-'+key);
-    cnt.textContent=`${validados}/${pts.length}`;
-    cnt.className=validados===pts.length?'cnt done':'cnt';
+    const pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length;
+    const cnt=document.getElementById('cnt-'+key);cnt.textContent=`${v}/${pts.length}`;cnt.className=v===pts.length?'cnt done':'cnt';
   });
 }
-
-// ── TABS ──────────────────────────────────────────────────────────
-function setDia(dia) {
+function setDia(dia){
   diaActivo=dia;
-  document.querySelectorAll('.dia-tab').forEach((t,i)=>{
-    const keys=['L','M','X','J','V'];
-    t.classList.toggle('act',keys[i]===dia);
-  });
-  const puntosHoy=PUNTOS.filter(p=>p.dia===dia);
-  if(puntosHoy.length) {
-    const lats=puntosHoy.map(p=>p.lat), lons=puntosHoy.map(p=>p.lng);
-    map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[20,20]});
-  }
+  document.querySelectorAll('.dia-tab').forEach((t,i)=>t.classList.toggle('act',['L','M','X','J','V'][i]===dia));
+  const pts=PUNTOS.filter(p=>p.dia===dia);
+  if(pts.length){const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lng);map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[20,20]});}
   renderLista();
 }
-
-function setSubTab(tab) {
-  document.querySelectorAll('.sub-tab').forEach((t,i)=>
-    t.classList.toggle('act',['lista','res'][i]===tab));
+function setSubTab(tab){
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>t.classList.toggle('act',['lista','res'][i]===tab));
   document.getElementById('tab-lista').style.display=tab==='lista'?'':'none';
   document.getElementById('tab-res').style.display=tab==='res'?'block':'none';
   if(tab==='res')actualizarResultados();
 }
-
-function exportar() {
-  const vals=Object.values(estado);
-  const ok=vals.filter(v=>v.existe).length;
-  const no=vals.filter(v=>!v.existe).length;
-  let txt=`REPORTE DE VALIDACIÓN\n`;
-  txt+=`ID Ruta    : ${ID_RUTA}\n`;
-  txt+=`Zona       : Monterrey, NL — 5 km a la redonda\n`;
-  txt+=`Centro     : 25.721313, -100.278816\n`;
-  txt+=`Fecha      : ${new Date().toLocaleDateString('es-MX')}\n`;
-  txt+=`Fuentes    : Google Maps / DENUE / OpenStreetMap\n\n`;
-  txt+=`RESUMEN\n`;
-  txt+=`Total puntos : 125\n`;
-  txt+=`✅ Existen    : ${ok} (${Math.round(ok/125*100)}%)\n`;
-  txt+=`❌ No existen : ${no} (${Math.round(no/125*100)}%)\n`;
-  txt+=`⏳ Pendientes : ${125-vals.length}\n\n`;
+function exportar(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length;
+  let txt=`REPORTE DE VALIDACIÓN\nID Ruta   : ${ID_RUTA}\nID Coord  : VAL-NL-MTY-257213_100278\nZona      : San Nicolás de los Garza, NL — Tiendas Independientes\nCentro    : 25.721313, -100.278816\nFecha     : ${new Date().toLocaleDateString('es-MX')}\nFuentes   : Google Maps + OpenStreetMap (sin cadenas)\n\nRESUMEN\nTotal     : 125\n✅ Existen  : ${ok} (${Math.round(ok/125*100)}%)\n❌ No exist : ${no} (${Math.round(no/125*100)}%)\n⏳ Pendient : ${125-vals.length}\n\n`;
   ['L','M','X','J','V'].forEach(key=>{
-    const info=DIAS_INFO[key];
-    const pts=PUNTOS.filter(p=>p.dia===key);
-    const v=pts.filter(p=>estado[p.id]).length;
+    const info=DIAS_INFO[key],pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length;
     txt+=`${info.nom}: ${v}/25 validados\n`;
-    pts.forEach(p=>{
-      const e=estado[p.id];
-      const res=e?(e.existe?'EXISTE':'NO EXISTE'):'PENDIENTE';
-      const hora=e?` — ${new Date(e.ts).toLocaleString('es-MX')}`:'';
-      txt+=`  [${ID_RUTA}-${p.dia}-${p.id}] ${p.nombre} (${p.tipo}): ${res}${hora}\n`;
-    });
+    pts.forEach(p=>{const e=estado[p.id];txt+=`  [${ID_RUTA}-${p.dia}-${p.id}] ${p.nombre} (${p.tipo}): ${e?(e.existe?'EXISTE':'NO EXISTE'):'PENDIENTE'}${e?' — '+new Date(e.ts).toLocaleString('es-MX'):''}\n`;});
     txt+='\n';
   });
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
-  a.download=`${ID_RUTA}_${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+  a.download=`${ID_RUTA}_${new Date().toISOString().slice(0,10)}.txt`;a.click();
 }
+function resetear(){if(!confirm('¿Reiniciar toda la validación?'))return;localStorage.removeItem('val_'+ID_RUTA);estado={};PUNTOS.forEach(p=>marcadores[p.id].setIcon(iconM(p)));renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();}
 
-function resetear() {
-  if(!confirm('¿Reiniciar toda la validación?'))return;
-  localStorage.removeItem('val_'+ID_RUTA);
-  estado={};
-  PUNTOS.forEach(p=>marcadores[p.id].setIcon(iconM(p)));
-  renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
-}
-
-// INIT
-renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
-setDia('L');
+renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();setDia('L');
 </script>
 </body>
 </html>
