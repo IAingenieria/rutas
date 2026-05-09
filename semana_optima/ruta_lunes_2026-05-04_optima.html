@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ruta Lunes — Mr. Ruta Tostisanas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+    .container { max-width: 980px; margin: 0 auto; padding: 20px; }
+    .header { background: #0d1b2a; color: white; padding: 22px 28px; border-radius: 10px;
+               margin-bottom: 18px; display: flex; align-items: center; gap: 16px; }
+    .header-badge { background: #1a73e8; padding: 6px 14px; border-radius: 20px;
+                     font-size: 12px; font-weight: bold; white-space: nowrap; }
+    .stats { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .stat-card { background: white; padding: 14px 20px; border-radius: 8px;
+                  box-shadow: 0 1px 4px rgba(0,0,0,.1); flex: 1; min-width: 140px;
+                  border-top: 3px solid #1a73e8; }
+    .stat-card .num { font-size: 24px; font-weight: bold; color: #1a73e8; }
+    .stat-card .lbl { font-size: 11px; color: #888; margin-top: 2px; }
+    .map-banner { background: #e8f4fd; border-left: 4px solid #1a73e8;
+                   padding: 14px 18px; border-radius: 6px; margin-bottom: 18px; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; background: white;
+             box-shadow: 0 1px 4px rgba(0,0,0,.1); border-radius: 8px; overflow: hidden; }
+    thead tr { background: #0d1b2a; color: white; }
+    thead th { padding: 11px 10px; font-size: 12px; font-weight: 600; text-transform: uppercase;
+                letter-spacing: .5px; }
+    .footer { text-align: center; color: #bbb; font-size: 11px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div>
+      <div style="font-size:20px;font-weight:bold;letter-spacing:.5px">
+        &#x1F69B; Mr. Ruta &mdash; Lunes
+      </div>
+      <div style="color:#9ab;font-size:13px;margin-top:4px">
+        Tostisanas &nbsp;&middot;&nbsp; Zona Sur Monterrey &nbsp;&middot;&nbsp; 2026-05-04
+      </div>
+    </div>
+    <div class="header-badge">DIA 1 / 6</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num">25</div>
+      <div class="lbl">VISITAS DEL DIA</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">17.2 km</div>
+      <div class="lbl">DISTANCIA TOTAL</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">~241 min</div>
+      <div class="lbl">TIEMPO ESTIMADO</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">0h 1m</div>
+      <div class="lbl">JORNADA COMPLETA</div>
+    </div>
+  </div>
+
+  <div class="map-banner">
+    <strong>Salida/Regreso:</strong> Cedis Tostimex &nbsp;|&nbsp;
+    <strong>Algoritmo:</strong> Nearest Neighbor + 2-opt (sin cruces) &nbsp;|&nbsp;
+    <strong>Solo Canal:</strong> Tienda<br><br>
+    <a href="https://www.google.com/maps/dir/25.704423,-100.2834504/25.69256,-100.280241/25.6869488,-100.2873976/25.686689,-100.288406/25.667803,-100.290415/25.666975,-100.289032/25.668395,-100.288292/25.6685004,-100.2883026/25.6686043,-100.2883681/25.6682576,-100.2869003/25.669318,-100.280741/25.662511,-100.279312/25.660021,-100.275004/25.660343,-100.272641/25.6606521,-100.2702835/25.660837,-100.270273/25.666557,-100.264644/25.667222,-100.2633159/25.6716959,-100.2759357/25.674618,-100.272057/25.675285,-100.272201/25.672215,-100.26304/25.673477,-100.261962/25.674411,-100.259917/25.704423,-100.2834504" target="_blank"
+       style="background:#1a73e8;color:white;padding:9px 18px;border-radius:5px;
+              text-decoration:none;font-size:13px;display:inline-block">
+      &#x1F5FA; Abrir Ruta en Google Maps
+    </a>
+    <a href="https://www.google.com/maps/dir/25.704423,-100.2834504/25.671794,-100.254956/25.680913,-100.256264/25.704423,-100.2834504" target="_blank" style="background:#444;color:white;padding:9px 16px;border-radius:5px;text-decoration:none;font-size:13px;display:inline-block;margin-left:8px">&#x1F5FA; Segmento 2 (stops 24+)</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:42px">#</th>
+        <th style="text-align:left">Negocio</th>
+        <th style="text-align:left">Tipo</th>
+        <th>C.P.</th>
+        <th>Ubicacion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">1</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">MINI SUPER VALDE</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64530</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.69256,-100.280241" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">2</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">MINI SUPER TEXAS</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64550</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.6869488,-100.2873976" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">3</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABA Y CAR LEAL</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64580</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.686689,-100.288406" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">4</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">LEAL CHAPULTEPEC SA DE CV.</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">LEAL</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.667803,-100.290415" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">5</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABA AMERICA</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.666975,-100.289032" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">6</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">VIDEO VALLE</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64810</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.668395,-100.288292" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">7</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">DEPOSITO AZABACHE</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.6685004,-100.2883026" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">8</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABARROTES MOY</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.6686043,-100.2883681" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">9</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ESTANQUILLO BELTRAN</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.6682576,-100.2869003" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">10</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABTS. PROGRESO</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.669318,-100.280741" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">11</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">SUPER CARNES HUAJUCO</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64820</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.662511,-100.279312" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">12</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">SUPER CANTU</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64820</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.660021,-100.275004" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">13</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">MINI SUPER JORGE</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64820</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.660343,-100.272641" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">14</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABARROTES LETTY</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64820</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.6606521,-100.2702835" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">15</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">SUPER PARIS</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64820</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.660837,-100.270273" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">16</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">COMERCIAL TREVINO BODEGA 106 Y 107</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESPECIAL</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67140</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.666557,-100.264644" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">17</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">SUPER CARNES R.C</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64900</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.667222,-100.2633159" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">18</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">PAPELERIA Y ABARROTES DEL FRACC.</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">64800</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.6716959,-100.2759357" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">19</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABARROTES TOMMY</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67140</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.674618,-100.272057" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">20</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABARROTES LA TORTUGA</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67140</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.675285,-100.272201" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">21</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABARROTES GUAJARDO</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67140</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.672215,-100.26304" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">22</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">MINI SUPER MARQUEZ</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67100</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.673477,-100.261962" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">23</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">HERACLIO FLORES BUGARIN</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67100</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.674411,-100.259917" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:#f9f9f9">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">24</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ARMANDO ORTIZ</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67140</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.671794,-100.254956" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+      <tr style="background:white">
+        <td style="padding:8px 10px;text-align:center;font-weight:bold;color:#555;font-size:13px">25</td>
+        <td style="padding:8px 10px;font-size:13px;font-weight:500">ABA MORENO</td>
+        <td style="padding:8px 10px;color:#777;font-size:12px">ESTABLECIMIENTO</td>
+        <td style="padding:8px 10px;text-align:center;color:#777;font-size:12px">67100</td>
+        <td style="padding:8px 10px;text-align:center">
+          <a href="https://maps.google.com/?q=25.680913,-100.256264" target="_blank"
+             style="background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:12px;text-decoration:none;font-size:11px;font-weight:600">&#128205; Mapa</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">Mr. Ruta &middot; Sistema DSD + WMS &middot; info@mr-ruta.com &middot; 2026-05-04</div>
+</div>
+</body>
+</html>
