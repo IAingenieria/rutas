@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VAL-NL-MTY-002 — Validación de Puntos</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1a1a2e}
+.header{background:#1a3a5c;color:white;padding:10px 14px;position:sticky;top:0;z-index:1000}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header h1{font-size:15px;font-weight:800}
+.route-id{font-size:9px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:1px}
+.header p{font-size:10px;opacity:.8;margin-top:2px}
+.prog-wrap{background:rgba(255,255,255,.2);border-radius:20px;height:7px;margin-top:7px}
+.prog-bar{height:100%;background:#27ae60;border-radius:20px;transition:width .4s}
+.prog-txt{font-size:9px;text-align:right;margin-top:2px;opacity:.85}
+.dia-tabs{display:flex;background:#122b45;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dia-tab{flex-shrink:0;padding:8px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.5);
+          border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.dia-tab.act{color:white;border-bottom-color:var(--c)}
+.dia-tab .cnt{font-size:9px;margin-left:4px;background:rgba(255,255,255,.15);padding:1px 5px;border-radius:8px}
+.dia-tab .cnt.done{background:#27ae60;color:white}
+.gps-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:white;border-bottom:1px solid #e0e0e0;font-size:11px}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.gps-dot.on{background:#27ae60;animation:pulse 1.5s infinite}
+.gps-dot.err{background:#e74c3c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#map{height:240px;width:100%}
+.sub-tabs{display:flex;background:white;border-bottom:2px solid #e0e0e0}
+.sub-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:600;color:#888;border:none;background:none;cursor:pointer}
+.sub-tab.act{color:#1a3a5c;border-bottom:3px solid #2e6da4;margin-bottom:-2px}
+#tab-lista{padding:10px}
+.punto-card{background:white;border-radius:10px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;border-left:4px solid #dce8f5;transition:border-color .2s}
+.punto-card.existe{border-left-color:#27ae60}
+.punto-card.no-existe{border-left-color:#e74c3c}
+.punto-card.cercano{border-left-color:#f39c12;background:#fffbf0}
+.p-icon{font-size:18px;flex-shrink:0}
+.p-info{flex:1;min-width:0}
+.p-nombre{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-tipo{font-size:10px;color:#888}
+.p-dist{font-size:9px;color:#bbb}
+.p-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;flex-shrink:0}
+.b-ok{background:#d4edda;color:#155724}
+.b-no{background:#f8d7da;color:#721c24}
+.b-pen{background:#e8f4fd;color:#0c5460}
+.alerta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:2000;background:white;border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.25);padding:18px 18px 28px}
+.alerta.show{display:block}
+.al-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.al-icon{font-size:28px;margin-bottom:4px}
+.al-nombre{font-size:19px;font-weight:800;color:#1a3a5c;margin-bottom:2px}
+.al-tipo{font-size:12px;color:#888;margin-bottom:2px}
+.al-coords{font-size:10px;color:#bbb;margin-bottom:16px}
+.al-btns{display:flex;gap:10px}
+.al-btns button{flex:1;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;cursor:pointer}
+.btn-ok{background:#27ae60;color:white}
+.btn-no{background:#e74c3c;color:white}
+.btn-cerrar{position:absolute;top:14px;right:14px;background:#f0f4f8;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#555}
+#tab-res{padding:12px;display:none}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-c{background:white;border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stat-n{font-size:22px;font-weight:800}
+.stat-l{font-size:10px;color:#888;margin-top:2px}
+.grafica{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.grafica h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.br-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.br-lbl{font-size:10px;width:65px;text-align:right;color:#555}
+.br-bg{flex:1;background:#f0f4f8;border-radius:8px;height:16px;overflow:hidden}
+.br-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:9px;font-weight:700;color:white;transition:width .5s;min-width:24px}
+.br-ok{background:#27ae60}.br-no{background:#e74c3c}
+.por-dia{background:white;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.por-dia h3{font-size:12px;margin-bottom:10px;color:#1a3a5c}
+.dia-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dia-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dia-nm{font-size:11px;width:70px;color:#555}
+.dia-br-bg{flex:1;background:#f0f4f8;border-radius:6px;height:14px;overflow:hidden}
+.dia-br-fill{height:100%;border-radius:6px;transition:width .4s;display:flex;align-items:center;padding:0 5px;font-size:8px;font-weight:700;color:white}
+.dia-num{font-size:10px;color:#888;width:40px;text-align:right}
+.btn-exp{width:100%;background:#1a3a5c;color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-rst{width:100%;background:#f8d7da;color:#721c24;border:none;border-radius:12px;padding:11px;font-size:12px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div><h1>📍 Validación de Puntos</h1><p>San Nicolás de los Garza, NL — Tiendas Independientes — 5 km</p></div>
+    <span class="route-id">VAL-NL-MTY-002</span>
+  </div>
+  <div class="prog-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+  <div class="prog-txt" id="progTxt">0 / 125 validados</div>
+</div>
+<div class="dia-tabs" id="diaTabs">
+  <button class="dia-tab act" style="--c:#2e6da4" onclick="setDia('L')" id="tab-L">Lunes <span class="cnt" id="cnt-L">0/25</span></button>
+  <button class="dia-tab" style="--c:#8e44ad" onclick="setDia('M')" id="tab-M">Martes <span class="cnt" id="cnt-M">0/25</span></button>
+  <button class="dia-tab" style="--c:#27ae60" onclick="setDia('X')" id="tab-X">Miércoles <span class="cnt" id="cnt-X">0/25</span></button>
+  <button class="dia-tab" style="--c:#e67e22" onclick="setDia('J')" id="tab-J">Jueves <span class="cnt" id="cnt-J">0/25</span></button>
+  <button class="dia-tab" style="--c:#c0392b" onclick="setDia('V')" id="tab-V">Viernes <span class="cnt" id="cnt-V">0/25</span></button>
+</div>
+<div class="gps-bar"><div class="gps-dot" id="gpsDot"></div><span id="gpsMsg">Iniciando GPS...</span></div>
+<div id="map"></div>
+<div class="sub-tabs">
+  <button class="sub-tab act" onclick="setSubTab('lista')">📋 Lista</button>
+  <button class="sub-tab" onclick="setSubTab('res')">📊 Resultados</button>
+</div>
+<div id="tab-lista"></div>
+<div id="tab-res">
+  <div class="stat-grid">
+    <div class="stat-c"><div class="stat-n" style="color:#27ae60" id="r-ok">0</div><div class="stat-l">✅ Existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#e74c3c" id="r-no">0</div><div class="stat-l">❌ No existen</div></div>
+    <div class="stat-c"><div class="stat-n" style="color:#f39c12" id="r-pen">125</div><div class="stat-l">⏳ Pendientes</div></div>
+  </div>
+  <div class="grafica">
+    <h3>Distribución total</h3>
+    <div class="br-row"><span class="br-lbl">Existen</span><div class="br-bg"><div class="br-fill br-ok" id="g-ok" style="width:0%">0%</div></div></div>
+    <div class="br-row"><span class="br-lbl">No existen</span><div class="br-bg"><div class="br-fill br-no" id="g-no" style="width:0%">0%</div></div></div>
+  </div>
+  <div class="por-dia"><h3>Avance por día</h3><div id="diasAvance"></div></div>
+  <button class="btn-exp" onclick="exportar()">📤 Exportar reporte completo</button>
+  <button class="btn-rst" onclick="resetear()">🔄 Reiniciar validación</button>
+</div>
+<div class="alerta" id="alerta">
+  <button class="btn-cerrar" onclick="cerrarAlerta()">✕</button>
+  <div class="al-label">📍 Llegaste al punto</div>
+  <div class="al-icon" id="al-icon">🏪</div>
+  <div class="al-nombre" id="al-nombre"></div>
+  <div class="al-tipo" id="al-tipo"></div>
+  <div class="al-coords" id="al-coords"></div>
+  <div class="al-btns">
+    <button class="btn-ok" onclick="validar(true)">✅ EXISTE</button>
+    <button class="btn-no" onclick="validar(false)">❌ NO EXISTE</button>
+  </div>
+</div>
+<script>
+const ID_RUTA='VAL-NL-MTY-002';
+const PUNTOS=[
+  {id:1,lat:25.7255066,lng:-100.32839943,nombre:'ABARROTES LESLIE',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:2,lat:25.72808123,lng:-100.32696269,nombre:'ABARROTES TREJO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:3,lat:25.72753525,lng:-100.32637705,nombre:'ABARROTES MOJARRO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:4,lat:25.71280174,lng:-100.32571309,nombre:'ABARROTES Y PAPELERIA LA 9',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:5,lat:25.73817023,lng:-100.32484474,nombre:'TORTILLERIA DE HARINA',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:6,lat:25.73329859,lng:-100.32452139,nombre:'PANADERIA LYR',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:7,lat:25.71867586,lng:-100.32368898,nombre:'TIENDA SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:8,lat:25.7082793,lng:-100.32303227,nombre:'ABARROTES EL LUCERO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:9,lat:25.70724637,lng:-100.32102269,nombre:'CARNICERIA HIDALGO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:10,lat:25.73282873,lng:-100.31971161,nombre:'DEPOSITO SIX',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:11,lat:25.73520324,lng:-100.31603491,nombre:'LA TIENDA ABARROTES',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:12,lat:25.74985761,lng:-100.31249864,nombre:'FRUTERIA VILLA FRUT',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:13,lat:25.7050591,lng:-100.3091467,nombre:'BODEGA FEMSA',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:14,lat:25.69190032,lng:-100.30482398,nombre:'FRUTERIA ASARCO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:15,lat:25.75465653,lng:-100.30307332,nombre:'ABARROTES LUCYS',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:16,lat:25.71009931,lng:-100.30192322,nombre:'TORTILLERIA VELA',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:17,lat:25.68925203,lng:-100.30055686,nombre:'TIENDA CANTU',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:18,lat:25.68605391,lng:-100.29941198,nombre:'MINISUPER 9',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:19,lat:25.71225997,lng:-100.29862352,nombre:'CEDIS MONTERREY T493',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:20,lat:25.75455945,lng:-100.29776892,nombre:'SUPER UNIMART',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:21,lat:25.72908409,lng:-100.29653544,nombre:'FRUTERIA CUAUHTEMOC',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:22,lat:25.70065514,lng:-100.29527934,nombre:'TIENDA DE ABARROTES',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:23,lat:25.69480079,lng:-100.29501661,nombre:'DEPOSITO AGUILA DE ORO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:24,lat:25.71508975,lng:-100.29449892,nombre:'CONDIMENTOS REGIOS',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:25,lat:25.68184218,lng:-100.29407133,nombre:'DEPOSITO MADERO',tipo:'Tienda Independiente',icon:'🏪',dia:'L',diaNom:'Lunes',color:'#2e6da4'},
+  {id:26,lat:25.70766116,lng:-100.29281769,nombre:'ABARROTES ANGEL',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:27,lat:25.68684828,lng:-100.292407,nombre:'SUPER TIENDA LA ESTRELLA',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:28,lat:25.70283185,lng:-100.29160502,nombre:'ABARROTES HERNANDEZ',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:29,lat:25.73892605,lng:-100.29096786,nombre:'ABARROTES DON VALE',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:30,lat:25.69725608,lng:-100.29016787,nombre:'ABARROTES SUPER 4',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:31,lat:25.75352719,lng:-100.28931697,nombre:'ABARROTES RG',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:32,lat:25.76508952,lng:-100.28827411,nombre:'TIENDA ESCOLAR',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:33,lat:25.69254639,lng:-100.28744731,nombre:'ABARROTES BLANCA',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:34,lat:25.69748702,lng:-100.28635274,nombre:'ABARROTES Y PANADERIA EMMANUEL',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:35,lat:25.74273994,lng:-100.28562982,nombre:'DEPOSITO LA PASADITA',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:36,lat:25.69706997,lng:-100.28526495,nombre:'ABARROTES MENDOZA',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:37,lat:25.75109309,lng:-100.28474927,nombre:'SUPER PLATA',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:38,lat:25.73425671,lng:-100.28414116,nombre:'ABARROTES ALANIS',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:39,lat:25.69616134,lng:-100.28335482,nombre:'ABARROTES CEREZO',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:40,lat:25.70797034,lng:-100.28281837,nombre:'GANGABOX REGALOS',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:41,lat:25.69788579,lng:-100.2818504,nombre:'ABARROTES Y FRUTERIA SALAZAR',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:42,lat:25.69039364,lng:-100.28113866,nombre:'MINISUPER MONTERREY',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:43,lat:25.73349918,lng:-100.28066776,nombre:'SUPER Y CARNICERIA LA 20',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:44,lat:25.70050805,lng:-100.28032403,nombre:'DEPOSITO TADEO',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:45,lat:25.69784911,lng:-100.27969846,nombre:'ABARROTES EL HUAJUCO',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:46,lat:25.69543036,lng:-100.27904113,nombre:'ABARROTES',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:47,lat:25.68942968,lng:-100.27850862,nombre:'TORTILLERIA SAN FRANCISCO',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:48,lat:25.72199859,lng:-100.27815512,nombre:'MISCELANEA CARMEN',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:49,lat:25.68841272,lng:-100.27762588,nombre:'COMERCIO AL POR MAYOR DE ABARROTES SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:50,lat:25.75747924,lng:-100.27709314,nombre:'MINISUPER JANITZIO',tipo:'Tienda Independiente',icon:'🏪',dia:'M',diaNom:'Martes',color:'#8e44ad'},
+  {id:51,lat:25.69240908,lng:-100.27586637,nombre:'MISCELANEA MARY',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:52,lat:25.71835606,lng:-100.27522235,nombre:'ABARROTES. MARY',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:53,lat:25.75589085,lng:-100.27477322,nombre:'MINI ABARROTES VAZQUEZ',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:54,lat:25.72867657,lng:-100.2743205,nombre:'TORTILLERIA CARMEN',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:55,lat:25.71932304,lng:-100.27407806,nombre:'ABARROTES LUCY',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:56,lat:25.72242102,lng:-100.27380294,nombre:'FRUTERIA MONY',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:57,lat:25.7186947,lng:-100.27348781,nombre:'ABARROTES HERNANDEZ',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:58,lat:25.7263459,lng:-100.27271257,nombre:'TIENDA DE ABARROTES ROSY',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:59,lat:25.7203255,lng:-100.27235318,nombre:'ABARROTES DON DORO',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:60,lat:25.72465984,lng:-100.27189434,nombre:'ABARROTES JUAREZ',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:61,lat:25.72966677,lng:-100.27122613,nombre:'TORTILLERIA GARELI',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:62,lat:25.72574764,lng:-100.27094294,nombre:'ABARROTES MARU',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:63,lat:25.73032081,lng:-100.27058936,nombre:'DEPOSITO LAS JUANAS',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:64,lat:25.72181702,lng:-100.27005844,nombre:'DEPOSITO TECATE SIX CACAMA ABARROTE',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:65,lat:25.70977524,lng:-100.2696589,nombre:'ABARROTES Y DEPOSITO',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:66,lat:25.70874682,lng:-100.26930219,nombre:'ABARROTES LUPITA',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:67,lat:25.7353512,lng:-100.26900885,nombre:'ABARROTES SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:68,lat:25.71814851,lng:-100.26856805,nombre:'ESTANQUILLO DOÑA ROSA',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:69,lat:25.72640199,lng:-100.26805456,nombre:'ABARROTES MOLINA',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:70,lat:25.7254484,lng:-100.26780778,nombre:'DEPOSITO SIX',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:71,lat:25.73125069,lng:-100.26725114,nombre:'LA FRUTERIA',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:72,lat:25.72170242,lng:-100.26692704,nombre:'FRUTERIA Y ABARROTES LOS REYES',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:73,lat:25.72015631,lng:-100.26657688,nombre:'DEPOSITO CAZARES',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:74,lat:25.73285146,lng:-100.26622905,nombre:'ABARROTES JUAN MARIA GAONA CASAS',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:75,lat:25.73264784,lng:-100.26586143,nombre:'TIENDA ABARROTES SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'X',diaNom:'Miércoles',color:'#27ae60'},
+  {id:76,lat:25.71257184,lng:-100.26517984,nombre:'MINI SUPER LA PLACITA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:77,lat:25.73091693,lng:-100.26443031,nombre:'COMERCIO AL POR MENOR EN TIENDAS DE ABARROTES, ULTRAMARINOS Y MISCELÁNEAS SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:78,lat:25.76379587,lng:-100.26377477,nombre:'TORTILLERIA KAREN',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:79,lat:25.74749663,lng:-100.26334726,nombre:'ABARROTES DON RULO',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:80,lat:25.71124149,lng:-100.26259045,nombre:'ARTESANIAS BREIMAR',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:81,lat:25.70254784,lng:-100.26199727,nombre:'DEPOSITO DERBY',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:82,lat:25.69987404,lng:-100.26153123,nombre:'ABARROTES ARELY',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:83,lat:25.7626249,lng:-100.26106161,nombre:'FRUTERIA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:84,lat:25.71764571,lng:-100.26044906,nombre:'ABARROTES ESPINOZA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:85,lat:25.75664396,lng:-100.2598799,nombre:'ABARROTES RODRIGUEZ',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:86,lat:25.74285277,lng:-100.25949643,nombre:'TIENDA DE ABARROTES',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:87,lat:25.71023619,lng:-100.25920695,nombre:'ABARROTES PEQUE',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:88,lat:25.74618834,lng:-100.25874914,nombre:'DEPOSITO Y ABARROTES GARAY',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:89,lat:25.75485178,lng:-100.25829176,nombre:'FRUTERIA SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:90,lat:25.698582,lng:-100.25798568,nombre:'FRUTERIA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:91,lat:25.71494596,lng:-100.25764648,nombre:'TORTILLERIA LA GUERITA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:92,lat:25.71009524,lng:-100.25717993,nombre:'MINI SUPER MONTOYA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:93,lat:25.74276015,lng:-100.25682954,nombre:'FRUTERIA LA PALMA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:94,lat:25.700565,lng:-100.25655635,nombre:'ABARROTES',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:95,lat:25.72298036,lng:-100.25614553,nombre:'FRUTERIA LJ',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:96,lat:25.75453215,lng:-100.25583449,nombre:'TECATE SIX BIZANCIO',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:97,lat:25.75033735,lng:-100.25540843,nombre:'TIENDA DE ACCESORIOS PARA TELEFONOS CELULAR IPHONELAND MTY',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:98,lat:25.7605814,lng:-100.2548177,nombre:'ABARROTES ANIA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:99,lat:25.75720626,lng:-100.25445844,nombre:'ABARROTES SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:100,lat:25.75384378,lng:-100.25391456,nombre:'ABARROTES LA PLACITA',tipo:'Tienda Independiente',icon:'🏪',dia:'J',diaNom:'Jueves',color:'#e67e22'},
+  {id:101,lat:25.69964361,lng:-100.25323756,nombre:'JUSCONCENTICE',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:102,lat:25.7218649,lng:-100.25296554,nombre:'ABARROTES SIN NOMBRE',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:103,lat:25.69909379,lng:-100.25215779,nombre:'ABARROTES Y PAPELERIA NORA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:104,lat:25.74346157,lng:-100.25166234,nombre:'FRUTERIA ANNETTE',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:105,lat:25.74163077,lng:-100.25122054,nombre:'TORTILLERIA DE LA TORRE',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:106,lat:25.69771209,lng:-100.25083171,nombre:'TIENDAS CUPRUM SUCURSAL GALGO ADOLFO PRIETO TIENDA 9531',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:107,lat:25.75142473,lng:-100.24995905,nombre:'ABARROTES CASTILLO',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:108,lat:25.71029839,lng:-100.24939727,nombre:'ABARROTES MAX',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:109,lat:25.71043667,lng:-100.24849494,nombre:'ABARROTES SERNA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:110,lat:25.75020485,lng:-100.24766664,nombre:'MINISUPER ALEX',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:111,lat:25.70868166,lng:-100.24687486,nombre:'ABARROTES ZAMORA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:112,lat:25.72931529,lng:-100.2464597,nombre:'TIENDA DE ABARROTES',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:113,lat:25.74168268,lng:-100.24556542,nombre:'ABARROTES HERNANDEZ',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:114,lat:25.70186025,lng:-100.24509016,nombre:'ABARROTES LA ESQUINA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:115,lat:25.70384418,lng:-100.24404404,nombre:'DEPOSITO TOÑO',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:116,lat:25.72444322,lng:-100.24312143,nombre:'ABARROTES LUPITA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:117,lat:25.72014674,lng:-100.24250045,nombre:'BODEGA DE ABARROTES TACUBA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:118,lat:25.72407766,lng:-100.242099,nombre:'ESTANQUILLO DON PANCHO',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:119,lat:25.72813225,lng:-100.24080615,nombre:'PANADERIA VILLA LUIS',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:120,lat:25.7355324,lng:-100.23937995,nombre:'ABARROTES TECATE SIX',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:121,lat:25.69765724,lng:-100.23740401,nombre:'ABARROTES MARIA Y JOSE',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:122,lat:25.72338331,lng:-100.2361751,nombre:'ABARROTES KARINA',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:123,lat:25.71582602,lng:-100.23517061,nombre:'FRUTERIA LORE',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:124,lat:25.73223688,lng:-100.23397119,nombre:'TIENDA DE REGALOS JAPI BERDY',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'},
+  {id:125,lat:25.72999381,lng:-100.23271428,nombre:'FRUTERIA PALERMO',tipo:'Tienda Independiente',icon:'🏪',dia:'V',diaNom:'Viernes',color:'#c0392b'}
+];
+const DIAS_INFO={L:{nom:'Lunes',color:'#2e6da4'},M:{nom:'Martes',color:'#8e44ad'},X:{nom:'Miércoles',color:'#27ae60'},J:{nom:'Jueves',color:'#e67e22'},V:{nom:'Viernes',color:'#c0392b'}};
+const RADIO=100;
+let estado=JSON.parse(localStorage.getItem('val_'+ID_RUTA)||'{}');
+let diaActivo='L',puntoActivo=null,miUbicacion=null,markerYo=null,marcadores={},alertaMostrada=false;
+
+const map=L.map('map').setView([25.721313,-100.278816],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+
+function iconM(p){
+  const e=estado[p.id],bg=e?(e.existe?'#27ae60':'#e74c3c'):p.color;
+  return L.divIcon({className:'',html:`<div style="background:${bg};width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 5px rgba(0,0,0,.3)">${p.icon}</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+}
+
+PUNTOS.forEach(p=>{
+  const m=L.marker([p.lat,p.lng],{icon:iconM(p)}).addTo(map)
+    .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>${p.tipo}<br><small>${ID_RUTA}-${p.dia}-${p.id}</small>`)
+    .on('click',()=>abrirAlerta(p.id));
+  marcadores[p.id]=m;
+});
+
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+}else{document.getElementById('gpsMsg').textContent='GPS no disponible';document.getElementById('gpsDot').classList.add('err');}
+
+function onPos(pos){
+  const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
+  miUbicacion={lat,lng};
+  document.getElementById('gpsDot').classList.remove('err');document.getElementById('gpsDot').classList.add('on');
+  document.getElementById('gpsMsg').textContent=`GPS activo — precisión ±${acc}m`;
+  if(!markerYo)markerYo=L.circleMarker([lat,lng],{radius:10,color:'#e67e22',fillColor:'#f39c12',fillOpacity:.9,weight:3}).addTo(map).bindPopup('📍 Tú estás aquí');
+  else markerYo.setLatLng([lat,lng]);
+  verificarCercania(lat,lng);
+}
+function onErr(err){document.getElementById('gpsDot').classList.add('err');document.getElementById('gpsMsg').textContent='Error GPS: '+(err.code===1?'Permiso denegado':err.code===2?'Sin señal':'Timeout');}
+
+function dist(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
+function verificarCercania(lat,lng){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  let mejor=null,minD=Infinity;
+  hoy.forEach(p=>{const d=dist(lat,lng,p.lat,p.lng);if(d<minD){minD=d;mejor=p;}marcadores[p.id].setIcon(iconM(p));});
+  renderLista();
+  if(mejor&&minD<RADIO&&!estado[mejor.id]&&!alertaMostrada){alertaMostrada=true;abrirAlerta(mejor.id);}
+  if(minD>=RADIO)alertaMostrada=false;
+}
+
+function abrirAlerta(id){
+  const p=PUNTOS.find(x=>x.id===id);puntoActivo=id;
+  document.getElementById('al-icon').textContent=p.icon;
+  document.getElementById('al-nombre').textContent=p.nombre;
+  document.getElementById('al-tipo').textContent=p.tipo;
+  document.getElementById('al-coords').textContent=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ${ID_RUTA}-${p.dia}-${p.id}`;
+  document.getElementById('alerta').classList.add('show');
+  map.setView([p.lat,p.lng],16);
+}
+function cerrarAlerta(){document.getElementById('alerta').classList.remove('show');puntoActivo=null;}
+
+function validar(existe){
+  if(puntoActivo===null)return;
+  estado[puntoActivo]={existe,ts:new Date().toISOString()};
+  localStorage.setItem('val_'+ID_RUTA,JSON.stringify(estado));
+  marcadores[puntoActivo].setIcon(iconM(PUNTOS.find(p=>p.id===puntoActivo)));
+  cerrarAlerta();renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();
+}
+
+function renderLista(){
+  const hoy=PUNTOS.filter(p=>p.dia===diaActivo);
+  document.getElementById('tab-lista').innerHTML=hoy.map(p=>{
+    const e=estado[p.id],cls=e?(e.existe?'existe':'no-existe'):'';
+    const badge=e?(e.existe?'<span class="p-badge b-ok">✅ Existe</span>':'<span class="p-badge b-no">❌ No existe</span>'):'<span class="p-badge b-pen">⏳</span>';
+    const dm=miUbicacion?` · ${Math.round(dist(miUbicacion.lat,miUbicacion.lng,p.lat,p.lng))}m`:'';
+    return `<div class="punto-card ${cls}" onclick="abrirAlerta(${p.id})"><div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-nombre">${p.nombre}</div><div class="p-tipo">${p.tipo}</div><div class="p-dist">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${dm}</div></div>${badge}</div>`;
+  }).join('');
+}
+
+function actualizarResultados(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length,pen=125-vals.length;
+  document.getElementById('r-ok').textContent=ok;document.getElementById('r-no').textContent=no;document.getElementById('r-pen').textContent=pen;
+  const pok=Math.round(ok/125*100),pno=Math.round(no/125*100);
+  document.getElementById('g-ok').style.width=pok+'%';document.getElementById('g-ok').textContent=pok?pok+'%':'';
+  document.getElementById('g-no').style.width=pno+'%';document.getElementById('g-no').textContent=pno?pno+'%':'';
+  document.getElementById('diasAvance').innerHTML=Object.entries(DIAS_INFO).map(([key,info])=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length,pct=Math.round(v/pts.length*100);
+    return `<div class="dia-row"><div class="dia-dot" style="background:${info.color}"></div><span class="dia-nm">${info.nom}</span><div class="dia-br-bg"><div class="dia-br-fill" style="background:${info.color};width:${pct}%">${pct?pct+'%':''}</div></div><span class="dia-num">${v}/25</span></div>`;
+  }).join('');
+}
+function actualizarProgreso(){
+  const h=Object.keys(estado).length,pct=Math.round(h/125*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=`${h} / 125 validados (${pct}%)`;
+}
+function actualizarTabDias(){
+  Object.keys(DIAS_INFO).forEach(key=>{
+    const pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length;
+    const cnt=document.getElementById('cnt-'+key);cnt.textContent=`${v}/${pts.length}`;cnt.className=v===pts.length?'cnt done':'cnt';
+  });
+}
+function setDia(dia){
+  diaActivo=dia;
+  document.querySelectorAll('.dia-tab').forEach((t,i)=>t.classList.toggle('act',['L','M','X','J','V'][i]===dia));
+  const pts=PUNTOS.filter(p=>p.dia===dia);
+  if(pts.length){const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lng);map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[20,20]});}
+  renderLista();
+}
+function setSubTab(tab){
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>t.classList.toggle('act',['lista','res'][i]===tab));
+  document.getElementById('tab-lista').style.display=tab==='lista'?'':'none';
+  document.getElementById('tab-res').style.display=tab==='res'?'block':'none';
+  if(tab==='res')actualizarResultados();
+}
+function exportar(){
+  const vals=Object.values(estado),ok=vals.filter(v=>v.existe).length,no=vals.filter(v=>!v.existe).length;
+  let txt=`REPORTE DE VALIDACIÓN\nID Ruta   : ${ID_RUTA}\nID Coord  : VAL-NL-MTY-257213_100278\nZona      : San Nicolás de los Garza, NL — Tiendas Independientes\nCentro    : 25.721313, -100.278816\nFecha     : ${new Date().toLocaleDateString('es-MX')}\nFuente    : DENUE INEGI (estrato 0-5)\n\nRESUMEN\nTotal     : 125\n✅ Existen  : ${ok} (${Math.round(ok/125*100)}%)\n❌ No exist : ${no} (${Math.round(no/125*100)}%)\n⏳ Pendient : ${125-vals.length}\n\n`;
+  ['L','M','X','J','V'].forEach(key=>{
+    const info=DIAS_INFO[key],pts=PUNTOS.filter(p=>p.dia===key),v=pts.filter(p=>estado[p.id]).length;
+    txt+=`${info.nom}: ${v}/25 validados\n`;
+    pts.forEach(p=>{const e=estado[p.id];txt+=`  [${ID_RUTA}-${p.dia}-${p.id}] ${p.nombre} (${p.tipo}): ${e?(e.existe?'EXISTE':'NO EXISTE'):'PENDIENTE'}${e?' — '+new Date(e.ts).toLocaleString('es-MX'):''}\n`;});
+    txt+='\n';
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+  a.download=`${ID_RUTA}_${new Date().toISOString().slice(0,10)}.txt`;a.click();
+}
+function resetear(){if(!confirm('¿Reiniciar toda la validación?'))return;localStorage.removeItem('val_'+ID_RUTA);estado={};PUNTOS.forEach(p=>marcadores[p.id].setIcon(iconM(p)));renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();}
+
+renderLista();actualizarResultados();actualizarProgreso();actualizarTabDias();setDia('L');
+</script>
+</body>
+</html>
