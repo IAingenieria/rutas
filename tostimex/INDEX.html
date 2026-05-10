@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tostimex — VAL Nuevo León · Etapa 1</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;color:#212121}
+#hdr{background:#1565c0;color:#fff;padding:14px 22px}
+#hdr h1{font-size:1.3rem;font-weight:700}
+#hdr .sub{font-size:.82rem;opacity:.85;margin-top:3px}
+.layout{display:grid;grid-template-columns:370px 1fr;height:calc(100vh - 60px)}
+#side{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;
+       background:#fff;border-right:1px solid #e0e0e0}
+#map{height:100%}
+.summ{background:#1565c0;color:#fff;border-radius:10px;padding:13px;
+       display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
+.summ .sv{font-size:1.5rem;font-weight:700;display:block}
+.summ .sl{font-size:.72rem;opacity:.85}
+.cdis{border:1px solid #e0e0e0;border-radius:8px;padding:12px}
+.cdis h3{font-size:.75rem;color:#888;margin-bottom:3px}
+.cdis-n{font-weight:700;color:#1565c0;font-size:.95rem}
+.cdis-a{font-size:.78rem;color:#555;margin-top:2px}
+.sec{font-size:.72rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em}
+.mc{border:1px solid #e0e0e0;border-radius:8px;padding:11px;background:#fff}
+.mh{padding-left:9px;margin-bottom:7px}
+.mn{font-weight:700;font-size:.92rem}
+.ms{font-size:.73rem;color:#777}
+.mst{display:flex;gap:14px;margin-top:4px}
+.mv{font-size:1.05rem;font-weight:700;color:#1565c0;display:block}
+.ml{font-size:.68rem;color:#888}
+.chip{display:inline-block;background:#1565c0;color:#fff;border-radius:14px;
+       padding:4px 13px;font-size:.76rem;text-decoration:none;font-weight:500}
+.chip:hover{opacity:.85}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <h1>🚛 Tostimex — Análisis VAL · Nuevo León · Etapa 1</h1>
+  <div class="sub">CEDIS Monterrey · 5 municipios · 13,436 puntos DENUE · 371 rutas estimadas</div>
+</div>
+<div class="layout">
+<div id="side">
+  <div class="summ">
+    <div><span class="sv">13,436</span><span class="sl">Puntos DENUE</span></div>
+    <div><span class="sv">5</span><span class="sl">Municipios</span></div>
+    <div><span class="sv">371</span><span class="sl">Rutas est.</span></div>
+  </div>
+  <div class="cdis">
+    <h3>CEDIS — Etapa 1</h3>
+    <div class="cdis-n">Tostimex · Monterrey</div>
+    <div class="cdis-a">Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.</div>
+  </div>
+  <div class="sec">Municipios · SCIAN 461 · 0-5 personas</div>
+
+    <div class="mc">
+      <div class="mh" style="border-left:4px solid #1565c0">
+        <div class="mn">Monterrey, N.L.</div>
+        <div class="ms">Monterrey · 10.0 km · mc=38</div>
+      </div>
+      <div class="mst">
+        <div><span class="mv">6,213</span><span class="ml">Puntos</span></div>
+        <div><span class="mv">38</span><span class="ml">Máx/ruta</span></div>
+        <div><span class="mv">164</span><span class="ml">Rutas est.</span></div>
+      </div>
+      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
+        <div>~7 vend. mensual</div>
+        <div>~28 vend. semanal</div>
+      </div>
+      <div style="margin-top:8px">
+        <a class="chip" href="monterrey/VAL-NL-MTY-001.html" target="_blank">📍 VAL MTY</a>
+      </div>
+    </div>
+    <div class="mc">
+      <div class="mh" style="border-left:4px solid #1565c0">
+        <div class="mn">Guadalupe, N.L.</div>
+        <div class="ms">Monterrey · 4.4 km · mc=40</div>
+      </div>
+      <div class="mst">
+        <div><span class="mv">3,080</span><span class="ml">Puntos</span></div>
+        <div><span class="mv">40</span><span class="ml">Máx/ruta</span></div>
+        <div><span class="mv">77</span><span class="ml">Rutas est.</span></div>
+      </div>
+      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
+        <div>~4 vend. mensual</div>
+        <div>~13 vend. semanal</div>
+      </div>
+      <div style="margin-top:8px">
+        <a class="chip" href="monterrey/VAL-NL-GUA-001.html" target="_blank">📍 VAL GUA</a>
+      </div>
+    </div>
+    <div class="mc">
+      <div class="mh" style="border-left:4px solid #1565c0">
+        <div class="mn">Santa Catarina, N.L.</div>
+        <div class="ms">Monterrey · 21.3 km · mc=35</div>
+      </div>
+      <div class="mst">
+        <div><span class="mv">1,521</span><span class="ml">Puntos</span></div>
+        <div><span class="mv">35</span><span class="ml">Máx/ruta</span></div>
+        <div><span class="mv">44</span><span class="ml">Rutas est.</span></div>
+      </div>
+      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
+        <div>~2 vend. mensual</div>
+        <div>~8 vend. semanal</div>
+      </div>
+      <div style="margin-top:8px">
+        <a class="chip" href="monterrey/VAL-NL-SCA-001.html" target="_blank">📍 VAL SCA</a>
+      </div>
+    </div>
+    <div class="mc">
+      <div class="mh" style="border-left:4px solid #1565c0">
+        <div class="mn">García, N.L.</div>
+        <div class="ms">Monterrey · 33.2 km · mc=31</div>
+      </div>
+      <div class="mst">
+        <div><span class="mv">2,365</span><span class="ml">Puntos</span></div>
+        <div><span class="mv">31</span><span class="ml">Máx/ruta</span></div>
+        <div><span class="mv">77</span><span class="ml">Rutas est.</span></div>
+      </div>
+      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
+        <div>~4 vend. mensual</div>
+        <div>~13 vend. semanal</div>
+      </div>
+      <div style="margin-top:8px">
+        <a class="chip" href="monterrey/VAL-NL-GAR-001.html" target="_blank">📍 VAL GAR</a>
+      </div>
+    </div>
+    <div class="mc">
+      <div class="mh" style="border-left:4px solid #1565c0">
+        <div class="mn">Santiago, N.L.</div>
+        <div class="ms">Monterrey · 31.4 km · mc=31</div>
+      </div>
+      <div class="mst">
+        <div><span class="mv">257</span><span class="ml">Puntos</span></div>
+        <div><span class="mv">31</span><span class="ml">Máx/ruta</span></div>
+        <div><span class="mv">9</span><span class="ml">Rutas est.</span></div>
+      </div>
+      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
+        <div>~1 vend. mensual</div>
+        <div>~2 vend. semanal</div>
+      </div>
+      <div style="margin-top:8px">
+        <a class="chip" href="monterrey/VAL-NL-STG-001.html" target="_blank">📍 VAL STG</a>
+      </div>
+    </div>
+</div>
+<div id="map"></div>
+</div>
+<script>
+const map = L.map('map').setView([25.689, -100.246], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
+
+// CEDIS
+L.marker([25.689, -100.246], {
+  icon: L.divIcon({className:'', iconSize:[30,30], iconAnchor:[15,15],
+    html:'<svg width="30" height="30"><circle cx="15" cy="15" r="14" fill="#1565c0" stroke="#fff" stroke-width="2.5"/><text x="15" y="20" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">C</text></svg>'})
+}).bindPopup('<b>CEDIS Tostimex Monterrey</b><br>Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.').addTo(map).openPopup();
+
+// Radio 54 km
+L.circle([25.689, -100.246], {
+  radius: 54000, color: '#1565c0', weight: 1.5, fillOpacity: 0.05, dashArray: '6 4'
+}).addTo(map);
+
+// Municipios
+
+    L.circleMarker([25.71661, -100.34137], {
+      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
+    }).bindPopup('<b>Monterrey</b><br>6,213 pts DENUE<br>164 rutas est.').addTo(map);
+    L.circleMarker([25.67611, -100.20405], {
+      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
+    }).bindPopup('<b>Guadalupe</b><br>3,080 pts DENUE<br>77 rutas est.').addTo(map);
+    L.circleMarker([25.68530, -100.45860], {
+      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
+    }).bindPopup('<b>Santa Catarina</b><br>1,521 pts DENUE<br>44 rutas est.').addTo(map);
+    L.circleMarker([25.79779, -100.55491], {
+      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
+    }).bindPopup('<b>García</b><br>2,365 pts DENUE<br>77 rutas est.').addTo(map);
+    L.circleMarker([25.42138, -100.14560], {
+      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
+    }).bindPopup('<b>Santiago</b><br>257 pts DENUE<br>9 rutas est.').addTo(map);
+</script>
+</body>
+</html>
