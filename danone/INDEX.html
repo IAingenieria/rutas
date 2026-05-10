@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Danone GTO+QRO — 3 CEDIS · Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#222}
+.hero{background:linear-gradient(135deg,#0d47a1 0%,#1565c0 60%,#1976d2 100%);color:#fff;padding:28px 32px 20px}
+.hero h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.hero p{font-size:13px;opacity:.85}
+.hero-stats{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+.hstat{background:rgba(255,255,255,.18);border-radius:10px;padding:10px 20px;text-align:center}
+.hstat .n{font-size:28px;font-weight:700}.hstat .l{font-size:11px;opacity:.8;margin-top:2px}
+#map-container{height:340px;background:#e8eaf6;position:relative}
+#map{height:100%;width:100%}
+.container{max-width:980px;margin:0 auto;padding:20px 14px}
+.sec-title{font-size:17px;font-weight:700;margin:24px 0 12px;color:#1a237e}
+.tbl-wrap{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.1);overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8f9fa;padding:7px 10px;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #e8eaf6;white-space:nowrap}
+td{border-bottom:1px solid #f0f0f0}
+tr:last-child td{border-bottom:none}
+.no-fac-box{background:#fff3e0;border-left:4px solid #ff9800;border-radius:6px;padding:14px 16px;margin-top:12px}
+.no-fac-box h3{font-size:14px;color:#e65100;margin-bottom:8px}
+.corridor-box{background:#e8f5e9;border-left:4px solid #43a047;border-radius:6px;padding:14px 16px;margin-top:12px}
+.corridor-box h3{font-size:14px;color:#2e7d32;margin-bottom:8px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}
+.legend-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+footer{text-align:center;padding:24px;font-size:12px;color:#9e9e9e}
+</style></head><body>
+
+<div class="hero">
+  <h1>🚚 Danone GTO+QRO — Plan de Distribución 3 CEDIS</h1>
+  <p>Establecimientos SCIAN 461xxx · 0–5 personas · INEGI DENUE 2024 · Guanajuato + Querétaro</p>
+  <div class="hero-stats">
+    <div class="hstat"><div class="n">32</div><div class="l">Municipios cubiertos</div></div>
+    <div class="hstat"><div class="n">54,145</div><div class="l">Establecimientos</div></div>
+    <div class="hstat"><div class="n">1,548</div><div class="l">Rutas totales</div></div>
+    <div class="hstat"><div class="n">66</div><div class="l">Vendedores (ciclo mensual)</div></div>
+    <div class="hstat"><div class="n">3</div><div class="l">CEDIS operativos</div></div>
+  </div>
+</div>
+
+<div id="map-container">
+  <div id="map"></div>
+</div>
+
+<div class="container">
+
+  <div class="sec-title">📍 CEDIS y Cobertura por Municipio</div>
+  
+<div style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px">
+  <div style="background:#1565c0;color:#fff;padding:16px 20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <h2 style="margin:0 0 2px;font-size:18px">CEDIS Apaseo el Grande</h2>
+        <p style="margin:0;opacity:.85;font-size:13px">18 municipios · 22,855 establecimientos</p>
+      </div>
+      <a href="apaseo/RESUMEN_DANONE_APG.html" target="_blank"
+         style="background:rgba(255,255,255,.2);color:#fff;text-decoration:none;
+                padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap">
+        Ver RESUMEN →
+      </a>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">706</div>
+        <div style="font-size:11px;opacity:.85">Rutas totales</div>
+      </div>
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">30</div>
+        <div style="font-size:11px;opacity:.85">Vendedores<br>ciclo mensual</div>
+      </div>
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">118</div>
+        <div style="font-size:11px;opacity:.85">Vendedores<br>ciclo semanal</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:14px 16px">
+    <p style="margin:0 0 8px;font-size:12px;color:#888;font-weight:600">MUNICIPIOS CUBIERTOS</p>
+    <div><a href="apaseo/VAL-QRO-QUE-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Querétaro <span style="color:#888">(7,540)</span></a><a href="apaseo/VAL-GTO-CEL-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Celaya <span style="color:#888">(4,485)</span></a><a href="apaseo/VAL-GTO-SAL-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Salvatierra <span style="color:#888">(1,289)</span></a><a href="apaseo/VAL-QRO-ELM-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">El Marqués <span style="color:#888">(1,266)</span></a><a href="apaseo/VAL-GTO-SAN-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">San Miguel de Allende <span style="color:#888">(1,133)</span></a><a href="apaseo/VAL-QRO-COR-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Corregidora <span style="color:#888">(1,104)</span></a><a href="apaseo/VAL-GTO-COR-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Cortazar <span style="color:#888">(1,059)</span></a><a href="apaseo/VAL-GTO-APA-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Apaseo el Grande <span style="color:#888">(934)</span></a><a href="apaseo/VAL-GTO-VIL-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Villagrán <span style="color:#888">(828)</span></a><a href="apaseo/VAL-GTO-SAN-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Santa Cruz Juventino Rosas <span style="color:#888">(747)</span></a><a href="apaseo/VAL-GTO-COM-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Comonfort <span style="color:#888">(605)</span></a><a href="apaseo/VAL-GTO-APA-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Apaseo el Alto <span style="color:#888">(526)</span></a><a href="apaseo/VAL-GTO-JAR-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Jaral del Progreso <span style="color:#888">(471)</span></a><a href="apaseo/VAL-GTO-TAR-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Tarimoro <span style="color:#888">(325)</span></a><a href="apaseo/VAL-GTO-JER-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Jerécuaro <span style="color:#888">(266)</span></a><a href="apaseo/VAL-QRO-HUI-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Huimilpan <span style="color:#888">(118)</span></a><a href="apaseo/VAL-GTO-COR-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Coroneo <span style="color:#888">(83)</span></a><a href="apaseo/VAL-GTO-SAN-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Santiago Maravatío <span style="color:#888">(76)</span></a></div>
+  </div>
+</div>
+<div style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px">
+  <div style="background:#b71c1c;color:#fff;padding:16px 20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <h2 style="margin:0 0 2px;font-size:18px">CEDIS Irapuato</h2>
+        <p style="margin:0;opacity:.85;font-size:13px">9 municipios · 12,327 establecimientos</p>
+      </div>
+      <a href="irapuato/RESUMEN_DANONE_IRP.html" target="_blank"
+         style="background:rgba(255,255,255,.2);color:#fff;text-decoration:none;
+                padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap">
+        Ver RESUMEN →
+      </a>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">346</div>
+        <div style="font-size:11px;opacity:.85">Rutas totales</div>
+      </div>
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">15</div>
+        <div style="font-size:11px;opacity:.85">Vendedores<br>ciclo mensual</div>
+      </div>
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">58</div>
+        <div style="font-size:11px;opacity:.85">Vendedores<br>ciclo semanal</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:14px 16px">
+    <p style="margin:0 0 8px;font-size:12px;color:#888;font-weight:600">MUNICIPIOS CUBIERTOS</p>
+    <div><a href="irapuato/VAL-GTO-IRA-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Irapuato <span style="color:#888">(5,774)</span></a><a href="irapuato/VAL-GTO-SAL-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Salamanca <span style="color:#888">(2,233)</span></a><a href="irapuato/VAL-GTO-GUA-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Guanajuato <span style="color:#888">(1,761)</span></a><a href="irapuato/VAL-GTO-VAL-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Valle de Santiago <span style="color:#888">(1,109)</span></a><a href="irapuato/VAL-GTO-ABA-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Abasolo <span style="color:#888">(482)</span></a><a href="irapuato/VAL-GTO-ROM-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Romita <span style="color:#888">(415)</span></a><a href="irapuato/VAL-GTO-CUE-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Cuerámaro <span style="color:#888">(338)</span></a><a href="irapuato/VAL-GTO-HUA-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Huanímaro <span style="color:#888">(122)</span></a><a href="irapuato/VAL-GTO-PUE-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Pueblo Nuevo <span style="color:#888">(93)</span></a></div>
+  </div>
+</div>
+<div style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden;margin-bottom:20px">
+  <div style="background:#2e7d32;color:#fff;padding:16px 20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <h2 style="margin:0 0 2px;font-size:18px">CEDIS León</h2>
+        <p style="margin:0;opacity:.85;font-size:13px">5 municipios · 18,963 establecimientos</p>
+      </div>
+      <a href="leon/RESUMEN_DANONE_LEO.html" target="_blank"
+         style="background:rgba(255,255,255,.2);color:#fff;text-decoration:none;
+                padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap">
+        Ver RESUMEN →
+      </a>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">496</div>
+        <div style="font-size:11px;opacity:.85">Rutas totales</div>
+      </div>
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">21</div>
+        <div style="font-size:11px;opacity:.85">Vendedores<br>ciclo mensual</div>
+      </div>
+      <div style="background:rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:700">83</div>
+        <div style="font-size:11px;opacity:.85">Vendedores<br>ciclo semanal</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:14px 16px">
+    <p style="margin:0 0 8px;font-size:12px;color:#888;font-weight:600">MUNICIPIOS CUBIERTOS</p>
+    <div><a href="leon/VAL-GTO-LEÓ-LEO-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">León <span style="color:#888">(14,740)</span></a><a href="leon/VAL-GTO-SIL-LEO-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Silao de la Victoria <span style="color:#888">(1,832)</span></a><a href="leon/VAL-GTO-SAN-LEO-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">San Francisco del Rincón <span style="color:#888">(1,330)</span></a><a href="leon/VAL-GTO-PUR-LEO-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Purísima del Rincón <span style="color:#888">(798)</span></a><a href="leon/VAL-GTO-MAN-LEO-001.html" target="_blank" style="display:inline-block;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;text-decoration:none;color:#333">Manuel Doblado <span style="color:#888">(263)</span></a></div>
+  </div>
+</div>
+
+  <div class="sec-title">👥 Dimensionamiento de Vendedores</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>CEDIS</th><th>Municipio</th>
+        <th style="text-align:right">Pts</th>
+        <th style="text-align:right">Max cli/ruta</th>
+        <th style="text-align:right">Rutas total</th>
+        <th style="text-align:right">Vend. mensual*</th>
+        <th style="text-align:right">Vend. semanal**</th>
+      </tr></thead>
+      <tbody>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Querétaro <span style="color:#999;font-size:11px">(QRO)</span></td>
+  <td style="padding:5px 10px;text-align:right">7,540</td>
+  <td style="padding:5px 10px;text-align:right">31</td>
+  <td style="padding:5px 10px;text-align:right">243</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">11</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">41</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Celaya <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">4,485</td>
+  <td style="padding:5px 10px;text-align:right">38</td>
+  <td style="padding:5px 10px;text-align:right">118</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">5</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">20</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Salvatierra <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,289</td>
+  <td style="padding:5px 10px;text-align:right">29</td>
+  <td style="padding:5px 10px;text-align:right">44</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">8</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">El Marqués <span style="color:#999;font-size:11px">(QRO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,266</td>
+  <td style="padding:5px 10px;text-align:right">27</td>
+  <td style="padding:5px 10px;text-align:right">46</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">8</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">San Miguel de Allende <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,133</td>
+  <td style="padding:5px 10px;text-align:right">28</td>
+  <td style="padding:5px 10px;text-align:right">40</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">7</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Corregidora <span style="color:#999;font-size:11px">(QRO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,104</td>
+  <td style="padding:5px 10px;text-align:right">32</td>
+  <td style="padding:5px 10px;text-align:right">34</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">6</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Cortazar <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,059</td>
+  <td style="padding:5px 10px;text-align:right">33</td>
+  <td style="padding:5px 10px;text-align:right">32</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">6</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Apaseo el Grande <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">934</td>
+  <td style="padding:5px 10px;text-align:right">38</td>
+  <td style="padding:5px 10px;text-align:right">24</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">4</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Villagrán <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">828</td>
+  <td style="padding:5px 10px;text-align:right">32</td>
+  <td style="padding:5px 10px;text-align:right">26</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">5</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Santa Cruz Juventino Rosas <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">747</td>
+  <td style="padding:5px 10px;text-align:right">32</td>
+  <td style="padding:5px 10px;text-align:right">23</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">4</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Comonfort <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">605</td>
+  <td style="padding:5px 10px;text-align:right">35</td>
+  <td style="padding:5px 10px;text-align:right">17</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">3</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Apaseo el Alto <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">526</td>
+  <td style="padding:5px 10px;text-align:right">36</td>
+  <td style="padding:5px 10px;text-align:right">14</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">3</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Jaral del Progreso <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">471</td>
+  <td style="padding:5px 10px;text-align:right">29</td>
+  <td style="padding:5px 10px;text-align:right">16</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">3</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Tarimoro <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">325</td>
+  <td style="padding:5px 10px;text-align:right">32</td>
+  <td style="padding:5px 10px;text-align:right">10</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">2</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Jerécuaro <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">266</td>
+  <td style="padding:5px 10px;text-align:right">25</td>
+  <td style="padding:5px 10px;text-align:right">10</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">2</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Huimilpan <span style="color:#999;font-size:11px">(QRO)</span></td>
+  <td style="padding:5px 10px;text-align:right">118</td>
+  <td style="padding:5px 10px;text-align:right">27</td>
+  <td style="padding:5px 10px;text-align:right">4</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">1</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Coroneo <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">83</td>
+  <td style="padding:5px 10px;text-align:right">25</td>
+  <td style="padding:5px 10px;text-align:right">3</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">1</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">APG</span></td>
+  <td style="padding:5px 10px">Santiago Maravatío <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">76</td>
+  <td style="padding:5px 10px;text-align:right">26</td>
+  <td style="padding:5px 10px;text-align:right">2</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">1</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Irapuato <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">5,774</td>
+  <td style="padding:5px 10px;text-align:right">40</td>
+  <td style="padding:5px 10px;text-align:right">144</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">6</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">24</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Salamanca <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">2,233</td>
+  <td style="padding:5px 10px;text-align:right">35</td>
+  <td style="padding:5px 10px;text-align:right">64</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">3</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">11</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Guanajuato <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,761</td>
+  <td style="padding:5px 10px;text-align:right">30</td>
+  <td style="padding:5px 10px;text-align:right">58</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">3</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">10</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Valle de Santiago <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,109</td>
+  <td style="padding:5px 10px;text-align:right">30</td>
+  <td style="padding:5px 10px;text-align:right">37</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">7</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Abasolo <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">482</td>
+  <td style="padding:5px 10px;text-align:right">33</td>
+  <td style="padding:5px 10px;text-align:right">14</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">3</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Romita <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">415</td>
+  <td style="padding:5px 10px;text-align:right">33</td>
+  <td style="padding:5px 10px;text-align:right">12</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">2</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Cuerámaro <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">338</td>
+  <td style="padding:5px 10px;text-align:right">31</td>
+  <td style="padding:5px 10px;text-align:right">11</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">2</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Huanímaro <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">122</td>
+  <td style="padding:5px 10px;text-align:right">30</td>
+  <td style="padding:5px 10px;text-align:right">4</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">1</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#b71c1c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">IRP</span></td>
+  <td style="padding:5px 10px">Pueblo Nuevo <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">93</td>
+  <td style="padding:5px 10px;text-align:right">36</td>
+  <td style="padding:5px 10px;text-align:right">2</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">1</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#2e7d32;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">LEO</span></td>
+  <td style="padding:5px 10px">León <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">14,740</td>
+  <td style="padding:5px 10px;text-align:right">40</td>
+  <td style="padding:5px 10px;text-align:right">368</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">16</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">62</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#2e7d32;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">LEO</span></td>
+  <td style="padding:5px 10px">Silao de la Victoria <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,832</td>
+  <td style="padding:5px 10px;text-align:right">32</td>
+  <td style="padding:5px 10px;text-align:right">57</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">3</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">10</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#2e7d32;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">LEO</span></td>
+  <td style="padding:5px 10px">San Francisco del Rincón <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">1,330</td>
+  <td style="padding:5px 10px;text-align:right">35</td>
+  <td style="padding:5px 10px;text-align:right">38</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">2</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">7</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#2e7d32;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">LEO</span></td>
+  <td style="padding:5px 10px">Purísima del Rincón <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">798</td>
+  <td style="padding:5px 10px;text-align:right">34</td>
+  <td style="padding:5px 10px;text-align:right">23</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">4</td>
+</tr>
+<tr>
+  <td style="padding:5px 10px"><span style="background:#2e7d32;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px">LEO</span></td>
+  <td style="padding:5px 10px">Manuel Doblado <span style="color:#999;font-size:11px">(GTO)</span></td>
+  <td style="padding:5px 10px;text-align:right">263</td>
+  <td style="padding:5px 10px;text-align:right">25</td>
+  <td style="padding:5px 10px;text-align:right">10</td>
+  <td style="padding:5px 10px;text-align:right;font-weight:600">1</td>
+  <td style="padding:5px 10px;text-align:right;color:#888">2</td>
+</tr>
+      <tr style="background:#f5f5f5;font-weight:700">
+        <td colspan="4" style="padding:6px 10px">TOTAL</td>
+        <td style="padding:6px 10px;text-align:right">1,548</td>
+        <td style="padding:6px 10px;text-align:right">66</td>
+        <td style="padding:6px 10px;text-align:right">258</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12px;color:#888;margin-top:6px">
+    * Ciclo mensual: cada cliente se visita 1 vez al mes (24 días hábiles L–S × 4 semanas).<br>
+    ** Ciclo semanal: cada cliente se visita 1 vez a la semana (6 días hábiles).
+  </p>
+
+  <div class="sec-title">⚠️ Municipios sin cobertura con 3 CEDIS</div>
+  <div class="no-fac-box">
+    <h3>Requieren un 4° CEDIS (sugerido: Querétaro ciudad o San Juan del Río)</h3>
+    <div class="tbl-wrap" style="margin-top:8px">
+      <table>
+        <thead><tr><th>Municipio</th><th style="text-align:right">Pts</th><th>Limitante</th></tr></thead>
+        <tbody><tr><td style="padding:4px 10px">San Juan del Río <span style="color:#999;font-size:11px">(QRO)</span></td><td style="padding:4px 10px;text-align:right">2,630</td><td style="padding:4px 10px;color:#888;font-size:12px">Necesita CEDIS en QRO o SJR</td></tr><tr><td style="padding:4px 10px">Acámbaro <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">1,272</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 23 cli desde APG</td></tr><tr><td style="padding:4px 10px">Pénjamo <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">1,263</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 24 cli desde IRP</td></tr><tr><td style="padding:4px 10px">Dolores Hidalgo <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">1,039</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 20 cli desde los 3 CEDIS</td></tr><tr><td style="padding:4px 10px">San José Iturbide <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">902</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 22 cli desde APG</td></tr><tr><td style="padding:4px 10px">Tequisquiapan <span style="color:#999;font-size:11px">(QRO)</span></td><td style="padding:4px 10px;text-align:right">873</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 16 cli desde APG</td></tr><tr><td style="padding:4px 10px">San Luis de la Paz <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">872</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 15 cli desde APG</td></tr><tr><td style="padding:4px 10px">San Felipe <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">836</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 20 cli desde LEO</td></tr><tr><td style="padding:4px 10px">Uriangato <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">788</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 22 cli desde IRP</td></tr><tr><td style="padding:4px 10px">Pedro Escobedo <span style="color:#999;font-size:11px">(QRO)</span></td><td style="padding:4px 10px;text-align:right">760</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 23 cli desde APG</td></tr><tr><td style="padding:4px 10px">Yuriria <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">665</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 24 cli desde IRP</td></tr><tr><td style="padding:4px 10px">Moroleón <span style="color:#999;font-size:11px">(GTO)</span></td><td style="padding:4px 10px;text-align:right">646</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 22 cli desde IRP</td></tr><tr><td style="padding:4px 10px">Ezequiel Montes <span style="color:#999;font-size:11px">(QRO)</span></td><td style="padding:4px 10px;text-align:right">500</td><td style="padding:4px 10px;color:#888;font-size:12px">Max 14 cli desde APG</td></tr></tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:8px">
+      Total establecimientos sin cobertura: <strong>13,046</strong>
+      (19% del universo GTO+QRO)
+    </p>
+  </div>
+
+  <div class="sec-title">🛣️ Corredor Carretera Fed. 51</div>
+  <div class="corridor-box">
+    <h3>VAL-CARR-GTO-051-APG-SMA-001 — Ya generado</h3>
+    <p style="font-size:13px;color:#555;margin-top:4px">
+      764 puntos en corredor ±500m · Apaseo el Grande → San Miguel de Allende<br>
+      Incluido en el territorio de CEDIS Apaseo.
+      <a href="../VAL-CARR-GTO-051-APG-SMA-001.html" target="_blank"
+         style="color:#2e7d32;font-weight:600">Ver mapa del corredor →</a>
+    </p>
+  </div>
+
+  <div class="sec-title">📊 Resumen Ejecutivo</div>
+  <div style="background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 6px rgba(0,0,0,.1)">
+    <table style="width:100%;font-size:14px">
+      <tbody>
+        <tr><td style="padding:6px 0;color:#555">Establecimientos cubiertos (3 CEDIS)</td>
+            <td style="padding:6px 0;text-align:right;font-weight:700">54,145</td></tr>
+        <tr><td style="padding:6px 0;color:#555">Establecimientos sin cobertura</td>
+            <td style="padding:6px 0;text-align:right;font-weight:700;color:#e65100">13,046</td></tr>
+        <tr style="border-top:2px solid #e8eaf6">
+            <td style="padding:6px 0;color:#555">Universo total GTO+QRO (461xxx, 0-5 pers.)</td>
+            <td style="padding:6px 0;text-align:right;font-weight:700">69,763</td></tr>
+        <tr><td style="padding:6px 0;color:#555">% cobertura con 3 CEDIS</td>
+            <td style="padding:6px 0;text-align:right;font-weight:700;color:#2e7d32">77%</td></tr>
+        <tr><td style="padding:6px 0;color:#555">Rutas totales para cobertura completa</td>
+            <td style="padding:6px 0;text-align:right;font-weight:700">1,548</td></tr>
+        <tr><td style="padding:6px 0;color:#555">Vendedores recomendados (ciclo mensual)</td>
+            <td style="padding:6px 0;text-align:right;font-weight:700">66</td></tr>
+        <tr><td style="padding:6px 0;color:#555">  · CEDIS Apaseo el Grande</td>
+            <td style="padding:6px 0;text-align:right">30</td></tr>
+        <tr><td style="padding:6px 0;color:#555">  · CEDIS Irapuato</td>
+            <td style="padding:6px 0;text-align:right">15</td></tr>
+        <tr><td style="padding:6px 0;color:#555">  · CEDIS León</td>
+            <td style="padding:6px 0;text-align:right">21</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>MrRuta × Danone GTO+QRO · 3 CEDIS · Generado 2026-05-09 · Datos: INEGI DENUE 2024</footer>
+
+<script>
+const CEDIS = [{"key": "APG", "nombre": "Apaseo el Grande", "color": "#1565c0", "lat": 20.5481, "lng": -100.7244}, {"key": "IRP", "nombre": "Irapuato", "color": "#b71c1c", "lat": 20.6778, "lng": -101.3566}, {"key": "LEO", "nombre": "Le\u00f3n", "color": "#2e7d32", "lat": 21.1217, "lng": -101.6827}];
+const map = L.map('map').setView([20.85, -101.10], 8);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
+
+// Radio de cobertura factible (~54 km = MIN_RUTA=25)
+const RADIO_KM = 54000;
+
+CEDIS.forEach(c => {
+  // Círculo de cobertura
+  L.circle([c.lat, c.lng], {
+    radius: RADIO_KM,
+    color: c.color, fillColor: c.color,
+    fillOpacity: 0.08, weight: 2, opacity: 0.5,
+    dashArray: '8 4'
+  }).addTo(map);
+
+  // Marcador CEDIS
+  L.marker([c.lat, c.lng], {
+    icon: L.divIcon({
+      className: '',
+      html: `<div style="background:${c.color};color:#fff;border-radius:50%;
+             width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+             font-weight:700;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.4);
+             border:3px solid #fff">${c.key}</div>`,
+      iconAnchor: [18, 18]
+    })
+  }).addTo(map).bindPopup(
+    `<b style="color:${c.color}">CEDIS ${c.nombre}</b><br>
+     <span style="font-size:12px">${c.key} · Lat ${c.lat.toFixed(4)} / Lng ${c.lng.toFixed(4)}</span>`
+  );
+});
+
+// Límite entre territorios (línea visual entre los 3 CEDIS)
+const cedisCoords = CEDIS.map(c => [c.lat, c.lng]);
+L.polyline(cedisCoords, {color:'#9e9e9e', weight:1, dashArray:'4 4', opacity:0.5}).addTo(map);
+</script>
+</body></html>
