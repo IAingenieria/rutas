@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tostimex — VAL Nuevo León · Etapa 1</title>
+<title>Tostimex — NL Etapa 1</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -17,9 +17,9 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;color:#212121}
        background:#fff;border-right:1px solid #e0e0e0}
 #map{height:100%}
 .summ{background:#1565c0;color:#fff;border-radius:10px;padding:13px;
-       display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
-.summ .sv{font-size:1.5rem;font-weight:700;display:block}
-.summ .sl{font-size:.72rem;opacity:.85}
+       display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.summ .sv{font-size:1.3rem;font-weight:700;display:block}
+.summ .sl{font-size:.7rem;opacity:.85}
 .cdis{border:1px solid #e0e0e0;border-radius:8px;padding:12px}
 .cdis h3{font-size:.75rem;color:#888;margin-bottom:3px}
 .cdis-n{font-weight:700;color:#1565c0;font-size:.95rem}
@@ -33,155 +33,118 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;color:#212121}
 .mv{font-size:1.05rem;font-weight:700;color:#1565c0;display:block}
 .ml{font-size:.68rem;color:#888}
 .chip{display:inline-block;background:#1565c0;color:#fff;border-radius:14px;
-       padding:4px 13px;font-size:.76rem;text-decoration:none;font-weight:500}
+       padding:4px 12px;font-size:.76rem;text-decoration:none;font-weight:500}
+.chip2{background:#2e7d32}
 .chip:hover{opacity:.85}
 </style>
 </head>
 <body>
 <div id="hdr">
-  <h1>🚛 Tostimex — Análisis VAL · Nuevo León · Etapa 1</h1>
-  <div class="sub">CEDIS Monterrey · 5 municipios · 12,512 puntos Mr Ruta Algoritmo · 344 rutas estimadas</div>
+  <h1>🚛 Tostimex — Nuevo León · Etapa 1</h1>
+  <div class="sub">CEDIS Monterrey · 5 municipios · 12,512 clientes Mr Ruta Algoritmo · 331 rutas · Salida 08:30</div>
 </div>
 <div class="layout">
 <div id="side">
   <div class="summ">
-    <div><span class="sv">12,512</span><span class="sl">Puntos Mr Ruta Algoritmo</span></div>
-    <div><span class="sv">5</span><span class="sl">Municipios</span></div>
-    <div><span class="sv">344</span><span class="sl">Rutas est.</span></div>
+    <div><span class="sv">12,512</span><span class="sl">Clientes</span></div>
+    <div><span class="sv">331</span><span class="sl">Rutas totales</span></div>
+    <div><span class="sv">14</span><span class="sl">Vendors/mes</span></div>
+    <div><span class="sv">56</span><span class="sl">Vendors/sem</span></div>
   </div>
   <div class="cdis">
-    <h3>CEDIS — Etapa 1</h3>
+    <h3>CEDIS · Salida 08:30 AM · Máx 40 cli/ruta</h3>
     <div class="cdis-n">Tostimex · Monterrey</div>
     <div class="cdis-a">Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.</div>
   </div>
-  <div class="sec">Municipios · SCIAN 461 · 0-5 personas</div>
+  <div class="sec">Municipios · Etapa 1</div>
 
     <div class="mc">
       <div class="mh" style="border-left:4px solid #1565c0">
         <div class="mn">Monterrey, N.L.</div>
-        <div class="ms">Monterrey · 10.0 km · mc=38</div>
+        <div class="ms">CEDIS MTY · 10.0 km · mc=40 cli/ruta · regreso máx 18:47</div>
       </div>
       <div class="mst">
-        <div><span class="mv">5,776</span><span class="ml">Puntos</span></div>
-        <div><span class="mv">38</span><span class="ml">Máx/ruta</span></div>
-        <div><span class="mv">152</span><span class="ml">Rutas est.</span></div>
+        <div><span class="mv">5,776</span><span class="ml">Clientes</span></div>
+        <div><span class="mv">145</span><span class="ml">Rutas</span></div>
+        <div><span class="mv">9.7h</span><span class="ml">Dur. prom.</span></div>
       </div>
-      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
-        <div>~7 vend. mensual</div>
-        <div>~26 vend. semanal</div>
-      </div>
-      <div style="margin-top:8px">
-        <a class="chip" href="monterrey/VAL-NL-MTY-001.html" target="_blank">📍 VAL MTY</a>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <a class="chip" href="monterrey/VAL-NL-MTY-001.html" target="_blank">📍 VAL</a>
+        <a class="chip chip2" href="monterrey/RESUMEN-NL-MTY.html" target="_blank">📋 Rutas</a>
       </div>
     </div>
     <div class="mc">
       <div class="mh" style="border-left:4px solid #1565c0">
         <div class="mn">Guadalupe, N.L.</div>
-        <div class="ms">Monterrey · 4.4 km · mc=40</div>
+        <div class="ms">CEDIS MTY · 4.4 km · mc=40 cli/ruta · regreso máx 18:14</div>
       </div>
       <div class="mst">
-        <div><span class="mv">2,876</span><span class="ml">Puntos</span></div>
-        <div><span class="mv">40</span><span class="ml">Máx/ruta</span></div>
-        <div><span class="mv">72</span><span class="ml">Rutas est.</span></div>
+        <div><span class="mv">2,876</span><span class="ml">Clientes</span></div>
+        <div><span class="mv">72</span><span class="ml">Rutas</span></div>
+        <div><span class="mv">9.4h</span><span class="ml">Dur. prom.</span></div>
       </div>
-      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
-        <div>~3 vend. mensual</div>
-        <div>~12 vend. semanal</div>
-      </div>
-      <div style="margin-top:8px">
-        <a class="chip" href="monterrey/VAL-NL-GUA-001.html" target="_blank">📍 VAL GUA</a>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <a class="chip" href="monterrey/VAL-NL-GUA-001.html" target="_blank">📍 VAL</a>
+        <a class="chip chip2" href="monterrey/RESUMEN-NL-GUA.html" target="_blank">📋 Rutas</a>
       </div>
     </div>
     <div class="mc">
       <div class="mh" style="border-left:4px solid #1565c0">
         <div class="mn">Santa Catarina, N.L.</div>
-        <div class="ms">Monterrey · 21.3 km · mc=35</div>
+        <div class="ms">CEDIS MTY · 21.3 km · mc=37 cli/ruta · regreso máx 18:19</div>
       </div>
       <div class="mst">
-        <div><span class="mv">1,431</span><span class="ml">Puntos</span></div>
-        <div><span class="mv">35</span><span class="ml">Máx/ruta</span></div>
-        <div><span class="mv">41</span><span class="ml">Rutas est.</span></div>
+        <div><span class="mv">1,431</span><span class="ml">Clientes</span></div>
+        <div><span class="mv">39</span><span class="ml">Rutas</span></div>
+        <div><span class="mv">9.6h</span><span class="ml">Dur. prom.</span></div>
       </div>
-      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
-        <div>~2 vend. mensual</div>
-        <div>~7 vend. semanal</div>
-      </div>
-      <div style="margin-top:8px">
-        <a class="chip" href="monterrey/VAL-NL-SCA-001.html" target="_blank">📍 VAL SCA</a>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <a class="chip" href="monterrey/VAL-NL-SCA-001.html" target="_blank">📍 VAL</a>
+        <a class="chip chip2" href="monterrey/RESUMEN-NL-SCA.html" target="_blank">📋 Rutas</a>
       </div>
     </div>
     <div class="mc">
       <div class="mh" style="border-left:4px solid #1565c0">
         <div class="mn">García, N.L.</div>
-        <div class="ms">Monterrey · 33.3 km · mc=31</div>
+        <div class="ms">CEDIS MTY · 33.3 km · mc=33 cli/ruta · regreso máx 18:31</div>
       </div>
       <div class="mst">
-        <div><span class="mv">2,184</span><span class="ml">Puntos</span></div>
-        <div><span class="mv">31</span><span class="ml">Máx/ruta</span></div>
-        <div><span class="mv">71</span><span class="ml">Rutas est.</span></div>
+        <div><span class="mv">2,184</span><span class="ml">Clientes</span></div>
+        <div><span class="mv">67</span><span class="ml">Rutas</span></div>
+        <div><span class="mv">9.7h</span><span class="ml">Dur. prom.</span></div>
       </div>
-      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
-        <div>~3 vend. mensual</div>
-        <div>~12 vend. semanal</div>
-      </div>
-      <div style="margin-top:8px">
-        <a class="chip" href="monterrey/VAL-NL-GAR-001.html" target="_blank">📍 VAL GAR</a>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <a class="chip" href="monterrey/VAL-NL-GAR-001.html" target="_blank">📍 VAL</a>
+        <a class="chip chip2" href="monterrey/RESUMEN-NL-GAR.html" target="_blank">📋 Rutas</a>
       </div>
     </div>
     <div class="mc">
       <div class="mh" style="border-left:4px solid #1565c0">
         <div class="mn">Santiago, N.L.</div>
-        <div class="ms">Monterrey · 31.4 km · mc=31</div>
+        <div class="ms">CEDIS MTY · 31.4 km · mc=34 cli/ruta · regreso máx 19:35</div>
       </div>
       <div class="mst">
-        <div><span class="mv">245</span><span class="ml">Puntos</span></div>
-        <div><span class="mv">31</span><span class="ml">Máx/ruta</span></div>
-        <div><span class="mv">8</span><span class="ml">Rutas est.</span></div>
+        <div><span class="mv">245</span><span class="ml">Clientes</span></div>
+        <div><span class="mv">8</span><span class="ml">Rutas</span></div>
+        <div><span class="mv">9.0h</span><span class="ml">Dur. prom.</span></div>
       </div>
-      <div class="mst" style="margin-top:4px;color:#666;font-size:.75rem">
-        <div>~1 vend. mensual</div>
-        <div>~2 vend. semanal</div>
-      </div>
-      <div style="margin-top:8px">
-        <a class="chip" href="monterrey/VAL-NL-STG-001.html" target="_blank">📍 VAL STG</a>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <a class="chip" href="monterrey/VAL-NL-STG-001.html" target="_blank">📍 VAL</a>
+        <a class="chip chip2" href="monterrey/RESUMEN-NL-STG.html" target="_blank">📋 Rutas</a>
       </div>
     </div>
 </div>
 <div id="map"></div>
 </div>
 <script>
-const map = L.map('map').setView([25.689, -100.246], 11);
+const map = L.map('map').setView([25.689,-100.246],11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
-
-// CEDIS
-L.marker([25.689, -100.246], {
-  icon: L.divIcon({className:'', iconSize:[30,30], iconAnchor:[15,15],
+  {maxZoom:19,attribution:'© OSM'}).addTo(map);
+L.marker([25.689,-100.246],{
+  icon:L.divIcon({className:'',iconSize:[30,30],iconAnchor:[15,15],
     html:'<svg width="30" height="30"><circle cx="15" cy="15" r="14" fill="#1565c0" stroke="#fff" stroke-width="2.5"/><text x="15" y="20" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">C</text></svg>'})
-}).bindPopup('<b>CEDIS Tostimex Monterrey</b><br>Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.').addTo(map).openPopup();
-
-// Radio 54 km
-L.circle([25.689, -100.246], {
-  radius: 54000, color: '#1565c0', weight: 1.5, fillOpacity: 0.05, dashArray: '6 4'
-}).addTo(map);
-
-// Municipios
-
-    L.circleMarker([25.71680, -100.34125], {
-      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
-    }).bindPopup('<b>Monterrey</b><br>5,776 pts Mr Ruta Algoritmo<br>152 rutas est.').addTo(map);
-    L.circleMarker([25.67612, -100.20407], {
-      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
-    }).bindPopup('<b>Guadalupe</b><br>2,876 pts Mr Ruta Algoritmo<br>72 rutas est.').addTo(map);
-    L.circleMarker([25.68524, -100.45822], {
-      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
-    }).bindPopup('<b>Santa Catarina</b><br>1,431 pts Mr Ruta Algoritmo<br>41 rutas est.').addTo(map);
-    L.circleMarker([25.79800, -100.55563], {
-      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
-    }).bindPopup('<b>García</b><br>2,184 pts Mr Ruta Algoritmo<br>71 rutas est.').addTo(map);
-    L.circleMarker([25.42131, -100.14557], {
-      radius:10, color:'#1565c0', fillColor:'#1565c0', fillOpacity:.7, weight:2
-    }).bindPopup('<b>Santiago</b><br>245 pts Mr Ruta Algoritmo<br>8 rutas est.').addTo(map);
+}).bindPopup('<b>CEDIS Tostimex</b><br>Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.').addTo(map).openPopup();
+L.circle([25.689,-100.246],{radius:54000,color:'#1565c0',weight:1.5,fillOpacity:.05,dashArray:'6 4'}).addTo(map);
 </script>
 </body>
 </html>

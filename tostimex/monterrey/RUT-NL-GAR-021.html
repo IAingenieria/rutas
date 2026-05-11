@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RUT-NL-GAR-021 · Tostimex</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f5f5f5;display:flex;flex-direction:column;height:100vh}
+#hdr{background:#1565c0;color:#fff;padding:9px 16px}
+#hdr h1{font-size:.95rem;font-weight:700}
+#hdr .sub{font-size:.76rem;opacity:.85}
+.layout{display:grid;grid-template-columns:340px 1fr;flex:1;overflow:hidden}
+#panel{overflow-y:auto;background:#fff;border-right:1px solid #e0e0e0}
+#kpis{display:flex;gap:0;border-bottom:1px solid #eee}
+.kpi{flex:1;padding:8px 10px;text-align:center;border-right:1px solid #eee}
+.kpi:last-child{border-right:none}
+.kv{font-size:1.1rem;font-weight:700;color:#1565c0;display:block}
+.kl{font-size:.68rem;color:#888}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{background:#f5f5f5;padding:6px 8px;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #e0e0e0;position:sticky;top:0}
+td{padding:5px 8px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+td:first-child{color:#999;font-size:.72rem;width:24px}
+td:nth-child(3),td:nth-child(4){white-space:nowrap;color:#1565c0;font-weight:600;width:48px}
+.sub{color:#aaa;font-size:.7rem}
+tr:hover td{background:#f9f9f9}
+#map{height:100%}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <h1>RUT-NL-GAR-021 · García · Tostimex</h1>
+  <div class="sub">Salida CEDIS 08:30 · Regreso ~18:11 · 33 clientes · 9.7h · Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.</div>
+</div>
+<div class="layout">
+<div id="panel">
+  <div id="kpis">
+    <div class="kpi"><span class="kv">08:30</span><span class="kl">Salida CEDIS</span></div>
+    <div class="kpi"><span class="kv">33</span><span class="kl">Clientes</span></div>
+    <div class="kpi"><span class="kv">09:11</span><span class="kl">1er cliente</span></div>
+    <div class="kpi"><span class="kv">18:11</span><span class="kl">Regreso</span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Cliente</th><th>Llega</th><th>Sale</th></tr></thead>
+    <tbody><tr><td>1</td><td><b>DESECHABLES. R&R</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">VILLAS DE SAN MARTIN</span></td><td>09:11</td><td>09:24</td></tr>
+<tr><td>2</td><td><b>ABARROTES LOPEZ</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">VILLAS DE SAN MARTIN</span></td><td>09:24</td><td>09:37</td></tr>
+<tr><td>3</td><td><b>ABARROTES CONCHITA</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">LAS PALMAS</span></td><td>09:38</td><td>09:51</td></tr>
+<tr><td>4</td><td><b>ABARROTES LAS PALMAS</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">LAS PALMAS</span></td><td>09:51</td><td>10:04</td></tr>
+<tr><td>5</td><td><b>TIENDA DE ABARROTES JESS</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">MITRAS BICENTENARIO</span></td><td>10:10</td><td>10:23</td></tr>
+<tr><td>6</td><td><b>TIENDA DE ABARROTES DON PABLO</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">MITRAS BICENTENARIO</span></td><td>10:23</td><td>10:36</td></tr>
+<tr><td>7</td><td><b>MINI SUPER ANGIE</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">PARQUES DIAMANTE</span></td><td>10:40</td><td>10:53</td></tr>
+<tr><td>8</td><td><b>DEPOSITO EL MILAGRO</b><br><span class="sub">Comercio al por menor de cerveza</span><br><span class="sub">VALLE DE LINCOLN</span></td><td>10:55</td><td>11:08</td></tr>
+<tr><td>9</td><td><b>FRUTERIA SIN NOMBRE</b><br><span class="sub">Comercio al por menor de frutas y v</span><br><span class="sub">VALE DE LINCOLN</span></td><td>11:08</td><td>11:21</td></tr>
+<tr><td>10</td><td><b>DEPOSITO EL AFERRADO</b><br><span class="sub">Comercio al por menor de cerveza</span><br><span class="sub">VALLE DE LINCOLN</span></td><td>11:23</td><td>11:36</td></tr>
+<tr><td>11</td><td><b>ABARROTES DOMY</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">ALTAVILLA</span></td><td>11:41</td><td>11:54</td></tr>
+<tr><td>12</td><td><b>DEPOSITO Y ABARROTES LA BORREGA</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>12:00</td><td>12:13</td></tr>
+<tr><td>13</td><td><b>ABARROTES NICKY LU</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>12:14</td><td>12:27</td></tr>
+<tr><td>14</td><td><b>BODEGA DE CERVEZA LEONES</b><br><span class="sub">Comercio al por menor de cerveza</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>12:27</td><td>12:40</td></tr>
+<tr><td>15</td><td><b>BODEGA DEPOSITO LEONES</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>12:40</td><td>12:53</td></tr>
+<tr><td>16</td><td><b>DEPOSITO LEONES</b><br><span class="sub">Comercio al por menor de cerveza</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>12:53</td><td>13:06</td></tr>
+<tr><td>17</td><td><b>ABARROTES JMK</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>13:07</td><td>13:20</td></tr>
+<tr><td>18</td><td><b>FRUTERIA JIREH</b><br><span class="sub">Comercio al por menor de frutas y v</span><br><span class="sub">HACIENDA DEL SOL</span></td><td>13:20</td><td>13:33</td></tr>
+<tr><td>19</td><td><b>ABARROTES LUIS</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">HACIENDA DEL SOL</span></td><td>13:33</td><td>13:46</td></tr>
+<tr><td>20</td><td><b>ABARROTES HERBERT</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">PRIVADA DE LAS VILLAS</span></td><td>13:48</td><td>14:01</td></tr>
+<tr><td>21</td><td><b>ABARROTES ELIOMAR</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">PRIVADA DE LAS VILLAS</span></td><td>14:01</td><td>14:14</td></tr>
+<tr><td>22</td><td><b>ABARROTES ADYAJU</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">PRIVADA DE LAS VILLAS</span></td><td>14:15</td><td>14:28</td></tr>
+<tr><td>23</td><td><b>KARY VENTAS</b><br><span class="sub">Comercio al por menor de otros alim</span><br><span class="sub">PRIVADA DE LAS VILLAS</span></td><td>14:29</td><td>14:42</td></tr>
+<tr><td>24</td><td><b>PASTELERIA LETY SUC GARCIA</b><br><span class="sub">Comercio al por menor de otros alim</span><br><span class="sub">LAS VILLAS</span></td><td>14:42</td><td>14:55</td></tr>
+<tr><td>25</td><td><b>FRUTERIA GUADALUPE</b><br><span class="sub">Comercio al por menor de frutas y v</span><br><span class="sub">PUNTA DIAMANTE</span></td><td>14:57</td><td>15:10</td></tr>
+<tr><td>26</td><td><b>TIENDA DE ABARROTES HEIDI</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">PASEO DE LAS TORRES</span></td><td>15:11</td><td>15:24</td></tr>
+<tr><td>27</td><td><b>ABARROTES ESPINOZA</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">PRIVADA DE LAS VILLAS</span></td><td>15:28</td><td>15:41</td></tr>
+<tr><td>28</td><td><b>ABARROTES LA CURBITA</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>15:44</td><td>15:57</td></tr>
+<tr><td>29</td><td><b>VENTA DE QUESOS FRESCOS DE VERACRUZ</b><br><span class="sub">Comercio al por menor de leche, otr</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>15:58</td><td>16:11</td></tr>
+<tr><td>30</td><td><b>FRUTERIA LA COSECHA</b><br><span class="sub">Comercio al por menor de frutas y v</span><br><span class="sub">HEROES DE CAPELLANIA</span></td><td>16:11</td><td>16:24</td></tr>
+<tr><td>31</td><td><b>SNACK MARICELA</b><br><span class="sub">Comercio al por menor de otros alim</span><br><span class="sub">VALLE DE LINCOLN</span></td><td>16:38</td><td>16:51</td></tr>
+<tr><td>32</td><td><b>ABARROTES GINA</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">LOS PARQUES RECIDENCIAL</span></td><td>16:55</td><td>17:08</td></tr>
+<tr><td>33</td><td><b>NL SIX 22 ROCIO</b><br><span class="sub">Comercio al por menor de cerveza</span><br><span class="sub">LAS PALMAS</span></td><td>17:16</td><td>17:29</td></tr>
+</tbody>
+  </table>
+</div>
+<div id="map"></div>
+</div>
+<script>
+const map = L.map('map',{preferCanvas:true}).setView([25.79121,-100.52205],14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'}).addTo(map);
+const ren = L.canvas({padding:.5});
+
+// Ruta (polyline)
+L.polyline([[25.79136127,-100.41976604],[25.79128387,-100.42059237],[25.79125785,-100.42468835],[25.79115403,-100.42654856],[25.79107873,-100.4558254],[25.79112012,-100.45610501],[25.79127371,-100.47400935],[25.79123799,-100.48516724],[25.79117823,-100.48659092],[25.79121528,-100.49554558],[25.79110006,-100.52103158],[25.79123888,-100.55226619],[25.79115611,-100.55639618],[25.79118405,-100.55651619],[25.79120486,-100.55660562],[25.79121648,-100.55669765],[25.79108305,-100.56099673],[25.79112251,-100.56146623],[25.79112248,-100.56345561],[25.79107707,-100.57112617],[25.79108914,-100.57219909],[25.79110985,-100.57867998],[25.79112725,-100.57994065],[25.79119068,-100.58253357],[25.79112931,-100.59176059],[25.79136843,-100.59698216],[25.79121663,-100.57424152],[25.79124296,-100.55981089],[25.79123325,-100.55837006],[25.79136781,-100.55735445],[25.79132191,-100.48442209],[25.79136035,-100.46479964],[25.79135051,-100.42523477]],{color:'#1565c0',weight:2.5,opacity:.7}).addTo(map);
+
+// CEDIS
+L.marker([25.689,-100.246],{
+  icon:L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],
+    html:'<svg width="22" height="22"><circle cx="11" cy="11" r="10" fill="#ff6f00" stroke="#fff" stroke-width="2"/><text x="11" y="15" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">C</text></svg>'})
+}).bindPopup('<b>CEDIS</b><br>Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.').addTo(map);
+
+// Clientes
+L.circleMarker([25.79136127,-100.41976604],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>1. DESECHABLES. R&R</b><br>09:11 – 09:24').addTo(map);
+L.circleMarker([25.79128387,-100.42059237],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>2. ABARROTES LOPEZ</b><br>09:24 – 09:37').addTo(map);
+L.circleMarker([25.79125785,-100.42468835],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>3. ABARROTES CONCHITA</b><br>09:38 – 09:51').addTo(map);
+L.circleMarker([25.79115403,-100.42654856],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>4. ABARROTES LAS PALMAS</b><br>09:51 – 10:04').addTo(map);
+L.circleMarker([25.79107873,-100.4558254],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>5. TIENDA DE ABARROTES JESS</b><br>10:10 – 10:23').addTo(map);
+L.circleMarker([25.79112012,-100.45610501],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>6. TIENDA DE ABARROTES DON PABLO</b><br>10:23 – 10:36').addTo(map);
+L.circleMarker([25.79127371,-100.47400935],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>7. MINI SUPER ANGIE</b><br>10:40 – 10:53').addTo(map);
+L.circleMarker([25.79123799,-100.48516724],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>8. DEPOSITO EL MILAGRO</b><br>10:55 – 11:08').addTo(map);
+L.circleMarker([25.79117823,-100.48659092],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>9. FRUTERIA SIN NOMBRE</b><br>11:08 – 11:21').addTo(map);
+L.circleMarker([25.79121528,-100.49554558],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>10. DEPOSITO EL AFERRADO</b><br>11:23 – 11:36').addTo(map);
+L.circleMarker([25.79110006,-100.52103158],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>11. ABARROTES DOMY</b><br>11:41 – 11:54').addTo(map);
+L.circleMarker([25.79123888,-100.55226619],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>12. DEPOSITO Y ABARROTES LA BORREGA</b><br>12:00 – 12:13').addTo(map);
+L.circleMarker([25.79115611,-100.55639618],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>13. ABARROTES NICKY LU</b><br>12:14 – 12:27').addTo(map);
+L.circleMarker([25.79118405,-100.55651619],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>14. BODEGA DE CERVEZA LEONES</b><br>12:27 – 12:40').addTo(map);
+L.circleMarker([25.79120486,-100.55660562],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>15. BODEGA DEPOSITO LEONES</b><br>12:40 – 12:53').addTo(map);
+L.circleMarker([25.79121648,-100.55669765],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>16. DEPOSITO LEONES</b><br>12:53 – 13:06').addTo(map);
+L.circleMarker([25.79108305,-100.56099673],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>17. ABARROTES JMK</b><br>13:07 – 13:20').addTo(map);
+L.circleMarker([25.79112251,-100.56146623],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>18. FRUTERIA JIREH</b><br>13:20 – 13:33').addTo(map);
+L.circleMarker([25.79112248,-100.56345561],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>19. ABARROTES LUIS</b><br>13:33 – 13:46').addTo(map);
+L.circleMarker([25.79107707,-100.57112617],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>20. ABARROTES HERBERT</b><br>13:48 – 14:01').addTo(map);
+L.circleMarker([25.79108914,-100.57219909],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>21. ABARROTES ELIOMAR</b><br>14:01 – 14:14').addTo(map);
+L.circleMarker([25.79110985,-100.57867998],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>22. ABARROTES ADYAJU</b><br>14:15 – 14:28').addTo(map);
+L.circleMarker([25.79112725,-100.57994065],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>23. KARY VENTAS</b><br>14:29 – 14:42').addTo(map);
+L.circleMarker([25.79119068,-100.58253357],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>24. PASTELERIA LETY SUC GARCIA</b><br>14:42 – 14:55').addTo(map);
+L.circleMarker([25.79112931,-100.59176059],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>25. FRUTERIA GUADALUPE</b><br>14:57 – 15:10').addTo(map);
+L.circleMarker([25.79136843,-100.59698216],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>26. TIENDA DE ABARROTES HEIDI</b><br>15:11 – 15:24').addTo(map);
+L.circleMarker([25.79121663,-100.57424152],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>27. ABARROTES ESPINOZA</b><br>15:28 – 15:41').addTo(map);
+L.circleMarker([25.79124296,-100.55981089],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>28. ABARROTES LA CURBITA</b><br>15:44 – 15:57').addTo(map);
+L.circleMarker([25.79123325,-100.55837006],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>29. VENTA DE QUESOS FRESCOS DE VERACRUZ</b><br>15:58 – 16:11').addTo(map);
+L.circleMarker([25.79136781,-100.55735445],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>30. FRUTERIA LA COSECHA</b><br>16:11 – 16:24').addTo(map);
+L.circleMarker([25.79132191,-100.48442209],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>31. SNACK MARICELA</b><br>16:38 – 16:51').addTo(map);
+L.circleMarker([25.79136035,-100.46479964],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>32. ABARROTES GINA</b><br>16:55 – 17:08').addTo(map);
+L.circleMarker([25.79135051,-100.42523477],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>33. NL SIX 22 ROCIO</b><br>17:16 – 17:29').addTo(map);
+
+</script>
+</body>
+</html>
