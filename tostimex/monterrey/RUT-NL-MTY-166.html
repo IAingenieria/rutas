@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RUT-NL-MTY-166 · Tostimex</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f5f5f5;display:flex;flex-direction:column;height:100vh}
+#hdr{background:#1565c0;color:#fff;padding:9px 16px}
+#hdr h1{font-size:.95rem;font-weight:700}
+#hdr .sub{font-size:.76rem;opacity:.85}
+.layout{display:grid;grid-template-columns:340px 1fr;flex:1;overflow:hidden}
+#panel{overflow-y:auto;background:#fff;border-right:1px solid #e0e0e0}
+#kpis{display:flex;gap:0;border-bottom:1px solid #eee}
+.kpi{flex:1;padding:8px 10px;text-align:center;border-right:1px solid #eee}
+.kpi:last-child{border-right:none}
+.kv{font-size:1.1rem;font-weight:700;color:#1565c0;display:block}
+.kl{font-size:.68rem;color:#888}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{background:#f5f5f5;padding:6px 8px;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #e0e0e0;position:sticky;top:0}
+td{padding:5px 8px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+td:first-child{color:#999;font-size:.72rem;width:24px}
+td:nth-child(3),td:nth-child(4){white-space:nowrap;color:#1565c0;font-weight:600;width:48px}
+.sub{color:#aaa;font-size:.7rem}
+tr:hover td{background:#f9f9f9}
+#map{height:100%}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <h1>RUT-NL-MTY-166 · Monterrey · Tostimex</h1>
+  <div class="sub">Salida CEDIS 08:30 · Regreso ~09:55 · 1 clientes · 1.4h · Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.</div>
+</div>
+<div class="layout">
+<div id="panel">
+  <div id="kpis">
+    <div class="kpi"><span class="kv">08:30</span><span class="kl">Salida CEDIS</span></div>
+    <div class="kpi"><span class="kv">1</span><span class="kl">Clientes</span></div>
+    <div class="kpi"><span class="kv">09:06</span><span class="kl">1er cliente</span></div>
+    <div class="kpi"><span class="kv">09:55</span><span class="kl">Regreso</span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Cliente</th><th>Llega</th><th>Sale</th></tr></thead>
+    <tbody><tr><td>1</td><td><b>SIX MAGUIRAS 22</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">FOMMERREY 35</span></td><td>09:06</td><td>09:19</td></tr>
+</tbody>
+  </table>
+</div>
+<div id="map"></div>
+</div>
+<script>
+const map = L.map('map',{preferCanvas:true}).setView([25.79644,-100.38411],14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'}).addTo(map);
+const ren = L.canvas({padding:.5});
+
+// Ruta (polyline)
+L.polyline([[25.79643638,-100.38410863]],{color:'#1565c0',weight:2.5,opacity:.7}).addTo(map);
+
+// CEDIS
+L.marker([25.689,-100.246],{
+  icon:L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],
+    html:'<svg width="22" height="22"><circle cx="11" cy="11" r="10" fill="#ff6f00" stroke="#fff" stroke-width="2"/><text x="11" y="15" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">C</text></svg>'})
+}).bindPopup('<b>CEDIS</b><br>Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.').addTo(map);
+
+// Clientes
+L.circleMarker([25.79643638,-100.38410863],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>1. SIX MAGUIRAS 22</b><br>09:06 – 09:19').addTo(map);
+
+</script>
+</body>
+</html>

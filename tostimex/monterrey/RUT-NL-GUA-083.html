@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RUT-NL-GUA-083 · Tostimex</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f5f5f5;display:flex;flex-direction:column;height:100vh}
+#hdr{background:#1565c0;color:#fff;padding:9px 16px}
+#hdr h1{font-size:.95rem;font-weight:700}
+#hdr .sub{font-size:.76rem;opacity:.85}
+.layout{display:grid;grid-template-columns:340px 1fr;flex:1;overflow:hidden}
+#panel{overflow-y:auto;background:#fff;border-right:1px solid #e0e0e0}
+#kpis{display:flex;gap:0;border-bottom:1px solid #eee}
+.kpi{flex:1;padding:8px 10px;text-align:center;border-right:1px solid #eee}
+.kpi:last-child{border-right:none}
+.kv{font-size:1.1rem;font-weight:700;color:#1565c0;display:block}
+.kl{font-size:.68rem;color:#888}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{background:#f5f5f5;padding:6px 8px;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #e0e0e0;position:sticky;top:0}
+td{padding:5px 8px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+td:first-child{color:#999;font-size:.72rem;width:24px}
+td:nth-child(3),td:nth-child(4){white-space:nowrap;color:#1565c0;font-weight:600;width:48px}
+.sub{color:#aaa;font-size:.7rem}
+tr:hover td{background:#f9f9f9}
+#map{height:100%}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <h1>RUT-NL-GUA-083 · Guadalupe · Tostimex</h1>
+  <div class="sub">Salida CEDIS 08:30 · Regreso ~10:19 · 6 clientes · 1.8h · Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.</div>
+</div>
+<div class="layout">
+<div id="panel">
+  <div id="kpis">
+    <div class="kpi"><span class="kv">08:30</span><span class="kl">Salida CEDIS</span></div>
+    <div class="kpi"><span class="kv">6</span><span class="kl">Clientes</span></div>
+    <div class="kpi"><span class="kv">08:43</span><span class="kl">1er cliente</span></div>
+    <div class="kpi"><span class="kv">10:19</span><span class="kl">Regreso</span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Cliente</th><th>Llega</th><th>Sale</th></tr></thead>
+    <tbody><tr><td>1</td><td><b>DEPOSITO Y BEBIDAS EL JERRY</b><br><span class="sub">Comercio al por menor de cerveza</span><br><span class="sub">TORREMOLINOS</span></td><td>08:43</td><td>08:56</td></tr>
+<tr><td>2</td><td><b>ABARROTES ALVARADO</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">EDUARDO CABALLERO</span></td><td>08:56</td><td>09:09</td></tr>
+<tr><td>3</td><td><b>ABARROTES CASTILLO</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">EDUARDO CABALLERO</span></td><td>09:09</td><td>09:22</td></tr>
+<tr><td>4</td><td><b>ABARROTES LAURA</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">CAÑADA BLANCA</span></td><td>09:24</td><td>09:37</td></tr>
+<tr><td>5</td><td><b>DEPOSITO TECATE</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">CAÑADA BLANCA</span></td><td>09:37</td><td>09:50</td></tr>
+<tr><td>6</td><td><b>ABARROTES TERE</b><br><span class="sub">Comercio al por menor en tiendas de</span><br><span class="sub">JOSEFA ZOZAYA</span></td><td>09:52</td><td>10:05</td></tr>
+</tbody>
+  </table>
+</div>
+<div id="map"></div>
+</div>
+<script>
+const map = L.map('map',{preferCanvas:true}).setView([25.73022,-100.19153],14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'}).addTo(map);
+const ren = L.canvas({padding:.5});
+
+// Ruta (polyline)
+L.polyline([[25.73066635,-100.19711201],[25.7303914,-100.19518233],[25.7300402,-100.19415377],[25.729707,-100.18501737],[25.72999402,-100.18580509],[25.73052569,-100.191906]],{color:'#1565c0',weight:2.5,opacity:.7}).addTo(map);
+
+// CEDIS
+L.marker([25.689,-100.246],{
+  icon:L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],
+    html:'<svg width="22" height="22"><circle cx="11" cy="11" r="10" fill="#ff6f00" stroke="#fff" stroke-width="2"/><text x="11" y="15" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">C</text></svg>'})
+}).bindPopup('<b>CEDIS</b><br>Av. Ruíz Cortínez No. 2529 Ote. Fracc. Coyoacán, Monterrey N.L.').addTo(map);
+
+// Clientes
+L.circleMarker([25.73066635,-100.19711201],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>1. DEPOSITO Y BEBIDAS EL JERRY</b><br>08:43 – 08:56').addTo(map);
+L.circleMarker([25.7303914,-100.19518233],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>2. ABARROTES ALVARADO</b><br>08:56 – 09:09').addTo(map);
+L.circleMarker([25.7300402,-100.19415377],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>3. ABARROTES CASTILLO</b><br>09:09 – 09:22').addTo(map);
+L.circleMarker([25.729707,-100.18501737],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>4. ABARROTES LAURA</b><br>09:24 – 09:37').addTo(map);
+L.circleMarker([25.72999402,-100.18580509],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>5. DEPOSITO TECATE</b><br>09:37 – 09:50').addTo(map);
+L.circleMarker([25.73052569,-100.191906],{renderer:ren,radius:6,color:'#1565c0',fillColor:'#1565c0',fillOpacity:.8,weight:1}).bindPopup('<b>6. ABARROTES TERE</b><br>09:52 – 10:05').addTo(map);
+
+</script>
+</body>
+</html>
