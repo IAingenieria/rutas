@@ -297,8 +297,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
       </div>
     </div>
     <div class="timer-info">
-      <div class="timer-info-row"><span>DENUE match</span><span class="timer-info-val" style="color:var(--verde)">Confirmado</span></div>
-      <div class="timer-info-row"><span>Google Places</span><span class="timer-info-val" id="v-goog-inline">—</span></div>
+      <div class="timer-info-row"><span>Padrón oficial</span><span class="timer-info-val" style="color:var(--verde)">Confirmado</span></div>
+      <div class="timer-info-row"><span>Índice de actividad</span><span class="timer-info-val" id="v-goog-inline">—</span></div>
       <div class="timer-info-row"><span>Municipio</span><span class="timer-info-val" id="v-mun-inline">—</span></div>
     </div>
   </div>
@@ -870,7 +870,7 @@ function abrirVisita(id){
   const idx = pts.indexOf(p);
   document.getElementById('v-pto-label').textContent = `Punto ${idx+1} de ${pts.length} · ${DIAS_NOM[curDay]}`;
   document.getElementById('v-nom').textContent = p.n;
-  document.getElementById('v-goog-inline').textContent = p.r ? `★${p.r} · ${p.rs} reseñas` : 'Sin Google Places';
+  document.getElementById('v-goog-inline').textContent = p.r ? `★${p.r} · ${p.rs} valoraciones` : 'Sin señal digital';
   document.getElementById('v-goog-inline').style.color = p.r ? 'var(--verde)' : 'var(--text2)';
   document.getElementById('v-mun-inline').textContent = p.m;
   document.getElementById('v-badges').innerHTML = `
