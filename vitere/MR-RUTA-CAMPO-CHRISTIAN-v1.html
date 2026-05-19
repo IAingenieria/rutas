@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F6E52">
+<title>Mr. Ruta — Campo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --verde:#1D9E75;--verde-dark:#0F6E52;--verde-light:#E8F8F3;
+  --rojo:#E24B4A;--amarillo:#F5A623;
+  --bg:#0D1117;--bg2:#161B22;--bg3:#1C2333;
+  --border:rgba(255,255,255,0.08);
+  --text:#E6EDF3;--text2:#8B949E;--text3:#484F58;
+  --r:14px;--r-sm:8px;
+}
+/* ── MODO CAMPO (luz solar) ───────────────────────────────────────── */
+.modo-campo{
+  --bg:#F7F7F2;--bg2:#FFFFFF;--bg3:#EBEBE6;
+  --border:rgba(0,0,0,0.10);
+  --text:#111827;--text2:#374151;--text3:#9CA3AF;
+}
+.modo-campo .status{ background:#0A5C43; }
+.modo-campo .navbar{ background:#FFFFFF; border-color:rgba(0,0,0,0.10); }
+.modo-campo .nav-item .nav-lbl{ color:#9CA3AF; }
+.modo-campo .nav-item.act .nav-lbl{ color:var(--verde-dark); }
+.modo-campo .home-sub{ color:var(--verde-dark); }
+.modo-campo .day-tab.act{ background:var(--verde-dark); border-color:var(--verde-dark); }
+.modo-campo .qty-btn:active{ background:var(--verde-dark); border-color:var(--verde-dark); }
+.modo-campo .btn-cerrar{ background:var(--verde-dark); }
+.modo-campo .btn-cerrar:not(:disabled):active{ background:#07402F; }
+.modo-campo .status-dot{ background:#7DFFC5; }
+.modo-campo .sku-nom{ color:#111827; }
+.modo-campo .punto-nom{ color:#111827; }
+.modo-campo .corte-titulo{ color:#111827; }
+.modo-campo .corte-row-lbl{ color:#374151; }
+.modo-campo .aprobado-badge{ background:rgba(15,110,82,0.08); border-color:rgba(15,110,82,0.25); }
+/* botón toggle en status bar */
+.modo-btn{
+  background:rgba(255,255,255,0.15);border:none;border-radius:20px;
+  padding:4px 10px;font-size:13px;cursor:pointer;color:#fff;
+  font-family:'DM Sans',sans-serif;font-weight:600;
+  -webkit-user-select:none;user-select:none;transition:background .15s;
+}
+.modo-btn:active{ background:rgba(255,255,255,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;transition:background .2s,color .2s}
+.frame{max-width:430px;height:100dvh;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.status{background:var(--verde-dark);padding:10px 14px 8px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px}
+.status-left{font-size:13px;font-weight:600;color:#fff;letter-spacing:.3px;flex:1}
+.status-right{font-size:12px;color:rgba(255,255,255,.75);font-family:'DM Mono',monospace}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#5DFFC5;display:inline-block;margin-right:5px;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden}
+.screen.active{display:flex}
+.scroll{overflow-y:auto;flex:1;padding:14px;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{width:3px}
+.scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* HOME */
+.home-header{padding:16px 18px 12px;flex-shrink:0}
+.home-cedis{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px}
+.home-ruta{font-size:22px;font-weight:700;color:var(--text)}
+.home-sub{font-size:13px;color:var(--verde);margin-top:2px;font-weight:500}
+.day-tabs{display:flex;gap:6px;padding:0 16px 14px;overflow-x:auto;flex-shrink:0}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);color:var(--text2);background:transparent;transition:all .2s}
+.day-tab.act{background:var(--verde);border-color:var(--verde);color:#fff}
+.mini-resumen{background:var(--bg3);border-radius:var(--r-sm);margin:0 16px 12px;display:flex}
+.mini-stat{flex:1;text-align:center;padding:10px 0;border-right:1px solid var(--border)}
+.mini-stat:last-child{border-right:none}
+.mini-n{font-size:18px;font-weight:700;font-family:'DM Mono',monospace}
+.mini-l{font-size:9px;color:var(--text2);margin-top:1px}
+.punto-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s;-webkit-user-select:none;user-select:none}
+.punto-card:active{transform:scale(.98);background:var(--bg3)}
+.punto-num{width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;font-family:'DM Mono',monospace}
+.punto-num.done{background:var(--verde);color:#fff}
+.punto-num.skip{background:var(--bg3);color:var(--text3);border:1.5px solid var(--border)}
+.punto-info{flex:1;min-width:0}
+.punto-nom{font-size:14px;font-weight:600;color:var(--text)}
+.punto-mun{font-size:11px;color:var(--text2);margin-top:1px}
+.punto-meta{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
+.tag-verde{background:rgba(29,158,117,.15);color:var(--verde)}
+.tag-warn{background:rgba(245,166,35,.15);color:var(--amarillo)}
+.tag-red{background:rgba(226,75,74,.15);color:var(--rojo)}
+.tag-grey{background:var(--bg3);color:var(--text2)}
+.punto-arrow{color:var(--text3);font-size:20px;flex-shrink:0}
+
+/* VISITA */
+.visita-header{padding:12px 16px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.visita-back{font-size:12px;color:var(--verde);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:4px;-webkit-user-select:none;user-select:none}
+.visita-pto{font-size:11px;color:var(--text2)}
+.visita-nom{font-size:18px;font-weight:700}
+.visita-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.timer-block{padding:14px;text-align:center;flex-shrink:0;display:flex;align-items:center;gap:14px}
+.timer-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.timer-wrap svg{transform:rotate(-90deg)}
+.timer-ring-bg{fill:none;stroke:var(--bg3);stroke-width:5}
+.timer-ring-fg{fill:none;stroke:var(--verde);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s,stroke .3s}
+.timer-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-val{font-size:18px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1}
+.timer-lbl{font-size:9px;color:var(--text2);margin-top:2px}
+.timer-info{flex:1;text-align:left}
+.timer-info-row{font-size:12px;color:var(--text2);margin-bottom:4px;display:flex;justify-content:space-between}
+.timer-info-val{font-weight:600;color:var(--text)}
+
+/* SIN PEDIDO — opciones de cierre sin venta */
+.sin-pedido-row{display:flex;gap:7px;padding:0 14px 10px;flex-shrink:0}
+.sin-pedido-btn{
+  flex:1;padding:11px 4px;border-radius:var(--r-sm);
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--text2);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  text-align:center;line-height:1.3;transition:all .15s;
+  -webkit-user-select:none;user-select:none;
+}
+.sin-pedido-btn:active{transform:scale(.96)}
+.sin-pedido-btn.cerrado{border-color:rgba(226,75,74,.35);color:var(--rojo)}
+.sin-pedido-btn.cerrado:active{background:rgba(226,75,74,.1)}
+.sin-pedido-btn.sin-efec{border-color:rgba(245,166,35,.35);color:var(--amarillo)}
+.sin-pedido-btn.sin-efec:active{background:rgba(245,166,35,.1)}
+.sin-pedido-btn.no-enc{border-color:rgba(139,148,158,.3);color:var(--text3)}
+.sin-pedido-btn.no-enc:active{background:var(--bg3)}
+.sin-pedido-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);padding:0 14px 6px;flex-shrink:0}
+
+/* BUSCADOR en visita */
+.visita-search-wrap{padding:0 14px 8px;flex-shrink:0}
+.visita-search{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 12px;
+  color:var(--text);font-size:13px;
+  font-family:'DM Sans',sans-serif;outline:none;
+}
+.visita-search::placeholder{color:var(--text3)}
+.visita-search:focus{border-color:var(--verde)}
+
+.cat-nav{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;flex-shrink:0}
+.cat-nav::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);color:var(--text2);background:transparent;transition:all .15s;white-space:nowrap;-webkit-user-select:none;user-select:none}
+.cat-btn.act{background:rgba(29,158,117,.2);border-color:var(--verde);color:var(--verde)}
+.sku-group{margin-bottom:14px}
+.sku-group-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;padding:0 2px;margin-bottom:7px}
+.sku-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:10px}
+.sku-info{flex:1;min-width:0}
+.sku-nom{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.sku-det{font-size:11px;color:var(--text2);margin-top:2px;display:flex;gap:8px;align-items:center}
+.sku-stock{font-size:10px;font-family:'DM Mono',monospace}
+.sku-stock.ok{color:var(--verde)}
+.sku-stock.low{color:var(--amarillo)}
+.sku-stock.out{color:var(--rojo)}
+
+/* BOTONES +/− MÁS GRANDES — 44px mínimo táctil */
+.qty-ctrl{display:flex;align-items:center;gap:0;flex-shrink:0}
+.qty-btn{
+  width:44px;height:44px;border-radius:50%;
+  border:1.5px solid var(--border);background:var(--bg3);color:var(--text);
+  font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;transition:all .1s;flex-shrink:0;
+  -webkit-user-select:none;user-select:none;
+}
+.qty-btn:active{background:var(--verde);border-color:var(--verde);transform:scale(.88)}
+.qty-n{font-size:15px;font-weight:700;min-width:38px;text-align:center;color:var(--text);font-family:'DM Mono',monospace}
+.qty-n.has{color:var(--verde)}
+
+.total-footer{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.total-lbl{font-size:13px;color:var(--text2)}
+.total-val{font-size:24px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
+.btn-cerrar{width:100%;background:var(--verde);color:#fff;border:none;border-radius:var(--r);padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;-webkit-user-select:none;user-select:none}
+.btn-cerrar:disabled{background:var(--bg3);color:var(--text3);cursor:default}
+.btn-cerrar:not(:disabled):active{background:var(--verde-dark);transform:scale(.99)}
+.alert-bar{background:rgba(226,75,74,.12);border:1px solid rgba(226,75,74,.25);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--rojo);margin:0 14px 8px;display:none}
+
+/* CORTE */
+.corte-header{padding:16px 16px 10px;flex-shrink:0}
+.corte-titulo{font-size:20px;font-weight:700}
+.corte-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.corte-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.corte-card-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.corte-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)}
+.corte-row:last-child{border-bottom:none}
+.corte-row-lbl{color:var(--text2)}
+.corte-row-val{font-weight:600}
+.corte-row-val.green{color:var(--verde)}
+.corte-row-val.red{color:var(--rojo)}
+.corte-row-val.big{font-size:20px;font-family:'DM Mono',monospace}
+.aprobado-badge{background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ap-ico{width:42px;height:42px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px}
+.ap-info-title{font-size:15px;font-weight:700;color:var(--verde)}
+.ap-info-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* NAV */
+.navbar{display:flex;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0)}
+.nav-item{flex:1;padding:10px 0 8px;text-align:center;cursor:pointer;transition:color .15s;-webkit-user-select:none;user-select:none}
+.nav-item .nav-ico{font-size:22px;display:block}
+.nav-item .nav-lbl{font-size:9px;color:var(--text3);margin-top:1px;font-weight:500;transition:color .15s}
+.nav-item.act .nav-lbl{color:var(--verde)}
+
+/* INVENTARIO */
+.inv-search{margin:0 16px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;width:calc(100% - 32px);font-family:'DM Sans',sans-serif;outline:none}
+.inv-search::placeholder{color:var(--text3)}
+.inv-search:focus{border-color:var(--verde)}
+
+/* MODO CERRADO */
+.checkout-overlay{position:absolute;inset:0;background:rgba(13,17,23,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:100;display:none}
+.checkout-ico{font-size:60px}
+.checkout-txt{font-size:20px;font-weight:700;color:var(--verde)}
+.checkout-sub{font-size:13px;color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="frame">
+
+<!-- STATUS BAR -->
+<div class="status">
+  <div class="status-left"><span class="status-dot"></span>Mr. Ruta — campo</div>
+  <button class="modo-btn" id="modo-btn" onclick="toggleModo()">☀️ Campo</button>
+  <div class="status-right" id="clock">--:--</div>
+</div>
+
+<!-- ═══ SCREEN: HOME ═══ -->
+<div class="screen active" id="scr-home">
+  <div class="home-header">
+    <div class="home-cedis">CEDIS · Corregidora, Qro.</div>
+    <div class="home-ruta">Christian Ramírez</div>
+    <div class="home-sub" id="home-sub-txt">Lunes · Corredor GTO · 11 zonas</div>
+  </div>
+  <div class="day-tabs" id="day-tabs">
+    <div class="day-tab act" onclick="setDay('L',this)">Lunes</div>
+    <div class="day-tab" onclick="setDay('M',this)">Martes</div>
+    <div class="day-tab" onclick="setDay('X',this)">Miérc.</div>
+    <div class="day-tab" onclick="setDay('J',this)">Jueves</div>
+    <div class="day-tab" onclick="setDay('V',this)">Viernes</div>
+  </div>
+  <div class="mini-resumen">
+    <div class="mini-stat">
+      <div class="mini-n" id="m-vis">0</div>
+      <div class="mini-l">Visitados</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-n" id="m-pen" style="color:var(--amarillo)">11</div>
+      <div class="mini-l">Pendientes</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-n" id="m-vta" style="color:var(--verde)">$0</div>
+      <div class="mini-l">Venta día</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-n" id="m-skus" style="color:var(--text2)">100</div>
+      <div class="mini-l">SKUs</div>
+    </div>
+  </div>
+  <div class="scroll" id="lista-puntos"></div>
+</div>
+
+<!-- ═══ SCREEN: VISITA ═══ -->
+<div class="screen" id="scr-visita">
+  <div class="visita-header">
+    <div class="visita-back" onclick="goHome()">← Volver a ruta</div>
+    <div class="visita-pto" id="v-pto-label">Punto 1 de 11 · Lunes</div>
+    <div class="visita-nom" id="v-nom">—</div>
+    <div class="visita-badges" id="v-badges"></div>
+  </div>
+
+  <div class="timer-block">
+    <div class="timer-wrap">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle class="timer-ring-bg" cx="40" cy="40" r="34"/>
+        <circle class="timer-ring-fg" id="t-ring" cx="40" cy="40" r="34"
+          stroke-dasharray="214" stroke-dashoffset="214"/>
+      </svg>
+      <div class="timer-num">
+        <div class="timer-val" id="t-val">0:00</div>
+        <div class="timer-lbl" id="t-lbl">en punto</div>
+      </div>
+    </div>
+    <div class="timer-info">
+      <div class="timer-info-row"><span>DENUE match</span><span class="timer-info-val" style="color:var(--verde)">Confirmado</span></div>
+      <div class="timer-info-row"><span>Google Places</span><span class="timer-info-val" id="v-goog-inline">—</span></div>
+      <div class="timer-info-row"><span>Municipio</span><span class="timer-info-val" id="v-mun-inline">—</span></div>
+    </div>
+  </div>
+
+  <!-- SIN PEDIDO — cierre rápido sin venta -->
+  <div class="sin-pedido-lbl">Cerrar sin pedido:</div>
+  <div class="sin-pedido-row">
+    <button class="sin-pedido-btn cerrado" onclick="cerrarSinPedido('cerrado')">🔒 Cerrado</button>
+    <button class="sin-pedido-btn sin-efec" onclick="cerrarSinPedido('sin_efectivo')">💸 Sin efectivo</button>
+    <button class="sin-pedido-btn no-enc" onclick="cerrarSinPedido('no_encontrado')">❓ No encontrado</button>
+  </div>
+
+  <div class="alert-bar" id="alert-tiempo">⚠ Tiempo superado — cierra o justifica</div>
+
+  <!-- BUSCADOR de SKU dentro de visita -->
+  <div class="visita-search-wrap">
+    <input class="visita-search" id="visita-search" placeholder="🔍 Buscar producto..." oninput="onSkuSearch(this.value)">
+  </div>
+
+  <div class="cat-nav" id="cat-nav"></div>
+  <div class="scroll" id="sku-lista"></div>
+
+  <div class="total-footer">
+    <div class="total-row">
+      <div>
+        <div class="total-lbl">Total pedido</div>
+        <div style="font-size:10px;color:var(--text3)" id="skus-cnt">0 productos</div>
+      </div>
+      <span class="total-val" id="total-val">$0.00</span>
+    </div>
+    <button class="btn-cerrar" id="btn-cerrar" disabled onclick="cerrarVisita()">
+      Cerrar visita y continuar
+    </button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: INVENTARIO ═══ -->
+<div class="screen" id="scr-inventario">
+  <div class="corte-header">
+    <div class="corte-titulo">Inventario en unidad</div>
+    <div class="corte-sub">1,000 piezas por SKU · 100 productos</div>
+  </div>
+  <input class="inv-search" id="inv-search" placeholder="🔍 Buscar producto..." oninput="renderInventario(this.value)">
+  <div class="scroll" id="inv-lista"></div>
+</div>
+
+<!-- ═══ SCREEN: CORTE ═══ -->
+<div class="screen" id="scr-corte">
+  <div class="corte-header">
+    <div class="corte-titulo">Corte del día</div>
+    <div class="corte-sub" id="corte-fecha">—</div>
+  </div>
+  <div class="scroll">
+    <div class="aprobado-badge">
+      <div class="ap-ico">✓</div>
+      <div>
+        <div class="ap-info-title">Corte del día aprobado</div>
+        <div class="ap-info-sub" id="corte-hora">—</div>
+      </div>
+    </div>
+    <div class="corte-card">
+      <div class="corte-card-title">Métricas del día</div>
+      <div class="corte-row"><span class="corte-row-lbl">Clientes visitados</span><span class="corte-row-val green" id="c-vis">—</span></div>
+      <div class="corte-row"><span class="corte-row-lbl">Sin pedido (cerrado/sin efec.)</span><span class="corte-row-val red" id="c-skip">0</span></div>
+      <div class="corte-row"><span class="corte-row-lbl">Venta bruta</span><span class="corte-row-val" id="c-bruta">$0.00</span></div>
+      <div class="corte-row"><span class="corte-row-lbl">Devoluciones</span><span class="corte-row-val red">$0.00</span></div>
+      <div class="corte-row"><span class="corte-row-lbl">Faltante inventario</span><span class="corte-row-val red">$0.00</span></div>
+      <div class="corte-row" style="padding-top:8px;margin-top:2px">
+        <span style="font-weight:700;font-size:14px">Total a entregar</span>
+        <span class="corte-row-val big green" id="c-neta">$0.00</span>
+      </div>
+    </div>
+    <div class="corte-card">
+      <div class="corte-card-title">Estado del sistema</div>
+      <div class="corte-row"><span class="corte-row-lbl">Foto de corte</span><span class="corte-row-val green">Subida ✓</span></div>
+      <div class="corte-row"><span class="corte-row-lbl">Enviado a Supabase</span><span class="corte-row-val green">Confirmado ✓</span></div>
+      <div class="corte-row"><span class="corte-row-lbl">Visible para Rigoberto</span><span class="corte-row-val green">En tiempo real ✓</span></div>
+    </div>
+    <div class="corte-card">
+      <div class="corte-card-title">Productos vendidos hoy</div>
+      <div id="sobrante-lista"><div style="font-size:13px;color:var(--text2);padding:4px 0">Sin ventas registradas aún</div></div>
+    </div>
+    <div class="corte-card" id="skip-card" style="display:none">
+      <div class="corte-card-title">Puntos sin pedido</div>
+      <div id="skip-lista"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<div class="navbar">
+  <div class="nav-item act" id="nav-ruta" onclick="showScreen('home')">
+    <span class="nav-ico">🗺</span>
+    <div class="nav-lbl">Ruta</div>
+  </div>
+  <div class="nav-item" id="nav-inv" onclick="showScreen('inventario')">
+    <span class="nav-ico">📦</span>
+    <div class="nav-lbl">Inventario</div>
+  </div>
+  <div class="nav-item" id="nav-corte" onclick="showScreen('corte')">
+    <span class="nav-ico">💰</span>
+    <div class="nav-lbl">Corte</div>
+  </div>
+</div>
+
+</div><!-- /frame -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CATÁLOGO COMPLETO — 100 SKUs de Cristhian Ramírez
+// ═══════════════════════════════════════════════════════
+const CATS = [
+  { id:'danup', nom:'Danup', ico:'🥛', skus:[
+    {id:'D001',n:'Danup Fresa 220g',p:14.40},
+    {id:'D002',n:'Danup Piña 220g',p:14.40},
+    {id:'D003',n:'Danup Galleta 220g',p:14.40},
+    {id:'D004',n:'Danup Piña 435g',p:21.00},
+    {id:'D005',n:'Danup Fresa 435g',p:21.00},
+    {id:'D006',n:'Danup Galleta 435g',p:21.00},
+  ]},
+  { id:'danone', nom:'Danone Natural', ico:'🍶', skus:[
+    {id:'D007',n:'Danone Durazno 120g',p:8.00},
+    {id:'D008',n:'Danone Fresa 120g',p:8.00},
+    {id:'D009',n:'Danone Manzana 120g',p:8.00},
+    {id:'D010',n:'Danone Manzana 220g',p:14.40},
+    {id:'D011',n:'Danone Fresa 220g',p:14.40},
+    {id:'D012',n:'Danone Durazno 220g',p:14.40},
+    {id:'D026',n:'Danone Natural 900g',p:45.00},
+  ]},
+  { id:'cereal', nom:'Cereal', ico:'🥣', skus:[
+    {id:'D013',n:'Cereal Zucaritas',p:13.00},
+    {id:'D014',n:'Cereal Chococroc',p:13.00},
+    {id:'D015',n:'Cereal Froot Loops',p:13.00},
+  ]},
+  { id:'licuado', nom:'Licuado / Activia', ico:'💚', skus:[
+    {id:'D016',n:'Danone Licuado 435g',p:21.00},
+    {id:'D017',n:'Activia Fresa',p:15.00},
+    {id:'D018',n:'Activia Ciruela Pasa',p:15.00},
+  ]},
+  { id:'danonino', nom:'Danonino', ico:'🐣', skus:[
+    {id:'D019',n:'Danonino Líquido 90g',p:8.00},
+    {id:'D020',n:'Danonino Líquido 170g',p:10.50},
+    {id:'D021',n:'Danonino 168g',p:22.00},
+    {id:'D031',n:'Danonino Pouch',p:12.50},
+  ]},
+  { id:'griego', nom:'Griego / Oikos', ico:'🏺', skus:[
+    {id:'D022',n:'Griego Vaso',p:8.00},
+    {id:'D030',n:'Oikos',p:13.00},
+  ]},
+  { id:'dany', nom:'Dany / Dan Mix', ico:'🧃', skus:[
+    {id:'D024',n:'Dany Leche',p:10.00},
+    {id:'D027',n:'Dany Pouch',p:12.50},
+    {id:'D028',n:'Dan Mix Orco',p:19.00},
+    {id:'D029',n:'Dan Mix Lunetas',p:19.00},
+  ]},
+  { id:'postres', nom:'Postres / Gelatinas', ico:'🍮', skus:[
+    {id:'D032',n:'Natilla',p:10.00},
+    {id:'D033',n:'Gelatina Dany Uva',p:8.80},
+    {id:'D034',n:'Gelatina Dany Limón',p:8.80},
+    {id:'D035',n:'Gelatina Dany Fresa',p:8.80},
+    {id:'D036',n:'Danette Flan',p:9.50},
+    {id:'D025',n:'Benegastro',p:15.00},
+  ]},
+  { id:'lacteos', nom:'Lácteos', ico:'🥛', skus:[
+    {id:'D023',n:'Leche Sillk',p:45.00},
+    {id:'C001',n:'Leche Hersheys',p:13.00},
+    {id:'M024',n:'Leche Clásica',p:310.00},
+    {id:'M044',n:'Leche Deslactosada',p:306.00},
+    {id:'M046',n:'Nutrileche',p:295.00},
+    {id:'M029',n:'Crema Alpura 1/2',p:39.00},
+    {id:'M030',n:'Crema Alpura 1/4',p:19.00},
+  ]},
+  { id:'kinder', nom:'Kinder / Nutella', ico:'🍫', skus:[
+    {id:'C004',n:'Nutella B-Ready',p:120.00},
+    {id:'C005',n:'Kinder Bueno',p:185.00},
+    {id:'C006',n:'Kinder Chocolate',p:152.00},
+    {id:'C007',n:'Huevo Kinder',p:22.00},
+    {id:'C008',n:'Kinder Maxi',p:104.00},
+    {id:'C009',n:'Delice',p:130.00},
+    {id:'C010',n:'Nutelita',p:5.50},
+  ]},
+  { id:'quesos', nom:'Quesos', ico:'🧀', skus:[
+    {id:'M001',n:'Azul Molido',p:113.00},
+    {id:'M002',n:'Orión Molido',p:127.00},
+    {id:'M003',n:'Mozarella',p:105.00},
+    {id:'M006',n:'Ranchero 1/2 kg',p:64.00},
+    {id:'M018',n:'Q. Puerco 1/2 kg',p:50.00},
+    {id:'M019',n:'Q. Biolac',p:110.00},
+    {id:'M022',n:'Oaxaca Lupita',p:115.00},
+    {id:'M032',n:'Oaxaca Verde',p:124.00},
+    {id:'M033',n:'Oaxaca Azul',p:136.00},
+    {id:'M037',n:'Philadelphia',p:92.00},
+    {id:'M042',n:'Manchego Polimax',p:67.00},
+    {id:'M043',n:'Q. Panela',p:129.00},
+    {id:'M045',n:'Panela Verde',p:115.00},
+    {id:'M047',n:'Polimax',p:155.00},
+    {id:'M054',n:'Q. Ranchero 1 kg',p:39.50},
+  ]},
+  { id:'embutidos', nom:'Embutidos', ico:'🌭', skus:[
+    {id:'M009',n:'Chistorra',p:63.00},
+    {id:'M010',n:'Salchicha Arcos',p:142.00},
+    {id:'M011',n:'Salchicha Any',p:125.00},
+    {id:'M012',n:'Salchicha Yossi',p:107.00},
+    {id:'M026',n:'Salchicha Azar',p:65.00},
+    {id:'M014',n:'Chorizo Corona',p:150.00},
+    {id:'M016',n:'Chorizo Cancún',p:85.00},
+    {id:'M017',n:'Chorizo Rocha',p:76.00},
+    {id:'M036',n:'Chorizo Capistrano',p:136.00},
+    {id:'M028',n:'Longaniza',p:102.00},
+    {id:'M049',n:'Jamón Campiramo',p:62.00},
+    {id:'M050',n:'Jamón Inter',p:93.00},
+    {id:'M051',n:'Horneado',p:80.00},
+    {id:'M052',n:'Jamón Delicia',p:97.00},
+    {id:'M035',n:'Iberia',p:12.00},
+    {id:'M005',n:'Preparado',p:110.00},
+    {id:'M025',n:'Tocino Kilo Par.',p:150.00},
+    {id:'M027',n:'Tocino Breco',p:45.00},
+    {id:'M021',n:'Maya Fud',p:23.50},
+  ]},
+  { id:'carnes', nom:'Carnes', ico:'🥩', skus:[
+    {id:'M013',n:'Arrachera 1 kg',p:120.00},
+    {id:'M015',n:'Pastor',p:120.00},
+    {id:'M020',n:'Costilla',p:125.00},
+    {id:'M023',n:'Chuleta Papel 1 kg',p:110.00},
+    {id:'M034',n:'Chuleta Cent.',p:58.00},
+    {id:'M038',n:'Oreja',p:105.00},
+    {id:'M039',n:'Pata',p:95.00},
+    {id:'M040',n:'Pierna',p:115.00},
+    {id:'M041',n:'Adovera 1 kg',p:135.00},
+    {id:'M048',n:'Cueros',p:25.00},
+  ]},
+  { id:'varios', nom:'Varios', ico:'🛒', skus:[
+    {id:'C002',n:'Agua Cactos',p:144.00},
+    {id:'C003',n:'Palomas',p:210.00},
+    {id:'M004',n:'Maíz Pozolero',p:25.00},
+    {id:'M007',n:'Huevo',p:31.00},
+    {id:'M008',n:'Yakult',p:21.00},
+    {id:'M031',n:'Café Olé',p:30.00},
+    {id:'M053',n:'Aderezo Nacho',p:22.00},
+  ]},
+];
+
+// PUNTOS POR DÍA
+const PUNTOS = {
+  L:[
+    {id:'sb',n:'San Bartolomé AC',m:'Apaseo el Alto, GTO',r:4.1,rs:18},
+    {id:'sv',n:'San Vicente',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'oa',n:'Ojo de Agua de Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'se',n:'El Salto de Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'ls',n:'La Soledad del Realengo',m:'Apaseo el Alto, GTO',r:4.0,rs:1},
+    {id:'si',n:'San Isidro',m:'Apaseo el Alto, GTO',r:4.9,rs:10},
+    {id:'ga',n:'Santa Cruz de Gamboa',m:'Apaseo el Alto, GTO',r:5.0,rs:2},
+    {id:'du',n:'El Durazno',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'cp',n:'Corral de Piedra',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'po',n:'El Pocito',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'ba',n:'Barajas',m:'Apaseo el Alto, GTO',r:null,rs:0},
+  ],
+  M:[
+    {id:'es',n:'El Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'ag',n:'Aguaje de Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'ma',n:'Mandujano Hidalgo',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'ac',n:'Col. Centro',m:'Apaseo el Alto, GTO',r:4.2,rs:12},
+    {id:'az',n:'Col. Emiliano Zapata',m:'Apaseo el Alto, GTO',r:null,rs:0},
+  ],
+  X:[
+    {id:'te',n:'El Terrero',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'be',n:'Belén',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'cu',n:'La Cuevita',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'ji',n:'Jiménez',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'no',n:'Nopalera de Juárez',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'sl',n:'San Lucas',m:'Apaseo el Alto, GTO',r:null,rs:0},
+  ],
+  J:[
+    {id:'vh',n:'Vista Hermosa',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'aa',n:'San José Agua Azul',m:'Apaseo el Grande, GTO',r:null,rs:0},
+    {id:'pu',n:'La Purísima',m:'Apaseo el Grande, GTO',r:4.2,rs:31},
+    {id:'gu',n:'El Guadalupano',m:'Apaseo el Grande, GTO',r:null,rs:0},
+    {id:'gm',n:'Guadalupe del Monte',m:'Apaseo el Grande, GTO',r:null,rs:0},
+    {id:'vi',n:'San José Viborillas',m:'Apaseo el Grande, GTO',r:null,rs:0},
+    {id:'tu',n:'El Tunal',m:'Apaseo el Grande, GTO',r:null,rs:0},
+    {id:'co',n:'La Concepción',m:'Apaseo el Grande, GTO',r:null,rs:0},
+  ],
+  V:[
+    {id:'sbv',n:'San Bartolomé AC (2da)',m:'Apaseo el Alto, GTO',r:4.1,rs:18},
+    {id:'svv',n:'San Vicente (2da)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'oav',n:'Ojo de Agua (2da)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'sev',n:'Salto de Espejo (2da)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'lsv',n:'La Soledad (2da)',m:'Apaseo el Alto, GTO',r:4.0,rs:1},
+    {id:'esv',n:'El Espejo (regreso)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'agv',n:'Aguaje (regreso)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'mav',n:'Mandujano (regreso)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+  ],
+};
+
+const DIAS_NOM = {L:'Lunes',M:'Martes',X:'Miércoles',J:'Jueves',V:'Viernes'};
+const RAZON_LABEL = {cerrado:'🔒 Cerrado',sin_efectivo:'💸 Sin efectivo',no_encontrado:'❓ No encontrado'};
+
+// ESTADO
+const INV = {};
+CATS.forEach(c=>c.skus.forEach(s=>{ INV[s.id]=1000; }));
+const PEDIDOS_DIA = {};
+let ventaDia = 0;
+let curDay = 'L';
+let visitados = new Set();
+let razonesSkip = {};  // id → razon de visita sin pedido
+let pedidoActual = {};
+let puntoActual = null;
+let catActiva = CATS[0].id;
+let timerSecs = 0, timerInt = null;
+let skuFiltro = '';
+let modoOscuro = true;
+
+// ── MODO CAMPO ────────────────────────────────────────────────────
+function toggleModo(){
+  modoOscuro = !modoOscuro;
+  const btn = document.getElementById('modo-btn');
+  if(modoOscuro){
+    document.body.classList.remove('modo-campo');
+    btn.textContent = '☀️ Campo';
+  } else {
+    document.body.classList.add('modo-campo');
+    btn.textContent = '🌙 Noche';
+  }
+}
+
+// RELOJ
+function tick(){ const n=new Date(); document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
+tick(); setInterval(tick,15000);
+
+// FECHA
+function fechaHoy(){ return new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+
+// ── HOME ──────────────────────────────────────────────────────────
+const subtitles = {L:'Corredor GTO · 11 zonas',M:'Apaseo el Alto · 5 zonas',X:'Ruta Sur · 6 zonas',J:'APAlto + APGrande · 8 zonas',V:'Doble visita · 8 zonas'};
+
+function setDay(d,el){
+  curDay=d;
+  document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  document.getElementById('home-sub-txt').textContent = DIAS_NOM[d]+' · '+subtitles[d];
+  renderPuntos();
+}
+
+function renderPuntos(){
+  const pts = PUNTOS[curDay];
+  const vis = pts.filter(p=>visitados.has(p.id)).length;
+  const pen = pts.length - vis;
+  document.getElementById('m-vis').textContent = vis;
+  document.getElementById('m-pen').textContent = pen;
+  document.getElementById('m-pen').style.color = pen>0?'var(--amarillo)':'var(--verde)';
+  document.getElementById('m-vta').textContent = ventaDia>=1000?'$'+Math.round(ventaDia/1000)+'k':'$'+Math.round(ventaDia);
+  document.getElementById('m-skus').textContent = CATS.reduce((s,c)=>s+c.skus.length,0);
+  document.getElementById('lista-puntos').innerHTML = pts.map((p,i)=>{
+    const done = visitados.has(p.id);
+    const skip = done && razonesSkip[p.id];
+    const razon = skip ? razonesSkip[p.id] : null;
+    const gTag = p.r ? `<span class="tag tag-verde">★${p.r} · ${p.rs}</span>` : `<span class="tag tag-grey">Sin GBP</span>`;
+    const doneTag = done && !skip ? `<span class="tag tag-verde">✓ Visitado</span>` : '';
+    const skipTag = skip ? `<span class="tag tag-red">${RAZON_LABEL[razon]}</span>` : '';
+    const score = p.r>=4.0&&p.rs>=10 ? `<span class="tag tag-warn">Alta prioridad</span>` : '';
+    const numClass = done ? (skip ? 'skip' : 'done') : '';
+    const numIcon = done ? (skip ? '—' : '✓') : (i+1);
+    return `<div class="punto-card" onclick="abrirVisita('${p.id}')">
+      <div class="punto-num${numClass?' '+numClass:''}">${numIcon}</div>
+      <div class="punto-info">
+        <div class="punto-nom">${p.n}</div>
+        <div class="punto-mun">${p.m}</div>
+        <div class="punto-meta">${gTag}${score}${doneTag}${skipTag}</div>
+      </div>
+      <div class="punto-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+// ── VISITA ────────────────────────────────────────────────────────
+function abrirVisita(id){
+  const pts = PUNTOS[curDay];
+  const p = pts.find(x=>x.id===id);
+  if(!p) return;
+  puntoActual = p;
+  pedidoActual = {};
+  skuFiltro = '';
+  timerSecs = 0;
+  if(timerInt) clearInterval(timerInt);
+
+  const idx = pts.indexOf(p);
+  document.getElementById('v-pto-label').textContent = `Punto ${idx+1} de ${pts.length} · ${DIAS_NOM[curDay]}`;
+  document.getElementById('v-nom').textContent = p.n;
+  document.getElementById('v-goog-inline').textContent = p.r ? `★${p.r} · ${p.rs} reseñas` : 'Sin Google Places';
+  document.getElementById('v-goog-inline').style.color = p.r ? 'var(--verde)' : 'var(--text2)';
+  document.getElementById('v-mun-inline').textContent = p.m;
+  document.getElementById('v-badges').innerHTML = `
+    <span class="tag tag-verde">Check-in OK</span>
+    ${p.r ? `<span class="tag tag-verde">★${p.r} Google</span>` : ''}
+    <span class="tag tag-grey">${p.m.split(',')[0]}</span>
+  `;
+  document.getElementById('total-val').textContent = '$0.00';
+  document.getElementById('skus-cnt').textContent = '0 productos';
+  document.getElementById('btn-cerrar').disabled = true;
+  document.getElementById('btn-cerrar').textContent = 'Cerrar visita y continuar';
+  document.getElementById('alert-tiempo').style.display = 'none';
+  document.getElementById('t-ring').style.stroke = 'var(--verde)';
+  document.getElementById('t-lbl').textContent = 'en punto';
+  document.getElementById('visita-search').value = '';
+
+  catActiva = CATS[0].id;
+  document.getElementById('cat-nav').innerHTML = CATS.map(c=>
+    `<button class="cat-btn${c.id===catActiva?' act':''}" onclick="setCat('${c.id}',this)">${c.ico} ${c.nom}</button>`
+  ).join('');
+
+  renderSKUs();
+  showScreen('visita');
+
+  const CIRC = 214;
+  const MAX_SECS = 7*60;
+  timerInt = setInterval(()=>{
+    timerSecs++;
+    const m = Math.floor(timerSecs/60), s = timerSecs%60;
+    document.getElementById('t-val').textContent = m+':'+(s<10?'0':'')+s;
+    const pct = Math.min(timerSecs/MAX_SECS,1);
+    document.getElementById('t-ring').style.strokeDashoffset = (CIRC-pct*CIRC).toFixed(1);
+    if(timerSecs>MAX_SECS){
+      document.getElementById('t-ring').style.stroke='var(--rojo)';
+      document.getElementById('t-lbl').textContent='excedido';
+      document.getElementById('alert-tiempo').style.display='block';
+    }
+  },1000);
+}
+
+function setCat(id,el){
+  catActiva=id;
+  skuFiltro='';
+  document.getElementById('visita-search').value='';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('act'));
+  el.classList.add('act');
+  renderSKUs();
+}
+
+function onSkuSearch(val){
+  skuFiltro = val.toLowerCase().trim();
+  renderSKUs();
+}
+
+function renderSKUs(){
+  // Si hay búsqueda activa, mostrar todas las categorías filtradas
+  if(skuFiltro){
+    let html = '';
+    CATS.forEach(c=>{
+      const matched = c.skus.filter(s=>s.n.toLowerCase().includes(skuFiltro));
+      if(!matched.length) return;
+      html += `<div class="sku-group">
+        <div class="sku-group-title">${c.ico} ${c.nom} — ${matched.length} resultado${matched.length!==1?'s':''}</div>
+        ${matched.map(s=>skuRowHTML(s)).join('')}
+      </div>`;
+    });
+    document.getElementById('sku-lista').innerHTML = html ||
+      `<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Sin resultados para "${skuFiltro}"</div>`;
+    return;
+  }
+  // Sin búsqueda: mostrar categoría activa
+  const cat = CATS.find(c=>c.id===catActiva);
+  if(!cat) return;
+  document.getElementById('sku-lista').innerHTML = `<div class="sku-group">
+    <div class="sku-group-title">${cat.ico} ${cat.nom} — ${cat.skus.length} productos</div>
+    ${cat.skus.map(s=>skuRowHTML(s)).join('')}
+  </div>`;
+}
+
+function skuRowHTML(s){
+  const q = pedidoActual[s.id]||0;
+  const sold = PEDIDOS_DIA[s.id]||0;
+  const stock = INV[s.id]-sold;
+  const sc = stock>200?'ok':stock>50?'low':'out';
+  return `<div class="sku-row">
+    <div class="sku-info">
+      <div class="sku-nom">${s.n}</div>
+      <div class="sku-det">
+        <span style="color:var(--verde);font-weight:600">$${s.p.toFixed(2)}</span>
+        <span class="sku-stock ${sc}">inv:${stock}</span>
+        ${sold>0?`<span style="color:var(--text3)">−${sold} hoy</span>`:''}
+      </div>
+    </div>
+    <div class="qty-ctrl">
+      <button class="qty-btn" onclick="adj('${s.id}',${s.p},-1)">−</button>
+      <span class="qty-n${q>0?' has':''}" id="qn-${s.id}">${q}</span>
+      <button class="qty-btn" onclick="adj('${s.id}',${s.p},1)">+</button>
+    </div>
+  </div>`;
+}
+
+function adj(id,precio,d){
+  pedidoActual[id] = Math.max(0,(pedidoActual[id]||0)+d);
+  const el = document.getElementById('qn-'+id);
+  if(el){ el.textContent=pedidoActual[id]; el.className='qty-n'+(pedidoActual[id]>0?' has':''); }
+  let total=0, cnt=0;
+  CATS.forEach(c=>c.skus.forEach(s=>{
+    const q=pedidoActual[s.id]||0;
+    if(q>0){ total+=s.p*q; cnt+=q; }
+  }));
+  document.getElementById('total-val').textContent='$'+total.toFixed(2);
+  document.getElementById('skus-cnt').textContent=cnt+' unidades';
+  document.getElementById('btn-cerrar').disabled=(total===0);
+}
+
+function cerrarVisita(){
+  if(!puntoActual) return;
+  clearInterval(timerInt); timerInt=null;
+  let vPunto=0;
+  CATS.forEach(c=>c.skus.forEach(s=>{
+    const q=pedidoActual[s.id]||0;
+    if(q>0){
+      PEDIDOS_DIA[s.id]=(PEDIDOS_DIA[s.id]||0)+q;
+      INV[s.id]=Math.max(0,INV[s.id]-q);
+      vPunto+=s.p*q;
+    }
+  }));
+  ventaDia+=vPunto;
+  visitados.add(puntoActual.id);
+  delete razonesSkip[puntoActual.id];
+  document.getElementById('btn-cerrar').disabled=true;
+  document.getElementById('btn-cerrar').textContent='✓ Checkout registrado';
+  document.getElementById('t-lbl').textContent='cerrado';
+  setTimeout(()=>{
+    renderPuntos();
+    actualizarCorte();
+    goHome();
+  },700);
+}
+
+// Cerrar visita sin pedido (tienda cerrada, sin efectivo, no encontrado)
+function cerrarSinPedido(razon){
+  if(!puntoActual) return;
+  clearInterval(timerInt); timerInt=null;
+  visitados.add(puntoActual.id);
+  razonesSkip[puntoActual.id] = razon;
+  document.getElementById('btn-cerrar').textContent = RAZON_LABEL[razon]+' — registrado';
+  document.getElementById('t-lbl').textContent = 'cerrado';
+  setTimeout(()=>{
+    renderPuntos();
+    actualizarCorte();
+    goHome();
+  },700);
+}
+
+function goHome(){
+  if(timerInt){clearInterval(timerInt);timerInt=null;}
+  showScreen('home');
+}
+
+// ── INVENTARIO ────────────────────────────────────────────────────
+function renderInventario(filtro=''){
+  const q = filtro.toLowerCase();
+  let html='';
+  CATS.forEach(c=>{
+    const skus = q ? c.skus.filter(s=>s.n.toLowerCase().includes(q)) : c.skus;
+    if(!skus.length) return;
+    html+=`<div class="sku-group">
+      <div class="sku-group-title">${c.ico} ${c.nom}</div>
+      ${skus.map(s=>{
+        const sold=PEDIDOS_DIA[s.id]||0;
+        const stock=INV[s.id];
+        const col=stock>200?'var(--verde)':stock>50?'var(--amarillo)':'var(--rojo)';
+        return `<div class="sku-row">
+          <div class="sku-info">
+            <div class="sku-nom">${s.n}</div>
+            <div class="sku-det"><span style="color:var(--verde)">$${s.p.toFixed(2)}</span>${sold>0?`<span style="color:var(--amarillo)">−${sold} vendidos</span>`:''}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:${col}">${stock}</div>
+            <div style="font-size:10px;color:var(--text3)">en unidad</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  document.getElementById('inv-lista').innerHTML = html||`<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Sin resultados para "${filtro}"</div>`;
+}
+
+// ── CORTE ─────────────────────────────────────────────────────────
+function actualizarCorte(){
+  const pts = PUNTOS[curDay];
+  const vis = pts.filter(p=>visitados.has(p.id)).length;
+  const skips = Object.keys(razonesSkip).filter(id=>pts.some(p=>p.id===id)).length;
+  document.getElementById('c-vis').textContent=`${vis-skips} / ${pts.length}`;
+  document.getElementById('c-skip').textContent=skips>0?skips:'0';
+  document.getElementById('c-skip').className='corte-row-val'+(skips>0?' red':'');
+  document.getElementById('c-bruta').textContent='$'+ventaDia.toFixed(2);
+  document.getElementById('c-neta').textContent='$'+ventaDia.toFixed(2);
+  const now = new Date();
+  document.getElementById('corte-fecha').textContent = fechaHoy();
+  document.getElementById('corte-hora').textContent = DIAS_NOM[curDay]+' '+now.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' · '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  let html='';
+  CATS.forEach(c=>c.skus.forEach(s=>{
+    const sold=PEDIDOS_DIA[s.id]||0;
+    if(sold>0) html+=`<div class="corte-row"><span class="corte-row-lbl">${s.n}</span><span class="corte-row-val">${sold} pzas · <span style="color:var(--verde)">$${(s.p*sold).toFixed(2)}</span></span></div>`;
+  }));
+  document.getElementById('sobrante-lista').innerHTML=html||`<div style="font-size:13px;color:var(--text2);padding:4px 0">Sin ventas registradas aún</div>`;
+
+  // Lista de puntos sin pedido
+  const skipEntries = pts.filter(p=>razonesSkip[p.id]);
+  const skipCard = document.getElementById('skip-card');
+  if(skipEntries.length){
+    skipCard.style.display='block';
+    document.getElementById('skip-lista').innerHTML=skipEntries.map(p=>
+      `<div class="corte-row"><span class="corte-row-lbl">${p.n}</span><span class="corte-row-val red">${RAZON_LABEL[razonesSkip[p.id]]}</span></div>`
+    ).join('');
+  } else {
+    skipCard.style.display='none';
+  }
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('act'));
+  const map={home:'scr-home',visita:'scr-visita',inventario:'scr-inventario',corte:'scr-corte'};
+  const navMap={home:'nav-ruta',inventario:'nav-inv',corte:'nav-corte'};
+  if(map[name]) document.getElementById(map[name]).classList.add('active');
+  if(navMap[name]) document.getElementById(navMap[name]).classList.add('act');
+  if(name==='inventario') renderInventario();
+  if(name==='corte') actualizarCorte();
+}
+
+// INIT
+renderPuntos();
+</script>
+</body>
+</html>
