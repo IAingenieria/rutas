@@ -166,7 +166,22 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   -webkit-user-select:none;user-select:none;
 }
 .qty-btn:active{background:var(--verde);border-color:var(--verde);transform:scale(.88)}
-.qty-n{font-size:15px;font-weight:700;min-width:38px;text-align:center;color:var(--text);font-family:'DM Mono',monospace}
+/* Input de cantidad — se toca para escribir directo */
+.qty-n{
+  font-size:15px;font-weight:700;width:44px;text-align:center;
+  color:var(--text);font-family:'DM Mono',monospace;
+  background:transparent;border:none;outline:none;
+  border-bottom:1.5px solid transparent;
+  -moz-appearance:textfield;padding:0;cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.qty-n::-webkit-inner-spin-button,
+.qty-n::-webkit-outer-spin-button{-webkit-appearance:none}
+.qty-n:focus{
+  border-bottom-color:var(--verde);
+  color:var(--verde);
+  cursor:text;
+}
 .qty-n.has{color:var(--verde)}
 
 .total-footer{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg)}
@@ -229,7 +244,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 <div class="screen active" id="scr-home">
   <div class="home-header">
     <div class="home-cedis">CEDIS · Corregidora, Qro.</div>
-    <div class="home-ruta">Christian Ramírez</div>
+    <div class="home-ruta">Cristian Ramírez</div>
     <div class="home-sub" id="home-sub-txt">Lunes · Corredor GTO · 11 zonas</div>
   </div>
   <div class="day-tabs" id="day-tabs">
@@ -529,52 +544,234 @@ const CATS = [
 // PUNTOS POR DÍA
 const PUNTOS = {
   L:[
-    {id:'sb',n:'San Bartolomé AC',m:'Apaseo el Alto, GTO',r:4.1,rs:18},
-    {id:'sv',n:'San Vicente',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'oa',n:'Ojo de Agua de Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'se',n:'El Salto de Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'ls',n:'La Soledad del Realengo',m:'Apaseo el Alto, GTO',r:4.0,rs:1},
-    {id:'si',n:'San Isidro',m:'Apaseo el Alto, GTO',r:4.9,rs:10},
-    {id:'ga',n:'Santa Cruz de Gamboa',m:'Apaseo el Alto, GTO',r:5.0,rs:2},
-    {id:'du',n:'El Durazno',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'cp',n:'Corral de Piedra',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'po',n:'El Pocito',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'ba',n:'Barajas',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'L01',n:"TIENDA DE ABARROTES",goog:"PANIFICADORA VAZQUEZ",m:"Apaseo el Alto, GTO",r:4.7,rs:13,lat:20.49365972,lng:-100.54595705,hora:"08:13",score:"🔴 Alta"},
+    {id:'L02',n:"MISCELANEA VAZQUEZ",goog:"PANIFICADORA VAZQUEZ",m:"Apaseo el Alto, GTO",r:4.7,rs:13,lat:20.49363625,lng:-100.54614876,hora:"08:20",score:"🔴 Alta"},
+    {id:'L03',n:"TIENDA DE ABARROTES LM",goog:"Tortilleria San Bartolome",m:"Apaseo el Alto, GTO",r:4.4,rs:15,lat:20.49430269,lng:-100.54986746,hora:"08:28",score:"🔴 Alta"},
+    {id:'L04',n:"POLLERIA VERO",goog:"Tortilleria San Bartolome",m:"Apaseo el Alto, GTO",r:4.4,rs:15,lat:20.49434084,lng:-100.55019417,hora:"08:35",score:"🔴 Alta"},
+    {id:'L05',n:"FRUTERIA VALENTINA",goog:"Tortilleria San Bartolome",m:"Apaseo el Alto, GTO",r:4.4,rs:15,lat:20.49432156,lng:-100.55035762,hora:"08:42",score:"🔴 Alta"},
+    {id:'L06',n:"ABARROTES LA OLIMPICA",goog:"Abarrotes Olímpica",m:"Apaseo el Alto, GTO",r:4.7,rs:26,lat:20.46110295,lng:-100.62019565,hora:"09:01",score:"🔴 Alta"},
+    {id:'L07',n:"TIENDA ADELA",goog:"Tiendas 3B",m:"Apaseo el Alto, GTO",r:4.1,rs:301,lat:20.45995131,lng:-100.62344813,hora:"09:09",score:"🔴 Alta"},
+    {id:'L08',n:"FRUTAS Y VERDURAS",goog:"Xochipilli Delicias de la vida",m:"Apaseo el Alto, GTO",r:4.7,rs:95,lat:20.45679757,lng:-100.62771436,hora:"09:17",score:"🔴 Alta"},
+    {id:'L09',n:"EXPENDIO DE PAN SIN NOMBRE",goog:"Super Aleman",m:"Apaseo el Alto, GTO",r:4.4,rs:363,lat:20.45668017,lng:-100.62810096,hora:"09:24",score:"🔴 Alta"},
+    {id:'L10',n:"ABARROTES JAZZ",goog:"Abarrotes Elliet",m:"Apaseo el Alto, GTO",r:3.9,rs:7,lat:20.49527584,lng:-100.54682541,hora:"09:45",score:"🟠 Media-alta"},
+    {id:'L11',n:"ABARROTES SERVIN",goog:"Servin Grocery Store",m:"Apaseo el Alto, GTO",r:4.3,rs:6,lat:20.49310091,lng:-100.54913036,hora:"09:53",score:"🟠 Media-alta"},
+    {id:'L12',n:"CARNICERIA DAISY",goog:"Carniceria",m:"Apaseo el Alto, GTO",r:4.6,rs:5,lat:20.46015194,lng:-100.62031341,hora:"10:12",score:"🟠 Media-alta"},
+    {id:'L13',n:"ABARROTES VINOS Y LICORES VALDEZ",goog:"Carniceria",m:"Apaseo el Alto, GTO",r:4.6,rs:5,lat:20.45952688,lng:-100.62038822,hora:"10:19",score:"🟠 Media-alta"},
+    {id:'L14',n:"FRUTAS Y LEGUMBRES MANCERA",goog:"Carniceria",m:"Apaseo el Alto, GTO",r:4.6,rs:5,lat:20.45971127,lng:-100.62082359,hora:"10:26",score:"🟠 Media-alta"},
+    {id:'L15',n:"TIENDA DE ABARROTES LA NORTEÑA",goog:"OXXO Apaseo Centro QRF",m:"Apaseo el Alto, GTO",r:3.7,rs:39,lat:20.45806714,lng:-100.62139741,hora:"10:33",score:"🟠 Media-alta"},
+    {id:'L16',n:"ABARROTES NUÑEZ",goog:"Abarrotes Nuñez",m:"Apaseo el Alto, GTO",r:4.0,rs:5,lat:20.45509803,lng:-100.62099727,hora:"10:41",score:"🟠 Media-alta"},
+    {id:'L17',n:"ABARROTES BARRIO CHINO",goog:"Abarrotes \"Barrio Chino\"",m:"Apaseo el Alto, GTO",r:3.9,rs:37,lat:20.45473189,lng:-100.62871459,hora:"10:49",score:"🟠 Media-alta"},
+    {id:'L18',n:"CARNICERIA GUERRER0",goog:"Carniceria Guerrero",m:"Apaseo el Alto, GTO",r:4.6,rs:5,lat:20.45630049,lng:-100.62867694,hora:"10:56",score:"🟠 Media-alta"},
+    {id:'L19',n:"RICO POLLO",goog:"Carniceria Guerrero",m:"Apaseo el Alto, GTO",r:4.6,rs:5,lat:20.456772,lng:-100.62878255,hora:"11:04",score:"🟠 Media-alta"},
+    {id:'L20',n:"FRUTAS Y VERDURAS",goog:"Carniceria Sofy",m:"Apaseo el Alto, GTO",r:4.2,rs:5,lat:20.45691065,lng:-100.6298022,hora:"11:11",score:"🟠 Media-alta"},
+    {id:'L21',n:"DISTRIBUIDORA PIÑA",goog:"Carniceria Sofy",m:"Apaseo el Alto, GTO",r:4.2,rs:5,lat:20.45707768,lng:-100.62977098,hora:"11:18",score:"🟠 Media-alta"},
+    {id:'L22',n:"ABARROTES Y VERDURAS",goog:"Abarrotes MA-RO",m:"Apaseo el Alto, GTO",r:4.8,rs:9,lat:20.46248358,lng:-100.62706647,hora:"11:26",score:"🟠 Media-alta"},
+    {id:'L23',n:"ABARROTES MARO",goog:"Abarrotes MA-RO",m:"Apaseo el Alto, GTO",r:4.8,rs:9,lat:20.46305605,lng:-100.62646805,hora:"11:33",score:"🟠 Media-alta"},
+    {id:'L24',n:"BOTANAS",goog:"Panadería Doña Tola",m:"Apaseo el Alto, GTO",r:3.0,rs:2,lat:20.49616591,lng:-100.54547875,hora:"11:54",score:"🟡 Media"},
+    {id:'L25',n:"ABARROTES EL REMOLINO",goog:"Panadería Doña Tola",m:"Apaseo el Alto, GTO",r:3.0,rs:2,lat:20.49604709,lng:-100.54588249,hora:"12:01",score:"🟡 Media"},
+    {id:'L26',n:"ABARROTES LA RUBIA",goog:"Abarrotes la rubia",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.49593562,lng:-100.54623206,hora:"12:08",score:"🟡 Media"},
+    {id:'L27',n:"CARNICERIA MANOLO",goog:"BASICOS ROQUE",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.49515774,lng:-100.54682296,hora:"12:15",score:"🟡 Media"},
+    {id:'L28',n:"TIENDA DE ABARROTES ROQUE",goog:"BASICOS ROQUE",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.49507655,lng:-100.5468132,hora:"12:22",score:"🟡 Media"},
+    {id:'L29',n:"POLLERIA LA PIEDAD",goog:"BASICOS ROQUE",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.49481252,lng:-100.54677144,hora:"12:29",score:"🟡 Media"},
+    {id:'L30',n:"CARNICERIA GUADALUPANA",goog:"Crepas y frappes “Las delicias”",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49512306,lng:-100.54783666,hora:"12:36",score:"🟡 Media"},
+    {id:'L31',n:"MISCELANEA KITY",goog:"Crepas y frappes “Las delicias”",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49475136,lng:-100.54796533,hora:"12:43",score:"🟡 Media"},
+    {id:'L32',n:"CARNICERIA LOS SANCHEZ",goog:"Crepas y frappes “Las delicias”",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49469519,lng:-100.54812157,hora:"12:50",score:"🟡 Media"},
+    {id:'L33',n:"TIENDA DE ABARROTES RAMIRIN",goog:"Crepas y frappes “Las delicias”",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49468808,lng:-100.5481605,hora:"12:57",score:"🟡 Media"},
+    {id:'L34',n:"CARNICDERIA SAN JUDAS TADEO",goog:"Crepas y frappes “Las delicias”",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49450217,lng:-100.54872063,hora:"13:04",score:"🟡 Media"},
+    {id:'L35',n:"ABARROTES GUTIERREZ",goog:"Crepas y frappes “Las delicias”",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49448265,lng:-100.54882621,hora:"13:11",score:"🟡 Media"},
+    {id:'L36',n:"TIENDA DE ABARROTES",goog:"Abarrotes Las Flores",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49065485,lng:-100.54611804,hora:"13:19",score:"🟡 Media"},
+    {id:'L37',n:"ABARROTES LAS FLORES",goog:"Abarrotes Las Flores",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49063605,lng:-100.54599118,hora:"13:26",score:"🟡 Media"},
+    {id:'L38',n:"TIENDA DE ABARROTES",goog:"Rinconcito en el cerro",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.4951707,lng:-100.55595004,hora:"13:35",score:"🟡 Media"},
+    {id:'L39',n:"TIENDA DE ABARROTES",goog:"Rinconcito en el cerro",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.49529536,lng:-100.55639195,hora:"13:42",score:"🟡 Media"},
+    {id:'L40',n:"FRUTERIA INSURGENTES",goog:"Panificadora \"La Integral\"",m:"Apaseo el Alto, GTO",r:4.0,rs:1,lat:20.45896543,lng:-100.62046296,hora:"14:01",score:"🟡 Media"},
+    {id:'L41',n:"TIENDA DE ABARROTES RAMIREZ",goog:"The waffle paradise",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.45789884,lng:-100.62021669,hora:"14:08",score:"🟡 Media"},
+    {id:'L42',n:"VENTA DE FRUTAS Y VERDURAS",goog:"The waffle paradise",m:"Apaseo el Alto, GTO",r:5.0,rs:2,lat:20.45780777,lng:-100.62022733,hora:"14:15",score:"🟡 Media"},
+    {id:'L43',n:"TIENDA DE ABARROTES MISCELANEA",goog:"Frutería Celi",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45667006,lng:-100.62029585,hora:"14:22",score:"🟡 Media"},
+    {id:'L44',n:"FRUTERIA CELI",goog:"Frutería Celi",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45666346,lng:-100.62024872,hora:"14:29",score:"🟡 Media"},
+    {id:'L45',n:"CARNICERIA GUERRERO",goog:"Frutería Celi",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45658563,lng:-100.62022979,hora:"14:36",score:"🟡 Media"},
+    {id:'L46',n:"ABARROTES Y CREMERIA",goog:"Tocumbo",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45679873,lng:-100.62123866,hora:"14:43",score:"🟡 Media"},
+    {id:'L47',n:"VINOS Y LICORES GARCIA",goog:"Tocumbo",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45691663,lng:-100.62155264,hora:"14:50",score:"🟡 Media"},
+    {id:'L48',n:"EL BARZON",goog:"Panaderia y Pasteleria morelos",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.4569225,lng:-100.62216031,hora:"14:57",score:"🟡 Media"},
+    {id:'L49',n:"EL VESUBIO",goog:"El vesubio",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45589932,lng:-100.62149743,hora:"15:05",score:"🟡 Media"},
+    {id:'L50',n:"ABARROTES ALLENDE",goog:"Sweet Surprises",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.45509633,lng:-100.62182355,hora:"15:12",score:"🟡 Media"},
+    {id:'L51',n:"FRUTYS CHAMOY",goog:"Sweet Surprises",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.45471569,lng:-100.62187395,hora:"15:19",score:"🟡 Media"},
+    {id:'L52',n:"ABARROTES FRUTAS Y LEGUMBRES",goog:"Sweet Surprises",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.45443332,lng:-100.6224657,hora:"15:26",score:"🟡 Media"},
+    {id:'L53',n:"ABARROTES FRUTAS Y VERDURAS",goog:"Pollería Mary",m:"Apaseo el Alto, GTO",r:1.0,rs:1,lat:20.45892634,lng:-100.62221879,hora:"15:34",score:"🟡 Media"},
+    {id:'L54',n:"VENTA DE POLLO FRESCO",goog:"Pollería Mary",m:"Apaseo el Alto, GTO",r:1.0,rs:1,lat:20.45901908,lng:-100.62215921,hora:"15:41",score:"🟡 Media"},
+    {id:'L55',n:"TIENDA CARRUCEL",goog:"Pollería Mary",m:"Apaseo el Alto, GTO",r:1.0,rs:1,lat:20.45908195,lng:-100.6226584,hora:"15:48",score:"🟡 Media"},
   ],
   M:[
-    {id:'es',n:'El Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'ag',n:'Aguaje de Espejo',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'ma',n:'Mandujano Hidalgo',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'ac',n:'Col. Centro',m:'Apaseo el Alto, GTO',r:4.2,rs:12},
-    {id:'az',n:'Col. Emiliano Zapata',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'M01',n:"SUPERCITO FAMILIAR",goog:"Supercito Familiar",m:"Apaseo el Alto, GTO",r:4.4,rs:12,lat:20.45857796,lng:-100.61475146,hora:"08:26",score:"🔴 Alta"},
+    {id:'M02',n:"PIÑA GONZALEZ",goog:"Cafe Tocumbo",m:"Apaseo el Alto, GTO",r:4.4,rs:215,lat:20.45811843,lng:-100.61531621,hora:"08:33",score:"🔴 Alta"},
+    {id:'M03',n:"VERDULERIA Y FRUTERIA",goog:"Carnicería Arzate Hnos.",m:"Apaseo el Alto, GTO",r:4.8,rs:24,lat:20.45696502,lng:-100.61488447,hora:"08:40",score:"🔴 Alta"},
+    {id:'M04',n:"CARNICERIA ARZATE HERMANOS",goog:"Carnicería Arzate Hnos.",m:"Apaseo el Alto, GTO",r:4.8,rs:24,lat:20.45691123,lng:-100.61500461,hora:"08:47",score:"🔴 Alta"},
+    {id:'M05',n:"FRUTERIA",goog:"Tiendas 3B Apaseo el Alto 2",m:"Apaseo el Alto, GTO",r:4.2,rs:21,lat:20.45495435,lng:-100.61472351,hora:"08:54",score:"🔴 Alta"},
+    {id:'M06',n:"DEPOSITO LA CRUZ",goog:"Tiendas 3B Apaseo el Alto 2",m:"Apaseo el Alto, GTO",r:4.2,rs:21,lat:20.45415119,lng:-100.61511417,hora:"09:01",score:"🔴 Alta"},
+    {id:'M07',n:"POLLERIA GOMEZ",goog:"Bara Apaseo el Alto",m:"Apaseo el Alto, GTO",r:4.1,rs:58,lat:20.45491886,lng:-100.6164924,hora:"09:09",score:"🔴 Alta"},
+    {id:'M08',n:"FRUTAS Y VERDURAS",goog:"Bara Apaseo el Alto",m:"Apaseo el Alto, GTO",r:4.1,rs:58,lat:20.45489615,lng:-100.61683848,hora:"09:16",score:"🔴 Alta"},
+    {id:'M09',n:"AVIPO",goog:"Bara Apaseo el Alto",m:"Apaseo el Alto, GTO",r:4.1,rs:58,lat:20.45508401,lng:-100.61699198,hora:"09:23",score:"🔴 Alta"},
+    {id:'M10',n:"ABARROTES VEGA",goog:"Bara Apaseo el Alto",m:"Apaseo el Alto, GTO",r:4.1,rs:58,lat:20.45510648,lng:-100.61705593,hora:"09:30",score:"🔴 Alta"},
+    {id:'M11',n:"TIENDA DE ABARROTES",goog:"Bara Apaseo el Alto",m:"Apaseo el Alto, GTO",r:4.1,rs:58,lat:20.4545837,lng:-100.61760386,hora:"09:37",score:"🔴 Alta"},
+    {id:'M12',n:"SUPER ECONOMICO CASH",goog:"Carbajal Sánchez Rosa María",m:"Apaseo el Alto, GTO",r:4.2,rs:41,lat:20.45681913,lng:-100.61886583,hora:"09:44",score:"🔴 Alta"},
+    {id:'M13',n:"FRUTERIA SANCHEZ",goog:"Carbajal Sánchez Rosa María",m:"Apaseo el Alto, GTO",r:4.2,rs:41,lat:20.4572843,lng:-100.61839439,hora:"09:51",score:"🔴 Alta"},
+    {id:'M14',n:"TIENDA DE ABARROTES MISCELANEA MAIRA",goog:"La Michoacana Helados",m:"Apaseo el Alto, GTO",r:4.6,rs:15,lat:20.4595812,lng:-100.61940371,hora:"09:59",score:"🔴 Alta"},
+    {id:'M15',n:"TIENDA DE ABARROTES MODELORAMA",goog:"Tamales El Güero",m:"Apaseo el Alto, GTO",r:4.8,rs:88,lat:20.46311567,lng:-100.61782571,hora:"10:07",score:"🔴 Alta"},
+    {id:'M16',n:"ABARROTES INDEPENDENCIA",goog:"Mi Bodega Aurrera, Apaseo, El Alto Sur",m:"Apaseo el Alto, GTO",r:4.6,rs:29,lat:20.44925904,lng:-100.61479703,hora:"10:16",score:"🔴 Alta"},
+    {id:'M17',n:"DEPOSITO RIVERA",goog:"Mi Bodega Aurrera, Apaseo, El Alto Sur",m:"Apaseo el Alto, GTO",r:4.6,rs:29,lat:20.44907921,lng:-100.61463162,hora:"10:23",score:"🔴 Alta"},
+    {id:'M18',n:"TIENDA DE ABARROTES SIN NOMBRE",goog:"Apaseo El Alto Cafeteria",m:"Apaseo el Alto, GTO",r:4.2,rs:17,lat:20.44864103,lng:-100.6171841,hora:"10:30",score:"🔴 Alta"},
+    {id:'M19',n:"FRUTERIA",goog:"Super QT301",m:"Apaseo el Alto, GTO",r:4.1,rs:26,lat:20.44399892,lng:-100.60976969,hora:"10:39",score:"🔴 Alta"},
+    {id:'M20',n:"ABARROTES MIROS",goog:"Postres Dejanira",m:"Apaseo el Alto, GTO",r:4.9,rs:7,lat:20.4607369,lng:-100.61702139,hora:"10:49",score:"🟠 Media-alta"},
+    {id:'M21',n:"CARNICERIA GUERRERO",goog:"Carniceria la estrella",m:"Apaseo el Alto, GTO",r:4.4,rs:7,lat:20.45958602,lng:-100.61986229,hora:"10:56",score:"🟠 Media-alta"},
+    {id:'M22',n:"POLLO Y VERDURAS",goog:"Repostería Luz",m:"Apaseo el Alto, GTO",r:4.9,rs:7,lat:20.45789733,lng:-100.61967661,hora:"11:04",score:"🟠 Media-alta"},
+    {id:'M23',n:"MISCELANEA LA MEXICANA",goog:"Repostería Luz",m:"Apaseo el Alto, GTO",r:4.9,rs:7,lat:20.45741601,lng:-100.61969446,hora:"11:11",score:"🟠 Media-alta"},
+    {id:'M24',n:"FRUTERIA OSORNIO",goog:"Merett pastelería",m:"Apaseo el Alto, GTO",r:4.8,rs:5,lat:20.45651792,lng:-100.61955675,hora:"11:18",score:"🟠 Media-alta"},
+    {id:'M25',n:"VENTA DE FRUTA Y AGUAS FRESCAS",goog:"Merett pastelería",m:"Apaseo el Alto, GTO",r:4.8,rs:5,lat:20.45654148,lng:-100.61921984,hora:"11:25",score:"🟠 Media-alta"},
+    {id:'M26',n:"CARNICERIA VEGA",goog:"Merett pastelería",m:"Apaseo el Alto, GTO",r:4.8,rs:5,lat:20.45646743,lng:-100.61911474,hora:"11:32",score:"🟠 Media-alta"},
+    {id:'M27',n:"ABARROTES AVILA",goog:"OXXO 16 de Septiembre QRF",m:"Apaseo el Alto, GTO",r:3.6,rs:15,lat:20.4557252,lng:-100.61786953,hora:"11:39",score:"🟠 Media-alta"},
+    {id:'M28',n:"CARNICERIA LA FAVORITA 5",goog:"Carniceria La Favorita 5",m:"Apaseo el Alto, GTO",r:4.4,rs:8,lat:20.45440043,lng:-100.61555502,hora:"11:46",score:"🟠 Media-alta"},
+    {id:'M29',n:"ABARROTES",goog:"Tortilleria La Palma",m:"Apaseo el Alto, GTO",r:4.5,rs:6,lat:20.45305302,lng:-100.61556911,hora:"11:54",score:"🟠 Media-alta"},
+    {id:'M30',n:"ABARROTES VINOS Y LICORES ARRACADAS",goog:"Pastelería Dany",m:"Apaseo el Alto, GTO",r:3.7,rs:10,lat:20.45154226,lng:-100.61593636,hora:"12:01",score:"🟠 Media-alta"},
+    {id:'M31',n:"ABARROTES LA ESTRELLA",goog:"Carnicería el pariente",m:"Apaseo el Alto, GTO",r:3.0,rs:2,lat:20.46221129,lng:-100.6133592,hora:"12:10",score:"🟡 Media"},
+    {id:'M32',n:"CARNICERIA EL PARIENTE",goog:"Carnicería el pariente",m:"Apaseo el Alto, GTO",r:3.0,rs:2,lat:20.46198638,lng:-100.61362882,hora:"12:17",score:"🟡 Media"},
+    {id:'M33',n:"PREPARACION DE MALTEDAS HERBALIFE",goog:"Tienda",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.4583361,lng:-100.61718058,hora:"12:25",score:"🟡 Media"},
+    {id:'M34',n:"PESCADERIA PUERTO VALLARTA",goog:"Frutería la Toronja",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45839594,lng:-100.61766099,hora:"12:32",score:"🟡 Media"},
+    {id:'M35',n:"EXPENDIO DE REFRESCOS DEPOSITO VAZQUEZ",goog:"Frutería la Toronja",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45859468,lng:-100.61823712,hora:"12:39",score:"🟡 Media"},
+    {id:'M36',n:"VENTA DE REFRESCO SIN NOMBRE",goog:"D",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45883856,lng:-100.61857319,hora:"12:46",score:"🟡 Media"},
+    {id:'M37',n:"DEPOSITO ALEX",goog:"D",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45901049,lng:-100.61854188,hora:"12:53",score:"🟡 Media"},
+    {id:'M38',n:"TIENDA DE ABARROTES JUAREZ",goog:"Matador Quintana Roo",m:"Apaseo el Alto, GTO",r:3.8,rs:4,lat:20.45933671,lng:-100.61848247,hora:"13:00",score:"🟡 Media"},
+    {id:'M39',n:"FRUTERIA SIN NOMBRE",goog:"Matador Quintana Roo",m:"Apaseo el Alto, GTO",r:3.8,rs:4,lat:20.45937962,lng:-100.61868124,hora:"13:07",score:"🟡 Media"},
+    {id:'M40',n:"POLLERIA DON POLLO",goog:"Pollería Don Pollo",m:"Apaseo el Alto, GTO",r:3.8,rs:4,lat:20.45951173,lng:-100.61914175,hora:"13:14",score:"🟡 Media"},
+    {id:'M41',n:"VENTA DE GORDITAS Y SOPES",goog:"Frutería Celi",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45662307,lng:-100.61996065,hora:"13:22",score:"🟡 Media"},
+    {id:'M42',n:"MISCELANEA CASA ORTIZ",goog:"Frutería Celi",m:"Apaseo el Alto, GTO",r:3.0,rs:1,lat:20.45640182,lng:-100.61985017,hora:"13:29",score:"🟡 Media"},
+    {id:'M43',n:"SERVICIOS EXPRESS DE ABARROTES",goog:"Super Centro Abarrotero Mega",m:"Apaseo el Alto, GTO",r:4.0,rs:2,lat:20.45567286,lng:-100.6191909,hora:"13:36",score:"🟡 Media"},
+    {id:'M44',n:"VINOS Y LICORES LA UNIVERSAL",goog:"Super Centro Abarrotero Mega",m:"Apaseo el Alto, GTO",r:4.0,rs:2,lat:20.45560677,lng:-100.61919059,hora:"13:43",score:"🟡 Media"},
+    {id:'M45',n:"ABARROTES ORTIZ",goog:"Creperia Del jardín",m:"Apaseo el Alto, GTO",r:4.8,rs:4,lat:20.45551086,lng:-100.61855624,hora:"13:50",score:"🟡 Media"},
+    {id:'M46',n:"CHANGARRO ROSY",goog:"Panadería La Estrella",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45549296,lng:-100.61844225,hora:"13:57",score:"🟡 Media"},
+    {id:'M47',n:"VENTA DE MATERIAS PRIMAS MAT PRO",goog:"Panadería La Estrella",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45545157,lng:-100.61817196,hora:"14:04",score:"🟡 Media"},
+    {id:'M48',n:"EXPENDIO DE PAN",goog:"Creperia Del jardín",m:"Apaseo el Alto, GTO",r:4.8,rs:4,lat:20.45590806,lng:-100.6180604,hora:"14:11",score:"🟡 Media"},
+    {id:'M49',n:"MISCELANEA LA CRUZ",goog:"Pastelería la Espiga 🌾",m:"Apaseo el Alto, GTO",r:3.5,rs:2,lat:20.45467166,lng:-100.6156593,hora:"14:18",score:"🟡 Media"},
+    {id:'M50',n:"FRUTERIA LA CRUZ",goog:"Pastelería \"San Juan\" (sucursal la cruz)",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.45416561,lng:-100.61534874,hora:"14:26",score:"🟡 Media"},
+    {id:'M51',n:"VENTA DE POLLO CRUDO DON POLLO",goog:"Pastelería \"San Juan\" (sucursal la cruz)",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.45418893,lng:-100.6151806,hora:"14:33",score:"🟡 Media"},
+    {id:'M52',n:"ABARROTES CHELY",goog:"Pastelería \"San Juan\" (sucursal la cruz)",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.4538761,lng:-100.61540131,hora:"14:40",score:"🟡 Media"},
+    {id:'M53',n:"FRUTERIA",goog:"Pastelería \"San Juan\" (sucursal la cruz)",m:"Apaseo el Alto, GTO",r:5.0,rs:3,lat:20.45390503,lng:-100.61551155,hora:"14:47",score:"🟡 Media"},
+    {id:'M54',n:"PASTELERIA EL ANGEL",goog:"Pastelería \"El Ángel\"",m:"Apaseo el Alto, GTO",r:3.7,rs:3,lat:20.45286197,lng:-100.61561353,hora:"14:54",score:"🟡 Media"},
+    {id:'M55',n:"TIENDA DE ABARROTES GABY",goog:"ABARROTES NAZAEL",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45420466,lng:-100.61092938,hora:"15:02",score:"🟡 Media"},
   ],
   X:[
-    {id:'te',n:'El Terrero',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'be',n:'Belén',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'cu',n:'La Cuevita',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'ji',n:'Jiménez',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'no',n:'Nopalera de Juárez',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'sl',n:'San Lucas',m:'Apaseo el Alto, GTO',r:null,rs:0},
   ],
   J:[
-    {id:'vh',n:'Vista Hermosa',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'aa',n:'San José Agua Azul',m:'Apaseo el Grande, GTO',r:null,rs:0},
-    {id:'pu',n:'La Purísima',m:'Apaseo el Grande, GTO',r:4.2,rs:31},
-    {id:'gu',n:'El Guadalupano',m:'Apaseo el Grande, GTO',r:null,rs:0},
-    {id:'gm',n:'Guadalupe del Monte',m:'Apaseo el Grande, GTO',r:null,rs:0},
-    {id:'vi',n:'San José Viborillas',m:'Apaseo el Grande, GTO',r:null,rs:0},
-    {id:'tu',n:'El Tunal',m:'Apaseo el Grande, GTO',r:null,rs:0},
-    {id:'co',n:'La Concepción',m:'Apaseo el Grande, GTO',r:null,rs:0},
+    {id:'J01',n:"ABARROTES CARREÑO",goog:"Abarrotes Carreño",m:"Apaseo el Alto, GTO",r:4.6,rs:21,lat:20.48686666,lng:-100.65537238,hora:"08:30",score:"🔴 Alta"},
+    {id:'J02',n:"CARNICERIA X",goog:"Panadería Chompi",m:"Apaseo el Alto, GTO",r:4.2,rs:19,lat:20.48631818,lng:-100.65644912,hora:"08:37",score:"🔴 Alta"},
+    {id:'J03',n:"FRITURAS Y RASPADOS MARTHA",goog:"Frituras Martha",m:"Apaseo el Alto, GTO",r:4.7,rs:24,lat:20.4858376,lng:-100.65976581,hora:"08:45",score:"🔴 Alta"},
+    {id:'J04',n:"VENTA DE POLLO",goog:"Frituras Martha",m:"Apaseo el Alto, GTO",r:4.7,rs:24,lat:20.48565123,lng:-100.66036285,hora:"08:52",score:"🔴 Alta"},
+    {id:'J05',n:"LA PUERTA NEGRA ABARROTES",goog:"Frituras Martha",m:"Apaseo el Alto, GTO",r:4.7,rs:24,lat:20.48618722,lng:-100.66045974,hora:"08:59",score:"🔴 Alta"},
+    {id:'J06',n:"MI TIENDITA",goog:"Cajeta Ávila (La Casera)",m:"Apaseo el Alto, GTO",r:4.8,rs:12,lat:20.49032598,lng:-100.6568187,hora:"09:07",score:"🔴 Alta"},
+    {id:'J07',n:"ABARROTES LA GUADALUPANA",goog:"Cajeta Ávila (La Casera)",m:"Apaseo el Alto, GTO",r:4.8,rs:12,lat:20.49039734,lng:-100.65634451,hora:"09:14",score:"🔴 Alta"},
+    {id:'J08',n:"FRESAS LETY S",goog:"Venta De Cajeta",m:"Apaseo el Grande, GTO",r:4.4,rs:355,lat:20.53191969,lng:-100.6664092,hora:"09:28",score:"🔴 Alta"},
+    {id:'J09',n:"AUTO PALAPA",goog:"Autopalapa Lalo",m:"Apaseo el Grande, GTO",r:4.2,rs:25,lat:20.53996261,lng:-100.67358321,hora:"09:37",score:"🔴 Alta"},
+    {id:'J10',n:"CARNICERIA LA NUEVA",goog:"Carnicería La Nueva",m:"Apaseo el Grande, GTO",r:4.8,rs:24,lat:20.54277804,lng:-100.67464029,hora:"09:44",score:"🔴 Alta"},
+    {id:'J11',n:"TIENDA DE ABARROTES",goog:"Carnicería La Nueva",m:"Apaseo el Grande, GTO",r:4.8,rs:24,lat:20.54293281,lng:-100.6742226,hora:"09:51",score:"🔴 Alta"},
+    {id:'J12',n:"TIENDA DE ABARROTES",goog:"Carnicería La Nueva",m:"Apaseo el Grande, GTO",r:4.8,rs:24,lat:20.54370141,lng:-100.67481936,hora:"09:58",score:"🔴 Alta"},
+    {id:'J13',n:"CARNICERIA LA FAJIT",goog:"Carnicería la fajita",m:"Apaseo el Grande, GTO",r:4.7,rs:19,lat:20.54625342,lng:-100.67771115,hora:"10:06",score:"🔴 Alta"},
+    {id:'J14',n:"FRUTAS Y VERDURAS PRADO",goog:"Carnicería la fajita",m:"Apaseo el Grande, GTO",r:4.7,rs:19,lat:20.54615034,lng:-100.67821867,hora:"10:13",score:"🔴 Alta"},
+    {id:'J15',n:"ABARROTES LA BATALLA",goog:"Sucursal Paleteria \"LA PRINCESA\"",m:"Apaseo el Grande, GTO",r:4.6,rs:34,lat:20.54311124,lng:-100.68210849,hora:"10:21",score:"🔴 Alta"},
+    {id:'J16',n:"CARNICERIA MANE",goog:"Sucursal Paleteria \"LA PRINCESA\"",m:"Apaseo el Grande, GTO",r:4.6,rs:34,lat:20.54302249,lng:-100.68207969,hora:"10:28",score:"🔴 Alta"},
+    {id:'J17',n:"ABARROTES ALLENDE",goog:"Sucursal Paleteria \"LA PRINCESA\"",m:"Apaseo el Grande, GTO",r:4.6,rs:34,lat:20.54329892,lng:-100.68263559,hora:"10:35",score:"🔴 Alta"},
+    {id:'J18',n:"TIENDA ABARROTES",goog:"Sucursal Paleteria \"LA PRINCESA\"",m:"Apaseo el Grande, GTO",r:4.6,rs:34,lat:20.54259596,lng:-100.68299802,hora:"10:42",score:"🔴 Alta"},
+    {id:'J19',n:"VENTA DE ABARROTES ULTRAMARINOS Y MISCELANEAS",goog:"Lacteos Muñoz Ledo",m:"Apaseo el Grande, GTO",r:4.7,rs:23,lat:20.54495273,lng:-100.68582389,hora:"10:50",score:"🔴 Alta"},
+    {id:'J20',n:"VINOS BLANQUITA",goog:"Gigantito",m:"Apaseo el Grande, GTO",r:4.6,rs:15,lat:20.54497407,lng:-100.68841175,hora:"10:57",score:"🔴 Alta"},
+    {id:'J21',n:"EXPENDIO SAN MARTIN",goog:"Gigantito",m:"Apaseo el Grande, GTO",r:4.6,rs:15,lat:20.54485931,lng:-100.68846731,hora:"11:04",score:"🔴 Alta"},
+    {id:'J22',n:"LA TIENDITA DE ABARROTES",goog:"Frutas y verduras Elia (El gallito)",m:"Apaseo el Grande, GTO",r:4.3,rs:16,lat:20.54487027,lng:-100.6897949,hora:"11:11",score:"🔴 Alta"},
+    {id:'J23',n:"FRUTETRIA EL GALLITO",goog:"Frutas y verduras Elia (El gallito)",m:"Apaseo el Grande, GTO",r:4.3,rs:16,lat:20.54454255,lng:-100.68995557,hora:"11:19",score:"🔴 Alta"},
+    {id:'J24',n:"CREMERIA SU JAMON",goog:"Frutas y verduras Elia (El gallito)",m:"Apaseo el Grande, GTO",r:4.3,rs:16,lat:20.54456431,lng:-100.69002994,hora:"11:26",score:"🔴 Alta"},
+    {id:'J25',n:"TIENDA DE ABARROTES SIN NOMBRE",goog:"Frutas y verduras Elia (El gallito)",m:"Apaseo el Grande, GTO",r:4.3,rs:16,lat:20.54470604,lng:-100.69022899,hora:"11:33",score:"🔴 Alta"},
+    {id:'J26',n:"CREMERIA ROMERO",goog:"Su Cremería Romero",m:"Apaseo el Grande, GTO",r:4.6,rs:18,lat:20.54443513,lng:-100.69220109,hora:"11:40",score:"🔴 Alta"},
+    {id:'J27',n:"VENTA DE PRODUCTOS ALIMENTICIOS SIN NOMBRE",goog:"Carniceria la central",m:"Apaseo el Grande, GTO",r:4.7,rs:13,lat:20.54572816,lng:-100.69253761,hora:"11:47",score:"🔴 Alta"},
+    {id:'J28',n:"CARNICERIA LA CENTRAL",goog:"Carniceria la central",m:"Apaseo el Grande, GTO",r:4.7,rs:13,lat:20.54578597,lng:-100.69267503,hora:"11:54",score:"🔴 Alta"},
+    {id:'J29',n:"DISTRIBUIDORA DE POLLO SIN NOMBRE",goog:"Carniceria la central",m:"Apaseo el Grande, GTO",r:4.7,rs:13,lat:20.54596512,lng:-100.69271888,hora:"12:01",score:"🔴 Alta"},
+    {id:'J30',n:"CARNICERIA AHEDO",goog:"Dulces Doña Mago",m:"Apaseo el Grande, GTO",r:4.6,rs:29,lat:20.54603797,lng:-100.69700105,hora:"12:09",score:"🔴 Alta"},
+    {id:'J31',n:"TENDAJON SIN NOMBRE",goog:"Dulces Doña Mago",m:"Apaseo el Grande, GTO",r:4.6,rs:29,lat:20.54674317,lng:-100.69705693,hora:"12:16",score:"🔴 Alta"},
+    {id:'J32',n:"ABARROTES EL ANGEL",goog:"Dulces Doña Mago",m:"Apaseo el Grande, GTO",r:4.6,rs:29,lat:20.54676973,lng:-100.69729772,hora:"12:23",score:"🔴 Alta"},
+    {id:'J33',n:"CARNISUPER",goog:"Carnisuper",m:"Apaseo el Grande, GTO",r:4.7,rs:50,lat:20.55052605,lng:-100.68995834,hora:"12:31",score:"🔴 Alta"},
+    {id:'J34',n:"POLLERIA TU POLLO",goog:"Tortilleria El Puente Colorado",m:"Apaseo el Grande, GTO",r:4.2,rs:34,lat:20.54814213,lng:-100.68623145,hora:"12:39",score:"🔴 Alta"},
+    {id:'J35',n:"CARNICERIA JIMENEZ",goog:"Carnitas \"ESTRELLA\"",m:"Apaseo el Grande, GTO",r:4.1,rs:11,lat:20.54776841,lng:-100.68634439,hora:"12:46",score:"🔴 Alta"},
+    {id:'J36',n:"POLLERIA VIRI",goog:"Tortilleria Campos",m:"Apaseo el Grande, GTO",r:4.1,rs:22,lat:20.54770747,lng:-100.68521338,hora:"12:53",score:"🔴 Alta"},
+    {id:'J37',n:"CARNICERIA BOULEVARD",goog:"Panadería San Martín",m:"Apaseo el Grande, GTO",r:4.5,rs:103,lat:20.54740946,lng:-100.68351947,hora:"13:01",score:"🔴 Alta"},
+    {id:'J38',n:"TIENDITA DE ABARROTES SIN NOMBRE",goog:"Panadería San Martín",m:"Apaseo el Grande, GTO",r:4.5,rs:103,lat:20.54735308,lng:-100.68330821,hora:"13:08",score:"🔴 Alta"},
+    {id:'J39',n:"PANADERIA Y PASTELERIA GUERRERO",goog:"Panadería San Martín",m:"Apaseo el Grande, GTO",r:4.5,rs:103,lat:20.54731239,lng:-100.68315548,hora:"13:15",score:"🔴 Alta"},
+    {id:'J40',n:"CREMERIA LA ECONOMICA",goog:"Panadería San Martín",m:"Apaseo el Grande, GTO",r:4.5,rs:103,lat:20.54718815,lng:-100.68328131,hora:"13:22",score:"🔴 Alta"},
+    {id:'J41',n:"TIENDA DE ABARROTES LA ECONOMICA",goog:"Panadería San Martín",m:"Apaseo el Grande, GTO",r:4.5,rs:103,lat:20.54721432,lng:-100.6833779,hora:"13:29",score:"🔴 Alta"},
+    {id:'J42',n:"ABARROTES LA REYNA",goog:"Dulce Revolución De Las Plantas Medicinales México",m:"Apaseo el Grande, GTO",r:5.0,rs:10,lat:20.55592207,lng:-100.68126671,hora:"13:37",score:"🔴 Alta"},
+    {id:'J43',n:"TIENDA DE ABARROTES MARY",goog:"Dulce Revolución De Las Plantas Medicinales México",m:"Apaseo el Grande, GTO",r:5.0,rs:10,lat:20.55608812,lng:-100.68154383,hora:"13:44",score:"🔴 Alta"},
+    {id:'J44',n:"ABARROTES Y SEMILLAS MUÑOZ",goog:"Dulce Revolución De Las Plantas Medicinales México",m:"Apaseo el Grande, GTO",r:5.0,rs:10,lat:20.55707617,lng:-100.68192838,hora:"13:51",score:"🔴 Alta"},
+    {id:'J45',n:"LA CHIVITA CELAYENSE",goog:"Candies Celaya - Querétaro",m:"Apaseo el Grande, GTO",r:4.4,rs:43,lat:20.53615997,lng:-100.69827152,hora:"14:03",score:"🔴 Alta"},
+    {id:'J46',n:"CARNICERIA LOS DOS PATRONES",goog:"Tamales Lore",m:"Apaseo el Alto, GTO",r:3.8,rs:5,lat:20.48473482,lng:-100.65978654,hora:"14:20",score:"🟠 Media-alta"},
+    {id:'J47',n:"TIENDA DE ABARROTES SIN NOMBRE",goog:"Tamales Lore",m:"Apaseo el Alto, GTO",r:3.8,rs:5,lat:20.48493537,lng:-100.6599399,hora:"14:27",score:"🟠 Media-alta"},
+    {id:'J48',n:"TIENDA DE ABARROTES SIN NOMBRE",goog:"Abarrotes Carreño",m:"Apaseo el Alto, GTO",r:3.5,rs:6,lat:20.48351547,lng:-100.66086848,hora:"14:34",score:"🟠 Media-alta"},
+    {id:'J49',n:"ABARROTES MONTOYA",goog:"Abarrotes Carreño",m:"Apaseo el Alto, GTO",r:3.5,rs:6,lat:20.48299856,lng:-100.66082986,hora:"14:42",score:"🟠 Media-alta"},
+    {id:'J50',n:"TIENDA DE ABARROTES SIN NOMBRE",goog:"Abarrotes Carreño",m:"Apaseo el Alto, GTO",r:3.5,rs:6,lat:20.48286288,lng:-100.66087969,hora:"14:49",score:"🟠 Media-alta"},
+    {id:'J51',n:"CARNICERIA LLANITO",goog:"Carniceria Llanito",m:"Apaseo el Grande, GTO",r:4.8,rs:8,lat:20.5303361,lng:-100.6702476,hora:"15:04",score:"🟠 Media-alta"},
+    {id:'J52',n:"CARNICERIA MONTERO",goog:"Carniceria Llanito",m:"Apaseo el Grande, GTO",r:4.8,rs:8,lat:20.53037866,lng:-100.67033331,hora:"15:11",score:"🟠 Media-alta"},
+    {id:'J53',n:"ABARROTES LULI",goog:"Carniceria Llanito",m:"Apaseo el Grande, GTO",r:4.8,rs:8,lat:20.53035502,lng:-100.67062128,hora:"15:18",score:"🟠 Media-alta"},
+    {id:'J54',n:"ABARROTES EL TIO",goog:"Carniceria Llanito",m:"Apaseo el Grande, GTO",r:4.8,rs:8,lat:20.53040788,lng:-100.6707539,hora:"15:25",score:"🟠 Media-alta"},
+    {id:'J55',n:"TIENDA DE ABARROTES",goog:"Carniceria Llanito",m:"Apaseo el Grande, GTO",r:4.8,rs:8,lat:20.53044108,lng:-100.6697268,hora:"15:32",score:"🟠 Media-alta"},
   ],
   V:[
-    {id:'sbv',n:'San Bartolomé AC (2da)',m:'Apaseo el Alto, GTO',r:4.1,rs:18},
-    {id:'svv',n:'San Vicente (2da)',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'oav',n:'Ojo de Agua (2da)',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'sev',n:'Salto de Espejo (2da)',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'lsv',n:'La Soledad (2da)',m:'Apaseo el Alto, GTO',r:4.0,rs:1},
-    {id:'esv',n:'El Espejo (regreso)',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'agv',n:'Aguaje (regreso)',m:'Apaseo el Alto, GTO',r:null,rs:0},
-    {id:'mav',n:'Mandujano (regreso)',m:'Apaseo el Alto, GTO',r:null,rs:0},
+    {id:'V01',n:"CARNICERIA CENTENO",goog:"OXXO Ambar QRF",m:"Apaseo el Grande, GTO",r:4.4,rs:11,lat:20.53521468,lng:-100.52383335,hora:"08:09",score:"🔴 Alta"},
+    {id:'V02',n:"TIENDA DE ABARROTES SUPER FUENTES",goog:"Dimasul fitnes club",m:"Apaseo el Grande, GTO",r:4.8,rs:11,lat:20.53826155,lng:-100.52507707,hora:"08:16",score:"🔴 Alta"},
+    {id:'V03',n:"FRUTERIA HERMANOS GONZALES",goog:"Carnicería SAN JUDAS TADEO",m:"Apaseo el Grande, GTO",r:4.9,rs:10,lat:20.5398003,lng:-100.52663964,hora:"08:24",score:"🔴 Alta"},
+    {id:'V04',n:"CARNICERIASAN JUDAS TADEO",goog:"Carnicería SAN JUDAS TADEO",m:"Apaseo el Grande, GTO",r:4.9,rs:10,lat:20.53991967,lng:-100.52674367,hora:"08:31",score:"🔴 Alta"},
+    {id:'V05',n:"TIENDA DE ABARROTES Y CREMERIA",goog:"Tienda Alex",m:"Apaseo el Grande, GTO",r:4.7,rs:13,lat:20.53486119,lng:-100.53214805,hora:"08:39",score:"🔴 Alta"},
+    {id:'V06',n:"VINOS Y ABARROTES EL AGAVE",goog:"Vinos Y Abarrotes El Agave",m:"Apaseo el Grande, GTO",r:4.2,rs:25,lat:20.54936085,lng:-100.58818229,hora:"08:55",score:"🔴 Alta"},
+    {id:'V07',n:"TIENDA LA PRIVADITA",goog:"La Privadita V.I.P.",m:"Apaseo el Grande, GTO",r:4.8,rs:6,lat:20.55729358,lng:-100.505248,hora:"09:15",score:"🟠 Media-alta"},
+    {id:'V08',n:"CREMERIA RIOJA",goog:"Bodega Aurrera Express, Fuentes de Balvanera",m:"Apaseo el Grande, GTO",r:3.7,rs:477,lat:20.53672976,lng:-100.5239637,hora:"09:26",score:"🟠 Media-alta"},
+    {id:'V09',n:"MISCELANEA MADIFER",goog:"Bodega Aurrera Express, Fuentes de Balvanera",m:"Apaseo el Grande, GTO",r:3.7,rs:477,lat:20.53598717,lng:-100.52441666,hora:"09:34",score:"🟠 Media-alta"},
+    {id:'V10',n:"CARNICERIA MAXI CARNE",goog:"OXXO Minas Maldonado QRF",m:"Apaseo el Grande, GTO",r:3.8,rs:9,lat:20.53657333,lng:-100.5289017,hora:"09:41",score:"🟠 Media-alta"},
+    {id:'V11',n:"MICELANEA BUENOS AIRES",goog:"Misc. Buenos Aires",m:"Apaseo el Grande, GTO",r:4.2,rs:5,lat:20.53665976,lng:-100.52899295,hora:"09:48",score:"🟠 Media-alta"},
+    {id:'V12',n:"TIENDA DE ABARROTES DON JUAN",goog:"OXXO Villas del Rey QRF",m:"Apaseo el Grande, GTO",r:3.6,rs:24,lat:20.53491762,lng:-100.53291294,hora:"09:56",score:"🟠 Media-alta"},
+    {id:'V13',n:"TIENDA DE ABARROTES PLAZA HIDALGO #7",goog:"La Mexicana San Juan",m:"Apaseo el Grande, GTO",r:4.8,rs:6,lat:20.51348325,lng:-100.54105502,hora:"10:07",score:"🟠 Media-alta"},
+    {id:'V14',n:"ABARROTES GARCIA",goog:"Frutas y Verduras Miguel Alemán",m:"Apaseo el Alto, GTO",r:4.8,rs:5,lat:20.45740862,lng:-100.63357881,hora:"10:31",score:"🟠 Media-alta"},
+    {id:'V15',n:"TIENDA DE ABARROTES SIN NOMBRE",goog:"PPG Repostería postres individuales y enteros.",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.55685613,lng:-100.50131397,hora:"11:05",score:"🟡 Media"},
+    {id:'V16',n:"ABARROTES LA ESTANCIA",goog:"PPG Repostería postres individuales y enteros.",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.55666423,lng:-100.501529,hora:"11:12",score:"🟡 Media"},
+    {id:'V17',n:"BOLIS SIN NOMBRE",goog:"Abarrotes San Benito",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.55626128,lng:-100.5021057,hora:"11:19",score:"🟡 Media"},
+    {id:'V18',n:"ABARROTES MINI PONI",goog:"OXXO Plaza Ponty QRF",m:"Apaseo el Grande, GTO",r:3.3,rs:56,lat:20.56002942,lng:-100.50237723,hora:"11:26",score:"🟡 Media"},
+    {id:'V19',n:"T003 BALVANERA 1",goog:"El Asturiano - Balvanera 2",m:"Apaseo el Grande, GTO",r:3.0,rs:1,lat:20.53953561,lng:-100.52640895,hora:"11:38",score:"🟡 Media"},
+    {id:'V20',n:"CREMERIA EL BUEN DIA",goog:"Dulcería arcoiris",m:"Apaseo el Grande, GTO",r:4.3,rs:3,lat:20.53951139,lng:-100.52669959,hora:"11:45",score:"🟡 Media"},
+    {id:'V21',n:"GRANOS Y SEMILLAS YEYETZI",goog:"YEYETZI Granos/Semillas /Moles/Desechables /Alimentos y Accesorios para mascotas",m:"Apaseo el Grande, GTO",r:5.0,rs:3,lat:20.53927264,lng:-100.52649151,hora:"11:52",score:"🟡 Media"},
+    {id:'V22',n:"MINI SUPER GALLEGOS",goog:"Mini Super Gallegos",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.53895596,lng:-100.52633804,hora:"12:00",score:"🟡 Media"},
+    {id:'V23',n:"MALDONADO",goog:"Dulcería arcoiris",m:"Apaseo el Grande, GTO",r:4.3,rs:3,lat:20.53883322,lng:-100.52720463,hora:"12:07",score:"🟡 Media"},
+    {id:'V24',n:"ABARROTES GARITA",goog:"Abarrotes De La Entrada",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.54087782,lng:-100.52788349,hora:"12:14",score:"🟡 Media"},
+    {id:'V25',n:"TORTILLERIA Y ABARROTES SIN NOMBRE",goog:"Cremeria El Toro",m:"Apaseo el Grande, GTO",r:5.0,rs:2,lat:20.53761092,lng:-100.53012889,hora:"12:22",score:"🟡 Media"},
+    {id:'V26',n:"CARNICERIA JRD",goog:"Frutas y Verduras Buenos Aires",m:"Apaseo el Grande, GTO",r:5.0,rs:2,lat:20.53709949,lng:-100.52990708,hora:"12:29",score:"🟡 Media"},
+    {id:'V27',n:"TIENDA DE ABARROTES EL BUEN GUSTO",goog:"POSTRES ANGY\'S",m:"Apaseo el Grande, GTO",r:3.0,rs:1,lat:20.53610525,lng:-100.53305091,hora:"12:36",score:"🟡 Media"},
+    {id:'V28',n:"TIENDA DE BOTANAS LA CABAÑA BOTANERA DE LIA",goog:"Abarrotes “El Oasis”",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.53317309,lng:-100.532832,hora:"12:44",score:"🟡 Media"},
+    {id:'V29',n:"TIENDA DE ABARROTES Y FRUTERIA SIN NOMBRE",goog:"Abarrotes “El Oasis”",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.53257427,lng:-100.53322022,hora:"12:51",score:"🟡 Media"},
+    {id:'V30',n:"TIENDA DE ABARROTES LA TIENDITA",goog:"Tienda Florencia",m:"Apaseo el Grande, GTO",r:5.0,rs:2,lat:20.53167026,lng:-100.5322004,hora:"12:58",score:"🟡 Media"},
+    {id:'V31',n:"FRUTERIA GARCIA",goog:"CREMERIA Y ABARROTES LAS GUERAS",m:"Apaseo el Grande, GTO",r:3.0,rs:1,lat:20.53246947,lng:-100.53097493,hora:"13:05",score:"🟡 Media"},
+    {id:'V32',n:"FRUTERIA SAN JUDAS TADEO",goog:"Frutas y verduras san judas tadeo",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.53272414,lng:-100.53104798,hora:"13:12",score:"🟡 Media"},
+    {id:'V33',n:"CARNICERIA SIN NOMBRE",goog:"Frutas y verduras san judas tadeo",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.53289461,lng:-100.53066536,hora:"13:19",score:"🟡 Media"},
+    {id:'V34',n:"FRUTERIA JUANITO",goog:"CREMERIA Y ABARROTES LAS GUERAS",m:"Apaseo el Grande, GTO",r:3.0,rs:1,lat:20.5323479,lng:-100.53030732,hora:"13:27",score:"🟡 Media"},
+    {id:'V35',n:"LA PROVIDENCIA",goog:"La Morenita",m:"Apaseo el Grande, GTO",r:4.7,rs:3,lat:20.52281493,lng:-100.53872918,hora:"13:36",score:"🟡 Media"},
+    {id:'V36',n:"ABARROTES RAMIREZ",goog:"Tortilleria Hermanos Ramirez",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.5198895,lng:-100.53915559,hora:"13:43",score:"🟡 Media"},
+    {id:'V37',n:"TIENDA DE ABARROTES",goog:"Tortilleria Hermanos Ramirez",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.51980302,lng:-100.5394746,hora:"13:50",score:"🟡 Media"},
+    {id:'V38',n:"TIENDA DE ABARROTES ALEX",goog:"Pasteles Charly",m:"Apaseo el Grande, GTO",r:5.0,rs:1,lat:20.51360724,lng:-100.54220157,hora:"13:58",score:"🟡 Media"},
+    {id:'V39',n:"ABARROTES",goog:"Abarrotes y Cremería \"La Estrella\"",m:"Apaseo el Grande, GTO",r:5.0,rs:3,lat:20.54764174,lng:-100.58784927,hora:"14:14",score:"🟡 Media"},
+    {id:'V40',n:"TIENDA DE ABARROTES",goog:"Rastro Municipal (Apaseo el Alto)",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46569785,lng:-100.63286887,hora:"14:37",score:"🟡 Media"},
+    {id:'V41',n:"ABARROTES MARIA",goog:"Cremería Revolucíon",m:"Apaseo el Alto, GTO",r:5.0,rs:4,lat:20.46430323,lng:-100.63501074,hora:"14:44",score:"🟡 Media"},
+    {id:'V42',n:"ABARROTES VAZQUEZ",goog:"Delicias Fire House",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46292435,lng:-100.63565129,hora:"14:51",score:"🟡 Media"},
+    {id:'V43',n:"ABARROTES MONSE",goog:"Delicias Fire House",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46220867,lng:-100.63512805,hora:"14:59",score:"🟡 Media"},
+    {id:'V44',n:"ABARROTES LUPITA",goog:"Grocery “Lupita”",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46218514,lng:-100.63450559,hora:"15:06",score:"🟡 Media"},
+    {id:'V45',n:"FRUTERIA SOFY",goog:"Grocery “Lupita”",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46186775,lng:-100.63451388,hora:"15:13",score:"🟡 Media"},
+    {id:'V46',n:"CREMERIA Y SALCHICHONERIA REVOLUCION",goog:"Grocery “Lupita”",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46286558,lng:-100.63452055,hora:"15:20",score:"🟡 Media"},
+    {id:'V47',n:"DEPOSITO PROMOS",goog:"Mariana Silva Repostería",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.46041427,lng:-100.63220011,hora:"15:27",score:"🟡 Media"},
+    {id:'V48',n:"TIENDA DE ABARROTES",goog:"Vinos Y Abarrotes Tavo",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45743458,lng:-100.63072488,hora:"15:35",score:"🟡 Media"},
+    {id:'V49',n:"ABARROTES Y CARNES FRIAS",goog:"Vinos Y Abarrotes Tavo",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.4573519,lng:-100.63060228,hora:"15:42",score:"🟡 Media"},
+    {id:'V50',n:"VINOS Y ABARROTES TAVO",goog:"Vinos Y Abarrotes Tavo",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45697712,lng:-100.63031052,hora:"15:49",score:"🟡 Media"},
+    {id:'V51',n:"EXPENDIO DE PAN DON JOSE",goog:"Vinos Y Abarrotes Tavo",m:"Apaseo el Alto, GTO",r:5.0,rs:1,lat:20.45694573,lng:-100.63007054,hora:"15:56",score:"🟡 Media"},
+    {id:'V52',n:"ABARROTES GOMEZ",goog:"Abarrotes Avila",m:"Apaseo el Alto, GTO",r:4.5,rs:4,lat:20.45603676,lng:-100.63025349,hora:"16:03",score:"🟡 Media"},
+    {id:'V53',n:"TIENDA DE ABARROTES EL MIRADOR",goog:"Abarrotes EL MIRADOR",m:"Apaseo el Alto, GTO",r:4.0,rs:4,lat:20.45397359,lng:-100.63078398,hora:"16:11",score:"🟡 Media"},
+    {id:'V54',n:"FRUTERIA",goog:"Carniceria La Estrella",m:"Apaseo el Alto, GTO",r:4.0,rs:2,lat:20.45747304,lng:-100.63407781,hora:"16:18",score:"🟡 Media"},
+    {id:'V55',n:"CARNICERIA LA ESTRELLA",goog:"Carniceria La Estrella",m:"Apaseo el Alto, GTO",r:4.0,rs:2,lat:20.45765295,lng:-100.63418217,hora:"16:25",score:"🟡 Media"},
   ],
 };
 
@@ -617,7 +814,7 @@ tick(); setInterval(tick,15000);
 function fechaHoy(){ return new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 
 // ── HOME ──────────────────────────────────────────────────────────
-const subtitles = {L:'Corredor GTO · 11 zonas',M:'Apaseo el Alto · 5 zonas',X:'Ruta Sur · 6 zonas',J:'APAlto + APGrande · 8 zonas',V:'Doble visita · 8 zonas'};
+const subtitles = {L:'San Bartolomé · San Vicente · Ojo de Agua · 55 pts',M:'Apaseo el Alto Centro · 55 pts',X:'Sin ruta · 0 pts',J:'APAlto + Apaseo el Grande · 55 pts',V:'Balvanera · Fuentes · Apaseo Alto · 55 pts'};
 
 function setDay(d,el){
   curDay=d;
@@ -768,16 +965,18 @@ function skuRowHTML(s){
     </div>
     <div class="qty-ctrl">
       <button class="qty-btn" onclick="adj('${s.id}',${s.p},-1)">−</button>
-      <span class="qty-n${q>0?' has':''}" id="qn-${s.id}">${q}</span>
+      <input class="qty-n${q>0?' has':''}" id="qn-${s.id}"
+        type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+        value="${q}"
+        onfocus="this.select()"
+        onchange="setQty('${s.id}',${s.p},this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()">
       <button class="qty-btn" onclick="adj('${s.id}',${s.p},1)">+</button>
     </div>
   </div>`;
 }
 
-function adj(id,precio,d){
-  pedidoActual[id] = Math.max(0,(pedidoActual[id]||0)+d);
-  const el = document.getElementById('qn-'+id);
-  if(el){ el.textContent=pedidoActual[id]; el.className='qty-n'+(pedidoActual[id]>0?' has':''); }
+function actualizarTotales(){
   let total=0, cnt=0;
   CATS.forEach(c=>c.skus.forEach(s=>{
     const q=pedidoActual[s.id]||0;
@@ -786,6 +985,29 @@ function adj(id,precio,d){
   document.getElementById('total-val').textContent='$'+total.toFixed(2);
   document.getElementById('skus-cnt').textContent=cnt+' unidades';
   document.getElementById('btn-cerrar').disabled=(total===0);
+}
+
+function actualizarInput(id){
+  const el = document.getElementById('qn-'+id);
+  if(!el) return;
+  const q = pedidoActual[id]||0;
+  el.value = q;
+  el.className = 'qty-n'+(q>0?' has':'');
+}
+
+// Botones +/−
+function adj(id,precio,d){
+  pedidoActual[id] = Math.max(0,(pedidoActual[id]||0)+d);
+  actualizarInput(id);
+  actualizarTotales();
+}
+
+// Escritura directa en el campo de cantidad
+function setQty(id,precio,val){
+  const q = Math.max(0, parseInt(val)||0);
+  pedidoActual[id] = q;
+  actualizarInput(id);
+  actualizarTotales();
 }
 
 function cerrarVisita(){
