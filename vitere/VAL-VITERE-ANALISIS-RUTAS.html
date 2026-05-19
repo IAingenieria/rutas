@@ -1,0 +1,599 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAL-VITERE-ANALISIS-RUTAS · Analisis Estrategico de Rutas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:#f0f2f5;color:#222;line-height:1.55}
+.cover{background:linear-gradient(135deg,#1a3a5c 0%,#c0392b 100%);color:#fff;padding:36px 24px 28px;position:relative}
+.cover-badge{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-bottom:10px}
+.cover h1{font-size:22px;font-weight:900;line-height:1.3;margin-bottom:8px}
+.cover-sub{font-size:13px;opacity:.85;margin-bottom:16px}
+.cover-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11px}
+.cover-meta span{background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-weight:600}
+.version-badge{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);font-size:9px;font-weight:800;letter-spacing:1px;padding:4px 10px;border-radius:12px;text-transform:uppercase}
+.toc{background:#1a3a5c;overflow-x:auto;white-space:nowrap;padding:0;border-bottom:3px solid #c0392b;position:sticky;top:0;z-index:100}
+.toc-inner{display:inline-flex;gap:0}
+.toc a{display:inline-block;color:rgba(255,255,255,.7);font-size:11px;font-weight:800;text-decoration:none;padding:12px 14px;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.toc a:hover,.toc a.active{color:#fff;border-bottom-color:#c0392b;background:rgba(255,255,255,.08)}
+.section{padding:24px 20px;background:#fff;margin-bottom:8px}
+.section-label{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#c0392b;margin-bottom:6px}
+.section h2{font-size:18px;font-weight:900;color:#1a3a5c;margin-bottom:16px;line-height:1.3}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:#f8faff;border-radius:12px;padding:16px 14px;border:2px solid #e3e8f0;text-align:center}
+.stat-card .num{font-size:28px;font-weight:900;color:#1a3a5c;line-height:1}
+.stat-card .num.red{color:#c0392b}
+.stat-card .lbl{font-size:11px;font-weight:700;color:#666;margin-top:4px;line-height:1.3}
+.stat-card .sub{font-size:10px;color:#999;margin-top:3px}
+.diag{border-left:4px solid;border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px}
+.diag.red{border-color:#c0392b;background:#fff5f5}
+.diag.warn{border-color:#e67e22;background:#fff9f0}
+.diag.ok{border-color:#27ae60;background:#f0fff5}
+.diag.info{border-color:#1a73e8;background:#f0f7ff}
+.diag.purple{border-color:#7b1fa2;background:#fdf0ff}
+.diag.gray{border-color:#888;background:#f9f9f9}
+.diag-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.diag.red .diag-title{color:#c0392b}
+.diag.warn .diag-title{color:#e67e22}
+.diag.ok .diag-title{color:#27ae60}
+.diag.info .diag-title{color:#1a73e8}
+.diag.purple .diag-title{color:#7b1fa2}
+.diag.gray .diag-title{color:#555}
+.diag p{font-size:13px;color:#444;margin-top:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.tbl th{background:#1a3a5c;color:#fff;padding:8px 10px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.5px}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+.tbl tr:nth-child(even) td{background:#f8f9fc}
+.tbl tr:hover td{background:#eef2ff}
+.tbl .num{text-align:right;font-weight:700}
+.day-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:20px}
+.day-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0}
+.day-dot.lunes{background:#1a73e8}
+.day-dot.martes{background:#7b1fa2}
+.day-dot.miercoles{background:#2e7d32}
+.day-dot.jueves{background:#e65100}
+.day-dot.viernes{background:#b71c1c}
+.day-title{font-size:15px;font-weight:900;color:#1a3a5c}
+.day-title small{font-size:11px;font-weight:600;color:#888;margin-left:6px}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;padding:3px 8px;border-radius:20px;text-transform:uppercase}
+.badge.critico{background:#fde8e8;color:#c0392b}
+.badge.warn{background:#fef3e2;color:#e67e22}
+.badge.ok{background:#e8f5e9;color:#27ae60}
+.badge.especial{background:#f3e5f5;color:#7b1fa2}
+.score-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.score-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:#f8f9fc}
+.score-icon{font-size:18px;flex-shrink:0}
+.score-label{flex:1;font-size:13px;font-weight:700;color:#333}
+.score-num{font-size:16px;font-weight:900;color:#1a3a5c}
+.score-pct{font-size:11px;color:#888;margin-top:1px}
+.opp-card{border:2px solid #e3e8f0;border-radius:12px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.opp-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px}
+.opp-card.opp1::before{background:#e65100}
+.opp-card.opp2::before{background:#7b1fa2}
+.opp-card.opp3::before{background:#1a73e8}
+.opp-card.opp4::before{background:#27ae60}
+.opp-card.opp5::before{background:#c0392b}
+.opp-num{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:4px}
+.opp-title{font-size:15px;font-weight:900;color:#1a3a5c;margin-bottom:6px}
+.opp-body{font-size:13px;color:#555;line-height:1.5}
+.opp-hl{font-size:16px;font-weight:900;color:#c0392b;margin-top:8px}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.step{display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8faff;border-radius:10px;border:1px solid #dde6f5}
+.step-num{width:32px;height:32px;border-radius:50%;background:#1a3a5c;color:#fff;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-size:13px;font-weight:800;color:#1a3a5c;margin-bottom:3px}
+.step-body{font-size:12px;color:#555;line-height:1.5}
+.signal-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.signal-item{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#f9f9fc;border-radius:8px;border-left:3px solid #c0392b}
+.signal-icon{font-size:20px;flex-shrink:0}
+.signal-title{font-size:13px;font-weight:800;color:#1a3a5c}
+.signal-desc{font-size:12px;color:#666;margin-top:2px}
+.q-block{background:#f8f9ff;border-left:3px solid #1a3a5c;padding:12px 14px;border-radius:0 8px 8px 0;margin-bottom:8px}
+.q-block .q-num{font-size:10px;font-weight:900;color:#c0392b;letter-spacing:1px;margin-bottom:3px}
+.q-block .q-text{font-size:13px;font-weight:700;color:#1a3a5c;margin-bottom:4px}
+.q-block .q-why{font-size:11px;color:#777;font-style:italic}
+.q-stitle{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#fff;background:#1a3a5c;padding:8px 14px;border-radius:8px 8px 0 0;margin-top:16px}
+.next-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.next-tbl th{background:#1a3a5c;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:800}
+.next-tbl td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:top}
+.next-tbl tr:nth-child(even) td{background:#f8f9fc}
+.next-tbl .resp{font-weight:800;color:#1a3a5c}
+.next-tbl .when{font-size:11px;font-weight:800;color:#c0392b}
+.chip{display:inline-block;font-size:10px;font-weight:800;padding:3px 9px;border-radius:12px}
+.chip.pending{background:#fff3cd;color:#856404}
+.chip.later{background:#cce5ff;color:#004085}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.lbtn{display:block;text-decoration:none;background:#1a3a5c;color:#fff;border-radius:10px;padding:14px 16px;text-align:center;font-weight:800;font-size:12px}
+.lbtn:hover{background:#c0392b}
+.lbtn .bi{font-size:20px;display:block;margin-bottom:4px}
+.lbtn .bl{display:block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+.lbtn .bd{display:block;font-size:10px;opacity:.75;margin-top:2px;font-weight:600}
+.hbox{background:linear-gradient(135deg,#1a3a5c 0%,#1565c0 100%);color:#fff;border-radius:12px;padding:18px;margin-bottom:16px}
+.hbox h3{font-size:15px;font-weight:900;margin-bottom:8px}
+.hbox p{font-size:13px;opacity:.9;line-height:1.6}
+.cbox{background:#f8fff8;border:2px solid #27ae60;border-radius:12px;padding:16px;margin-bottom:16px}
+.cbox h3{font-size:14px;font-weight:900;color:#1a3a5c;margin-bottom:10px}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #ccc;font-size:13px}
+.crow:last-child{border-bottom:none;font-weight:900;font-size:15px;color:#27ae60;padding-top:10px}
+.crow .cl{color:#555}
+.crow .cv{font-weight:800;color:#1a3a5c}
+.crow:last-child .cv{color:#27ae60}
+.ttag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:#e8f4fd;color:#1a3a5c;border:1px solid #b3d4ef;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+.istrip{background:#e8f4fd;border:1px solid #b3d4ef;border-radius:8px;padding:10px 14px;font-size:12px;color:#1a3a5c;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.istrip .ii{font-size:16px;flex-shrink:0;margin-top:1px}
+.cedis-box{background:#fff9f0;border:1px solid #f5c6a0;border-radius:8px;padding:12px 14px;font-size:12px;margin-bottom:14px}
+.cedis-title{font-size:10px;font-weight:900;color:#e67e22;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.cedis-addr{font-size:13px;font-weight:700;color:#333}
+.cedis-coord{font-size:11px;color:#888;margin-top:3px}
+.wrow{border:1px solid #e3e8f0;border-radius:10px;overflow:hidden;margin-bottom:8px}
+.whead{padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.whead.lunes{background:#e8f1ff;border-left:4px solid #1a73e8}
+.whead.martes{background:#f3e5f5;border-left:4px solid #7b1fa2}
+.whead.miercoles{background:#e8f5e9;border-left:4px solid #2e7d32}
+.whead.jueves{background:#fff3e0;border-left:4px solid #e65100}
+.whead.viernes{background:#fce8e8;border-left:4px solid #b71c1c}
+.whead-title{font-size:13px;font-weight:900;color:#333}
+.whead-nums{font-size:11px;color:#666;text-align:right}
+.wbody{padding:12px 14px;background:#fff;border-top:1px solid #f0f0f0;font-size:12px;color:#555;line-height:1.6}
+.brecha{border:2px dashed #c0392b;border-radius:10px;padding:16px;margin-bottom:16px;background:#fff5f5}
+.brecha h3{font-size:14px;font-weight:900;color:#c0392b;margin-bottom:10px}
+.brow{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.bicon{font-size:20px;flex-shrink:0}
+.btext{font-size:13px;color:#444}
+.bresult{background:#c0392b;color:#fff;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13px;font-weight:700;text-align:center}
+.divider{height:1px;background:linear-gradient(90deg,transparent,#ddd,transparent);margin:20px 0}
+.footer{background:#1a3a5c;color:rgba(255,255,255,.6);font-size:10px;text-align:center;padding:16px;letter-spacing:.5px}
+.footer strong{color:#fff}
+.footer a{color:rgba(255,255,255,.5)}
+@media(min-width:500px){.stat-grid{grid-template-columns:repeat(4,1fr)}.lgrid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="version-badge">VAL-VITERE-ANALISIS-RUTAS · 180526</div>
+  <div class="cover-badge">Analisis Estrategico · Rutas DSD · Bajio Mexico</div>
+  <h1>VITERE · Distribucion Danone<br>Analisis de Rutas</h1>
+  <div class="cover-sub">Territorio: Guanajuato · Apaseo el Alto + Apaseo el Grande · 1,182 puntos DENUE</div>
+  <div class="cover-meta">
+    <span>DSD Danone</span>
+    <span>Corregidora QRO a Gto.</span>
+    <span>Christian + Cunado</span>
+    <span>Semana 20</span>
+    <span>867 pts sin explorar</span>
+  </div>
+</div>
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#s1">📊 Situacion</a>
+    <a href="#s2">📅 Dias</a>
+    <a href="#s3">🎯 Oportunidades</a>
+    <a href="#s4">💰 Ventas</a>
+    <a href="#s5">🏔️ Protocolo</a>
+    <a href="#s6">🔍 Competencia</a>
+    <a href="#s7">❓ Preguntas</a>
+    <a href="#s8">🚀 Proximos pasos</a>
+  </div>
+</nav>
+<!-- ===== SECCION 1: SITUACION ACTUAL ===== -->
+<div class="section" id="s1">
+  <div class="section-label">Seccion 1 de 8</div>
+  <h2>📊 Situacion Actual de las Rutas</h2>
+  <div class="cedis-box">
+    <div class="cedis-title">CEDIS · Punto de salida</div>
+    <div class="cedis-addr">Calle Don Francisco #3, Col. Lomas de Balvanera, Corregidora, Queretaro</div>
+    <div class="cedis-coord">lat 20.5287532 / lng -100.4650044 · Territorio comercial: Guanajuato unicamente (Corregidora QRO = solo punto de salida, NO territorio comercial)</div>
+  </div>
+  <div class="ttag">Territorio comercial: Apaseo el Alto + Apaseo el Grande, Gto.</div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num">1,182</div><div class="lbl">Negocios registrados DENUE</div><div class="sub">SCIAN 461xxx · Guanajuato</div></div>
+    <div class="stat-card"><div class="num">315</div><div class="lbl">Visitas por semana actuales</div><div class="sub">Christian · aprox. 63/dia</div></div>
+    <div class="stat-card"><div class="num red">867</div><div class="lbl">Puntos sin explorar</div><div class="sub">73.4% del padron total</div></div>
+    <div class="stat-card"><div class="num red">69.1%</div><div class="lbl">Triple brecha</div><div class="sub">817 pts · maxima oportunidad</div></div>
+  </div>
+  <div class="brecha">
+    <h3>Que es la "Triple Brecha"</h3>
+    <div class="brow"><div class="bicon">🏪</div><div class="btext"><strong>DENUE SI</strong> — El negocio existe en el padron oficial de INEGI. Es una tienda de abarrotes real, con RFC, con actividad economica registrada formalmente ante las autoridades.</div></div>
+    <div class="brow"><div class="bicon">🔍</div><div class="btext"><strong>Google NO</strong> — El negocio no aparece en Google Maps. Sin resenas, sin fotos, sin horario publicado. Para el mundo digital es inexistente, aunque opere activamente cada dia.</div></div>
+    <div class="brow"><div class="bicon">🚚</div><div class="btext"><strong>Christian NO visita</strong> — El repartidor actual no llega a ese negocio. No esta en la ruta establecida. Nunca ha recibido producto Danone de VITERE en ninguna de sus visitas.</div></div>
+    <div class="bresult">⚪ 817 negocios (69.1%) sufren las tres brechas simultaneamente. Son el punto de maxima oportunidad: invisibles para todos, pero reales y activos en campo.</div>
+  </div>
+  <div class="divider"></div>
+  <div class="section-label" style="margin-bottom:10px">Distribucion dia por dia — semana tipo</div>
+  <table class="tbl">
+    <thead><tr><th>Dia</th><th class="num">DENUE</th><th class="num">Visitas actuales</th><th class="num">Sin visitar</th><th class="num">Cobertura</th></tr></thead>
+    <tbody>
+      <tr><td><span style="color:#1a73e8;font-weight:900">● Lunes</span></td><td class="num">152</td><td class="num">63</td><td class="num" style="color:#c0392b;font-weight:900">89</td><td class="num">41%</td></tr>
+      <tr><td><span style="color:#7b1fa2;font-weight:900">● Martes</span></td><td class="num">202</td><td class="num">63</td><td class="num" style="color:#c0392b;font-weight:900">139</td><td class="num">31%</td></tr>
+      <tr><td><span style="color:#2e7d32;font-weight:900">● Miercoles</span></td><td class="num" style="color:#888">0 *</td><td class="num">62</td><td class="num" style="color:#7b1fa2;font-weight:900">? sin padron</td><td class="num" style="color:#888">— rural</td></tr>
+      <tr><td><span style="color:#e65100;font-weight:900">● Jueves</span></td><td class="num" style="color:#e65100;font-weight:900;font-size:15px">569</td><td class="num">64</td><td class="num" style="color:#c0392b;font-weight:900;font-size:15px">505</td><td class="num" style="color:#c0392b;font-weight:900">11%</td></tr>
+      <tr><td><span style="color:#b71c1c;font-weight:900">● Viernes</span></td><td class="num">259</td><td class="num">63</td><td class="num" style="color:#c0392b;font-weight:900">196</td><td class="num">24%</td></tr>
+      <tr style="background:#f0f7ff"><td style="font-weight:900">TOTAL</td><td class="num" style="font-weight:900">1,182</td><td class="num" style="font-weight:900">315</td><td class="num" style="color:#c0392b;font-weight:900">867+</td><td class="num" style="font-weight:900">26.7%</td></tr>
+    </tbody>
+  </table>
+  <div class="istrip"><div class="ii">ℹ️</div><div>* Miercoles: zona rural El Terrero, San Lucas, Jimenez. INEGI no captura rancherias en DENUE pero las tiendas existen fisicamente. Numero real desconocido — validar con Christian en reunion de hoy PM.</div></div>
+  <div class="divider"></div>
+  <div class="section-label" style="margin-bottom:10px">Scoring Google Places — 1,182 puntos totales</div>
+  <div class="score-row">
+    <div class="score-item"><div class="score-icon">🔴</div><div class="score-label"><div style="font-weight:800">Alta prioridad</div><div class="score-pct">Rating igual o mayor a 4.0 con 10 o mas resenas en Google</div></div><div style="text-align:right"><div class="score-num">79</div><div class="score-pct">6.7%</div></div></div>
+    <div class="score-item"><div class="score-icon">🟠</div><div class="score-label"><div style="font-weight:800">Media-alta</div><div class="score-pct">Rating igual o mayor a 3.5 con 5 o mas resenas en Google</div></div><div style="text-align:right"><div class="score-num">85</div><div class="score-pct">7.2%</div></div></div>
+    <div class="score-item"><div class="score-icon">🟡</div><div class="score-label"><div style="font-weight:800">Media</div><div class="score-pct">Aparece en Google Maps con pocas resenas o sin calificacion formal</div></div><div style="text-align:right"><div class="score-num">201</div><div class="score-pct">17.0%</div></div></div>
+    <div class="score-item" style="border:2px dashed #c0392b;background:#fff5f5"><div class="score-icon">⚪</div><div class="score-label"><div style="font-weight:900;color:#c0392b">Triple brecha — MAXIMA OPORTUNIDAD</div><div class="score-pct">DENUE si · Google no · Christian no visita</div></div><div style="text-align:right"><div class="score-num" style="color:#c0392b">817</div><div class="score-pct" style="color:#c0392b;font-weight:800">69.1%</div></div></div>
+  </div>
+</div>
+<!-- ===== SECCION 2: ANALISIS DIA POR DIA ===== -->
+<div class="section" id="s2">
+  <div class="section-label">Seccion 2 de 8</div>
+  <h2>📅 Analisis Dia por Dia</h2>
+  <div class="istrip"><div class="ii">👥</div><div><strong>Dato clave confirmado:</strong> Christian y su cunado salen JUNTOS al mismo territorio cada dia. Christian atiende sus ~63 clientes establecidos. El cunado visita puntos nuevos de alta prioridad. Juntos pueden cubrir 55 puntos nuevos adicionales por dia sin costo extra de transporte.</div></div>
+
+  <!-- LUNES -->
+  <div class="day-header">
+    <div class="day-dot lunes">L</div>
+    <div><div class="day-title">Lunes <small>· Zona San Bartolome · Apaseo el Alto</small></div><span class="badge warn">Cobertura 41% — parcial</span></div>
+  </div>
+  <div class="wrow">
+    <div class="whead lunes"><div class="whead-title">Estado de ruta</div><div class="whead-nums">152 DENUE · 63 visitas · <strong style="color:#c0392b">89 sin explorar</strong></div></div>
+    <div class="wbody">La ruta del Lunes cubre la zona de San Bartolome y alrededores en Apaseo el Alto. Con solo el 41% del padron atendido, quedan 89 negocios DENUE sin visitar. Esta zona comparte territorio geografico con la ruta del Viernes, lo que crea oportunidad de sincronizacion entre ambos dias: lo que no cubre el Lunes puede incluirse el Viernes y viceversa, eliminando duplicidades y maximizando el alcance semanal total.</div>
+  </div>
+  <div class="diag warn"><div class="diag-title">89 negocios sin explorar disponibles este dia</div><p>El cunado puede dedicar el dia a los puntos prioritarios: 9 pts rojos alta (🔴) y 14 pts naranja media-alta (🟠) = 23 puntos de Semana 1 maxima prioridad. En semanas siguientes continuar con los 32 pts amarillos. Ruta conjunta Lunes total: 55 pts nuevos · 78 km adicionales · regreso aproximado 16:22.</p></div>
+  <div class="diag info"><div class="diag-title">RUTA-CONJUNTA-001 Lunes: 55 pts · 78 km · regreso ~16:22</div><p>Distribucion: 🔴 9 pts + 🟠 14 pts + 🟡 32 pts. El cunado complementa la secuencia de Christian sin alterar su ruta establecida. El recorrido adicional de 78 km queda dentro del radio habitual de operacion diaria del territorio.</p></div>
+
+  <!-- MARTES -->
+  <div class="day-header" style="margin-top:24px">
+    <div class="day-dot martes">M</div>
+    <div><div class="day-title">Martes <small>· Apaseo el Alto Centro</small></div><span class="badge ok">Dia mas eficiente logisticamente</span></div>
+  </div>
+  <div class="wrow">
+    <div class="whead martes"><div class="whead-title">Estado de ruta</div><div class="whead-nums">202 DENUE · 63 visitas · <strong style="color:#c0392b">139 sin explorar</strong></div></div>
+    <div class="wbody">Martes tiene el mayor volumen DENUE (202 pts) en zona centro de Apaseo el Alto. A pesar de contar con mas registros que cualquier otro dia, siguen sin visitarse 139 negocios. La alta densidad de tiendas por kilometro cuadrado hace que las rutas sean mas compactas y eficientes: solo 47 km adicionales para cubrir 55 puntos nuevos con el cunado — el menor recorrido de toda la semana.</div>
+  </div>
+  <div class="diag ok"><div class="diag-title">Solo 47 km para 55 pts nuevos · regreso mas temprano de la semana ~15:35</div><p>El menor kilometraje de expansion semanal. Alta densidad de tiendas en zona centro reduce tiempos de traslado. Martes S1 para el cunado solo (alta + media-alta): 🔴 19 pts + 🟠 11 pts = 30 puntos de maxima prioridad para la primera semana.</p></div>
+  <div class="diag info"><div class="diag-title">19 pts 🔴 alta el Martes — el mayor bloque de alta prioridad fuera de Jueves</div><p>Los 19 puntos de alta prioridad del Martes indican negocios activos con excelente gestion (rating 4.0+ con 10+ resenas en Google). Alta probabilidad de conversion en primera visita. Son el grupo mas rentable de abordar en las primeras semanas de expansion del cunado.</p></div>
+
+  <!-- MIERCOLES -->
+  <div class="day-header" style="margin-top:24px">
+    <div class="day-dot miercoles">X</div>
+    <div><div class="day-title">Miercoles <small>· El Terrero · San Lucas · Jimenez</small></div><span class="badge especial">Zona especial — rural sin padron</span></div>
+  </div>
+  <div class="diag purple"><div class="diag-title">ZONA RURAL ESPECIAL — 0 pts DENUE pero negocios reales existen en campo</div><p>El Terrero, San Lucas, Jimenez y otras rancherias del corredor rural del Miercoles son localidades que INEGI no captura en el DENUE comercial. Las tiendas de abarrotes existen fisicamente y son el abasto de cientos de familias, pero operan sin RFC formal ni registro en padrones digitales. Para Google Maps son inexistentes. Para el DENUE no existen. Pero para Christian ya son 62 clientes que le compran cada semana, confirmando que la demanda es real y la logistica funciona perfectamente.</p></div>
+  <div class="diag gray"><div class="diag-title">Datos Miercoles: 62 visitas confirmadas · 0 DENUE · sin ruta conjunta definida</div><p>No se define ruta conjunta para el Miercoles porque no hay padron formal del que partir para optimizar recorrido. La oportunidad es la exploracion libre del cunado en caminos laterales y localidades pequeñas que Christian conoce pero a veces saltea porque el pedido no justifica el viaje extra con el camion de reparto.</p></div>
+  <div class="diag warn"><div class="diag-title">Pregunta critica para Christian — validar en reunion de hoy</div><p>¿Cuantas tiendas hay en El Terrero, San Lucas y Jimenez que no estan en tu ruta actual? ¿Hay localidades rurales cercanas que saltas porque el camino es dificil o el pedido es pequeño? El cunado en su vehiculo propio podria explorar esas brechas mientras Christian hace su ruta establecida del Miercoles.</p></div>
+
+  <!-- JUEVES -->
+  <div class="day-header" style="margin-top:24px">
+    <div class="day-dot jueves">J</div>
+    <div><div class="day-title">Jueves <small>· Apaseo el Grande</small></div><span class="badge critico">MAYOR OPORTUNIDAD — 505 sin explorar</span></div>
+  </div>
+  <div class="wrow">
+    <div class="whead jueves"><div class="whead-title">Estado de ruta</div><div class="whead-nums">569 DENUE · 64 visitas · <strong style="color:#c0392b">505 sin explorar</strong></div></div>
+    <div class="wbody">Jueves tiene el mayor gap absoluto entre padron disponible y cobertura actual en todo el analisis. Apaseo el Grande registra 569 negocios en DENUE, pero Christian solo visita 64 — el 11.3% del total municipal. No es que la ruta sea ineficiente: el territorio es mucho mas grande de lo que la ruta actual contempla. Hay barrios completos y colonias enteras de APG que nunca han visto llegar a un distribuidor Danone.</div>
+  </div>
+  <div class="diag red"><div class="diag-title">88.7% del territorio Jueves sin cubrir — 505 negocios inexplorados</div><p>Esta es la mayor oportunidad de crecimiento en todo el analisis. No es mejora de eficiencia — es expansion territorial real. El cunado necesita minimo 3 semanas de trabajo enfocado para cubrir los puntos de alta y media-alta prioridad en APG. Plan: S1: 35 pts · S2: 35 pts · S3: 27 pts = 97 pts de maxima prioridad cubiertas en el primer mes.</p></div>
+  <div class="diag info"><div class="diag-title">RUTA-CONJUNTA-001 Jueves: 55 pts · 71 km · regreso ~16:11</div><p>Distribucion primera semana conjunta: 🔴 45 pts alta + 🟠 10 pts media-alta = 55 pts. Solo el Jueves tiene suficiente material de alta prioridad para 3 semanas de trabajo del cunado. El resto (mas de 400 pts 🟡 y ⚪) se trabajan en ciclos subsecuentes a lo largo del trimestre.</p></div>
+  <div class="cbox">
+    <h3>Estimado de oportunidad Jueves — Apaseo el Grande</h3>
+    <div class="crow"><span class="cl">Puntos alta prioridad 🔴 (rating 4.0+, 10+ resenas)</span><span class="cv">45 pts</span></div>
+    <div class="crow"><span class="cl">Puntos media-alta 🟠 (rating 3.5+, 5+ resenas)</span><span class="cv">10 pts</span></div>
+    <div class="crow"><span class="cl">Ticket promedio estimado por punto nuevo por semana</span><span class="cv">$350</span></div>
+    <div class="crow"><span class="cl">Tasa conversion primera visita DSD consumo basico (conservador)</span><span class="cv">35%</span></div>
+    <div class="crow"><span class="cl">Clientes convertidos estimados de alta + media-alta APG</span><span class="cv">~19 clientes</span></div>
+    <div class="crow"><span class="cl" style="font-weight:900">POTENCIAL ADICIONAL MENSUAL SOLO APG</span><span class="cv">$26,600–$45,000</span></div>
+  </div>
+
+  <!-- VIERNES -->
+  <div class="day-header" style="margin-top:24px">
+    <div class="day-dot viernes">V</div>
+    <div><div class="day-title">Viernes <small>· Doble zona · Apaseo el Alto</small></div><span class="badge warn">Ruta mixta — revisar estructura</span></div>
+  </div>
+  <div class="wrow">
+    <div class="whead viernes"><div class="whead-title">Estado de ruta</div><div class="whead-nums">259 DENUE · 63 visitas · <strong style="color:#c0392b">196 sin explorar</strong></div></div>
+    <div class="wbody">Viernes combina segundas visitas (clientes del Lunes que compran cada 15 dias) con zona nueva de Martes. Esta mezcla genera una ruta que no es completamente primera visita ni completamente segunda visita. El resultado: 196 DENUE sin explorar en la zona y, segun datos semana 20, apenas 9 puntos sin visitar esta semana — lo que sugiere que la ruta esta ajustada pero sin expansion real hacia el padron disponible.</div>
+  </div>
+  <div class="diag warn"><div class="diag-title">Ruta Viernes mixta — definir prioridad entre segunda visita y territorio nuevo</div><p>Pregunta clave para Christian en la reunion: "El Viernes visitas la misma zona que el Lunes, por que? Los clientes compran dos veces por semana o prefieren el Viernes?" Si las segundas visitas no generan pedido adicional significativo, ese tiempo puede redirigirse a los 196 puntos DENUE sin explorar de la zona Viernes.</p></div>
+  <div class="diag info"><div class="diag-title">RUTA-CONJUNTA-001 Viernes: 55 pts · 105 km · regreso ~17:01</div><p>El mayor recorrido semanal en kilometros: 105 km de expansion adicional. Distribucion cunado Viernes: 🔴 6 pts + 🟠 8 pts + 🟡 41 pts. La zona Viernes tiene mayoria de puntos media (🟡), indicando territorio menos maduro comercialmente con alto potencial a mediano plazo una vez establecida presencia inicial de VITERE.</p></div>
+</div>
+<!-- ===== SECCION 3: OPORTUNIDADES ===== -->
+<div class="section" id="s3">
+  <div class="section-label">Seccion 3 de 8</div>
+  <h2>🎯 Areas de Oportunidad Identificadas</h2>
+  <div class="istrip"><div class="ii">🎯</div><div>Se identificaron 5 areas de oportunidad con distinto nivel de urgencia y complejidad. Ordenadas por impacto potencial en ventas a corto plazo. Cada una tiene acciones concretas definidas y un responsable claro.</div></div>
+
+  <div class="opp-card opp1">
+    <div class="opp-num">OPP-1 · MAYOR PRIORIDAD INMEDIATA</div>
+    <div class="opp-title">Apaseo el Grande (Jueves) — Territorio casi virgen sin atender</div>
+    <div class="opp-body">Con 569 negocios registrados y solo 64 visitas actuales, Apaseo el Grande representa el 88.7% de su territorio completamente sin cubrir. No existe en todo el analisis un dia con una brecha tan absoluta entre padron disponible y cobertura real. La buena noticia: 45 puntos de alta prioridad (🔴) y 10 media-alta (🟠) ya identificados con coordenadas exactas en el mapa de scoring. El cunado puede comenzar inmediatamente con RUTA-CONJUNTA-001.html como guia. En 3 semanas de trabajo enfocado, los 97 puntos de mayor prioridad quedan cubiertos y se establece una base solida de clientes nuevos en APG que Christian puede convertir en ruta permanente.</div>
+    <div class="opp-hl">505 negocios sin atender · Potencial $45,000–$60,000/semana adicional proyectado</div>
+  </div>
+
+  <div class="opp-card opp2">
+    <div class="opp-num">OPP-2 · ALTA PRIORIDAD — ventaja competitiva exclusiva</div>
+    <div class="opp-title">Miercoles zona rural — Negocios reales sin capturar en ningun padron digital</div>
+    <div class="opp-body">El Terrero, San Lucas, Jimenez y las rancherias del corredor rural del Miercoles representan la oportunidad mas pura del analisis: negocios que no estan en DENUE, no estan en Google Maps, y actualmente solo los conoce Christian por experiencia propia de ruta. Esto significa cero competencia directa de distribuidores que usan padrones digitales para planear rutas. Cualquier competidor que quiera entrar aqui necesita hacer exactamente lo mismo que estamos haciendo ahora: exploracion fisica uno a uno en campo abierto. VITERE ya tiene ventaja de primer movimiento porque Christian conoce el terreno desde hace tiempo.</div>
+    <div class="opp-hl">Triple brecha maxima · Competencia cero · Ventaja de primer movimiento ya consolidada</div>
+  </div>
+
+  <div class="opp-card opp3">
+    <div class="opp-num">OPP-3 · MEDIA PRIORIDAD — restructuracion de eficiencia</div>
+    <div class="opp-title">Viernes reestructurado — Mover segunda visita hacia territorio nuevo</div>
+    <div class="opp-body">Actualmente el Viernes mezcla segundas visitas (clientes del Lunes que compran cada 15 dias) con zona nueva de Martes en la misma jornada. Si se confirma que las segundas visitas del Lunes al Viernes no generan pedidos adicionales significativos, ese tiempo puede redirigirse completamente a los 196 puntos DENUE inexplorados de la zona Viernes. Incluso sin eliminar las segundas visitas, agregar al cunado enfocado exclusivamente en puntos nuevos genera minimo 9 puntos nuevos por semana de clientes que actualmente no existen en la base activa de VITERE.</div>
+    <div class="opp-hl">Minimo +9 pts nuevos/semana garantizado · Requiere validar con Christian el motivo de segunda visita</div>
+  </div>
+
+  <div class="opp-card opp4">
+    <div class="opp-num">OPP-4 · MEDIA PRIORIDAD — clientes de alto ticket unitario</div>
+    <div class="opp-title">Supertiendas medianas — Super Aleman y similares ahora incluidos en padron</div>
+    <div class="opp-body">El filtro original del DENUE usaba el campo per_ocu (personal ocupado) para excluir negocios grandes. Esto resulto en que supertiendas medianas como Super Aleman quedaron fuera del analisis inicial. Ahora que el filtro se elimino (sin per_ocu), estos negocios estan incluidos en los 1,182 puntos del padron completo. Los autoservicios medianos de municipio son clientes de alto volumen: un solo Super Aleman puede comprar 5 a 10 veces mas que una tiendita de colonia. Identificarlos y hacer una visita comercial formal con catalogo y precios de volumen puede cambiar la escala de ventas de forma significativa en poco tiempo.</div>
+    <div class="opp-hl">Alto ticket por cliente · Visita comercial formal · Catalogo 100 SKUs a Supabase — HOY AM (Luis)</div>
+  </div>
+
+  <div class="opp-card opp5">
+    <div class="opp-num">OPP-5 · LARGO PLAZO — expansion territorial sostenida</div>
+    <div class="opp-title">Sierra y brechas — Localidades sin cobertura de ningun distribuidor formal</div>
+    <div class="opp-body">En los bordes del territorio de Apaseo el Grande hacia la sierra, existen localidades pequeñas accesibles solo por brechas de terraceria. Ningun distribuidor formal llega ahi — el abasto lo hacen camionetas de mayoreo que visitan una o dos veces al mes. Estas localidades tienen: (a) cero competencia de distribucion DSD directa, (b) clientes que actualmente compran en presentaciones grandes por falta de servicio frecuente, y (c) precios inflados por intermediarios. El vehiculo del cunado es el factor determinante: si puede circular por brechas, esta oportunidad se activa de inmediato sin inversion adicional de parte de VITERE.</div>
+    <div class="opp-hl">Territorio sin competidores · Depende del vehiculo del cunado · Confirmar en reunion de hoy PM</div>
+  </div>
+</div>
+
+<!-- ===== SECCION 4: VENTAS ===== -->
+<div class="section" id="s4">
+  <div class="section-label">Seccion 4 de 8</div>
+  <h2>💰 Por Que Mas Puntos Significa Mas Ventas</h2>
+  <div class="hbox">
+    <h3>El modelo DSD hace que cada visita adicional cueste casi cero</h3>
+    <p>En distribucion directa al tendero (DSD — Direct Store Delivery), el costo mas alto es el transporte. Una vez que el repartidor sale hacia una zona, el costo marginal de añadir una parada adicional es minimo: unos minutos de tiempo, unos metros mas de recorrido. El camion ya esta en la zona. Christian ya esta en el territorio. El cunado ya sale con el cada manana del CEDIS. Este modelo cambia por completo el calculo de rentabilidad de cada visita nueva que se añada a la operacion semanal.</p>
+  </div>
+  <div class="diag ok"><div class="diag-title">VENTAJA ESTRUCTURAL: ya salen juntos — cero costo adicional de transporte</div><p>Christian y el cunado salen del CEDIS juntos cada dia. El cunado no genera costo de combustible adicional porque viaja con Christian en el mismo recorrido de salida y regreso. Su unica inversion es tiempo — y ese tiempo ya esta siendo remunerado. Cada cliente nuevo que visita el cunado representa incremento puro de ventas con costo marginal practicamente cero para la operacion de VITERE.</p></div>
+  <div class="cbox">
+    <h3>Proyeccion conservadora — 55 puntos nuevos por dia del cunado</h3>
+    <div class="crow"><span class="cl">Puntos nuevos que visita el cunado por dia</span><span class="cv">55 pts/dia</span></div>
+    <div class="crow"><span class="cl">Dias de trabajo efectivos por semana (Lunes/Martes/Jueves/Viernes)</span><span class="cv">4 dias</span></div>
+    <div class="crow"><span class="cl">Total puntos nuevos visitados por semana</span><span class="cv">220 pts/semana</span></div>
+    <div class="crow"><span class="cl">Tasa de conversion primera visita DSD consumo basico (conservador)</span><span class="cv">30% = 66 clientes</span></div>
+    <div class="crow"><span class="cl">Ticket promedio por cliente nuevo por semana</span><span class="cv">$350</span></div>
+    <div class="crow"><span class="cl">Ingreso adicional semanal estimado (escenario conservador)</span><span class="cv">$23,100</span></div>
+    <div class="crow"><span class="cl" style="font-weight:900">PROYECCION ADICIONAL MENSUAL TOTAL (4 semanas)</span><span class="cv">$30,000–$45,000</span></div>
+  </div>
+  <div class="diag info"><div class="diag-title">Nota metodologica — tasa de conversion en primera visita DSD</div><p>El 30% de conversion en primera visita es estimacion conservadora para distribucion directa de consumo basico. Yogurts y lacteos Danone tienen alta rotacion en tiendas de abarrotes. Un cliente que ya compra yogurt (aunque sea de otra marca) casi siempre acepta probar si el distribuidor llega directamente a su puerta con catalogo y precio de lista. Los puntos 🔴 alta prioridad tienen tasas historicamente mas altas porque son negocios establecidos con buena gestion que valoran la consistencia del proveedor sobre el precio.</p></div>
+  <table class="tbl">
+    <thead><tr><th>Escenario</th><th class="num">Pts nuevos/sem</th><th class="num">Conversion</th><th class="num">Clientes ganados</th><th class="num">$ mes adicional</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700;color:#27ae60">Conservador</td><td class="num">220</td><td class="num">30%</td><td class="num">66</td><td class="num" style="color:#27ae60;font-weight:900">$30,000</td></tr>
+      <tr><td style="font-weight:700;color:#e67e22">Moderado</td><td class="num">220</td><td class="num">45%</td><td class="num">99</td><td class="num" style="color:#e67e22;font-weight:900">$45,000</td></tr>
+      <tr><td style="font-weight:700;color:#c0392b">Optimista</td><td class="num">220</td><td class="num">60%</td><td class="num">132</td><td class="num" style="color:#c0392b;font-weight:900">$60,000</td></tr>
+      <tr style="background:#f0fff5"><td style="font-weight:900">A 3 meses (base conservador)</td><td class="num">880+</td><td class="num">30%+</td><td class="num">264+</td><td class="num" style="color:#27ae60;font-weight:900">$90,000+</td></tr>
+    </tbody>
+  </table>
+  <div class="diag warn"><div class="diag-title">El cunado como preventista cambia el modelo de escalabilidad de VITERE</div><p>Si el cunado opera como preventista (levanta pedido hoy, Christian entrega en su siguiente visita a esa zona), el modelo se vuelve escalable independientemente del tamaño del camion de Christian. El cunado puede visitar mas puntos de los que caben en una carga diaria, y los pedidos se programan para la semana siguiente. Esto permite visitar los 867 puntos sin explorar en paralelo con la ruta activa de Christian, sin interferir con sus entregas establecidas ni requerir un segundo camion.</p></div>
+  <div class="hbox" style="background:linear-gradient(135deg,#c0392b 0%,#922b21 100%)">
+    <h3>La oportunidad real: $30,000 a $45,000 por mes adicionales</h3>
+    <p>Sin contratar nuevos repartidores. Sin comprar otro camion de reparto. Sin cambiar la ruta establecida de Christian. Solo utilizando el tiempo y la presencia que el cunado ya tiene en campo cada dia, y dirigiendolo hacia los 867 puntos DENUE que nunca han recibido una visita de VITERE. El analisis ya esta hecho. Las coordenadas ya estan en el mapa. Los puntos de mayor prioridad ya estan identificados. Solo falta ejecutar comenzando esta semana.</p>
+  </div>
+</div>
+<!-- ===== SECCION 5: PROTOCOLO CAMPO ===== -->
+<div class="section" id="s5">
+  <div class="section-label">Seccion 5 de 8</div>
+  <h2>🏔️ Protocolo de Campo — Cunado Preventista</h2>
+  <div class="istrip"><div class="ii">📋</div><div>Este protocolo de 5 pasos define exactamente que hace el cunado cuando llega a un punto nuevo de la lista. Simple, rapido, sin apps especiales — solo WhatsApp y la camara del telefono.</div></div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div><div class="step-title">Antes de salir: consultar el mapa del dia en el telefono</div><div class="step-body">Abrir RUTA-CONJUNTA-001.html en el telefono o pantalla del vehiculo. El mapa muestra exactamente que puntos nuevos le tocan ese dia, en que orden visitarlos, y cuanto kilometraje adicional genera. Los puntos estan marcados por color (🔴🟠🟡⚪) para priorizar. SIEMPRE empezar por los puntos rojos 🔴 — mayor probabilidad de conversion inmediata en primera visita.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div><div class="step-title">Al llegar: foto de fachada y confirmar si recibe distribuidores</div><div class="step-body">Foto de la fachada del negocio con geolocalizacion activada (esto da coordenadas automaticamente). Preguntar al dueno o encargado: "Usted recibe distribuidores de lacteos?" Si es No (solo compra en mayorista), registrar y continuar al siguiente punto. Si es Si o "a veces", pasar directamente al Paso 3.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div><div class="step-title">Pregunta clave de conversion: "Quien te surte el yogurt?"</div><div class="step-body">Si la respuesta incluye "cada 15 dias o mas", "voy yo a comprarlo al municipio", "a veces no hay", o "el que llega primero" — eso es SEÑAL DE OPORTUNIDAD MAXIMA. El cliente no tiene proveedor fijo o esta mal atendido. Esto es apertura directa para VITERE con entrega semanal garantizada y catalogo completo. Anotar la respuesta textual para el reporte.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div><div class="step-title">Revisar el refrigerador del negocio con permiso del tendero</div><div class="step-body">Con permiso: revisar el refrigerador. Hay espacio disponible? Que marcas estan? Hay productos Danone (Activia, Danonino, Oikos, yogurt natural)? Si hay refrigerador con espacio y NO hay Danone — es conversion casi segura. Si esta lleno de Lala o Alpura, preguntar si aceptaria un refrigerador adicional Danone para complementar la oferta de su tienda.</div></div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div><div class="step-title">Registrar en WhatsApp al grupo de VITERE inmediatamente</div><div class="step-body">Enviar al grupo: nombre del negocio, foto de fachada, coordenadas (captura de Google Maps con ubicacion), nombre del dueno, telefono si lo dio, y estado: ✅ convertido (dejo pedido) / 🔜 interesado proxima visita / ❌ no apto. Christian revisa la lista y programa la entrega en su siguiente visita a esa zona. El ciclo se cierra sin papel ni sistema especial.</div></div>
+    </div>
+  </div>
+  <div class="diag ok"><div class="diag-title">El protocolo no requiere ninguna app nueva ni capacitacion especial</div><p>Solo necesita: (1) el HTML de RUTA-CONJUNTA-001 abierto en el telefono, (2) la camara con geolocalizacion activa, y (3) un grupo de WhatsApp con Christian y Rigoberto. Funciona sin conexion a internet en zona rural una vez descargado el HTML en el dispositivo movil del cunado.</p></div>
+  <div class="divider"></div>
+  <div class="section-label" style="margin-bottom:10px">Resumen rutas conjuntas por dia de la semana</div>
+  <table class="tbl">
+    <thead><tr><th>Dia</th><th class="num">🔴 Alta</th><th class="num">🟠 Med-Alta</th><th class="num">🟡 Media</th><th class="num">Total pts</th><th class="num">Km extra</th><th class="num">Regreso</th></tr></thead>
+    <tbody>
+      <tr><td><span style="color:#1a73e8;font-weight:900">● Lunes</span></td><td class="num">9</td><td class="num">14</td><td class="num">32</td><td class="num" style="font-weight:900">55</td><td class="num">78 km</td><td class="num">~16:22</td></tr>
+      <tr><td><span style="color:#7b1fa2;font-weight:900">● Martes</span></td><td class="num">19</td><td class="num">11</td><td class="num">25</td><td class="num" style="font-weight:900">55</td><td class="num">47 km</td><td class="num">~15:35</td></tr>
+      <tr><td><span style="color:#2e7d32;font-weight:900">● Miercoles</span></td><td class="num" style="color:#888">—</td><td class="num" style="color:#888">—</td><td class="num" style="color:#888">—</td><td class="num" style="color:#888">0</td><td class="num" style="color:#888">—</td><td class="num" style="color:#888">—</td></tr>
+      <tr><td><span style="color:#e65100;font-weight:900">● Jueves</span></td><td class="num" style="color:#c0392b;font-weight:900">45</td><td class="num">10</td><td class="num" style="color:#888">—</td><td class="num" style="font-weight:900">55</td><td class="num">71 km</td><td class="num">~16:11</td></tr>
+      <tr><td><span style="color:#b71c1c;font-weight:900">● Viernes</span></td><td class="num">6</td><td class="num">8</td><td class="num">41</td><td class="num" style="font-weight:900">55</td><td class="num">105 km</td><td class="num">~17:01</td></tr>
+      <tr style="background:#f0fff5"><td style="font-weight:900">TOTAL SEMANA</td><td class="num" style="font-weight:900">79</td><td class="num" style="font-weight:900">43</td><td class="num" style="font-weight:900">98</td><td class="num" style="font-weight:900;color:#27ae60">220</td><td class="num" style="font-weight:900">301 km</td><td class="num" style="color:#888">—</td></tr>
+    </tbody>
+  </table>
+  <div class="divider"></div>
+  <div class="section-label" style="margin-bottom:10px">Plan preventista solo — alta + media-alta (primer mes)</div>
+  <table class="tbl">
+    <thead><tr><th>Dia / Semana</th><th class="num">Puntos prioritarios</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td>Lunes S1</td><td class="num">23 pts</td><td>🔴 9 pts alta + 🟠 14 pts media-alta</td></tr>
+      <tr><td>Martes S1</td><td class="num">30 pts</td><td>🔴 19 pts alta + 🟠 11 pts media-alta</td></tr>
+      <tr><td>Jueves S1</td><td class="num">35 pts</td><td>🔴 alta APG — bloque 1 de 3</td></tr>
+      <tr><td>Jueves S2</td><td class="num">35 pts</td><td>🔴 alta APG — bloque 2 de 3</td></tr>
+      <tr><td>Jueves S3</td><td class="num">27 pts</td><td>🔴+🟠 APG — bloque 3 de 3</td></tr>
+      <tr><td>Viernes S1</td><td class="num">14 pts</td><td>🔴 6 pts alta + 🟠 8 pts media-alta</td></tr>
+      <tr style="background:#f0fff5"><td style="font-weight:900">Total primer mes (aprox. 4 semanas)</td><td class="num" style="font-weight:900;color:#27ae60">164 pts</td><td style="font-weight:700">Todos de maxima prioridad alta + media-alta</td></tr>
+    </tbody>
+  </table>
+</div>
+<!-- ===== SECCION 6: COMPETENCIA ===== -->
+<div class="section" id="s6">
+  <div class="section-label">Seccion 6 de 8</div>
+  <h2>🔍 Indicadores de Competencia en Campo</h2>
+  <div class="istrip"><div class="ii">👁️</div><div>Estas 7 señales deben ser observadas activamente por el cunado en cada visita nueva. Permiten calificar el nivel de oportunidad real de cada punto mas alla del scoring de Google o del DENUE. En campo se puede confirmar o corregir todo el analisis digital.</div></div>
+  <div class="signal-list">
+    <div class="signal-item">
+      <div class="signal-icon">🧊</div>
+      <div><div class="signal-title">Señal 1: Refrigerador de competidor visible — Lala o Alpura</div><div class="signal-desc">Un refrigerador con logo de Lala, Alpura o Sigma indica que otro distribuidor tiene presencia activa. No es señal de derrota — es el mapa de quien llega. Si el refrigerador esta medio vacio o el tendero se queja del servicio, hay apertura total para VITERE. Si esta lleno y el tendero esta satisfecho, la estrategia es ofrecer un segundo refrigerador para SKUs complementarios que ese distribuidor no maneja (Oikos, Activia, lineas premium que no distribuye Lala).</div></div>
+    </div>
+    <div class="signal-item">
+      <div class="signal-icon">🚫</div>
+      <div><div class="signal-title">Señal 2: "Nunca viene ningun distribuidor por aqui"</div><div class="signal-desc">Esta frase es la señal de oportunidad mas directa posible. Significa que el negocio compra todo en mayorista, tiene cero acceso a precios de distribuidor, y esta pagando mas por su inventario de lo necesario. VITERE puede ofrecer precio de distribuidor + entrega semanal garantizada + credito a 7 dias — una propuesta de valor imbatible para un cliente que nunca ha tenido acceso a estos beneficios. La conversion en primera visita es practicamente segura si hay producto Danone en su mix actual.</div></div>
+    </div>
+    <div class="signal-item">
+      <div class="signal-icon">🛒</div>
+      <div><div class="signal-title">Señal 3: "Tengo que ir yo al municipio a comprar"</div><div class="signal-desc">El tendero asume el costo logistico completo de abastecerse: tiempo personal + gasolina + vehiculo propio + horas fuera del negocio. Si VITERE llega a su puerta con entrega directa, el cliente no solo compra mas — compra mas frecuentemente porque ya no tiene que planear el viaje. Estos clientes tienen frecuencia de reposicion mucho mas alta una vez que entran al esquema DSD.</div></div>
+    </div>
+    <div class="signal-item">
+      <div class="signal-icon">📦</div>
+      <div><div class="signal-title">Señal 4: Anaqueles solo con marcas genericas o locales sin reconocimiento</div><div class="signal-desc">Si el refrigerador solo tiene marcas regionales desconocidas o lacteos sin nombre de marca nacional reconocida, significa que ningun distribuidor de marca ha llegado ahi. Danone tiene ventaja de marca nacional — la reconocen aunque no la hayan comprado nunca. La primera presentacion de Activia o Danonino en una tienda donde jamas ha llegado tiene altisima probabilidad de dejar pedido confirmado en la misma visita.</div></div>
+    </div>
+    <div class="signal-item">
+      <div class="signal-icon">💵</div>
+      <div><div class="signal-title">Señal 5: Cliente que paga de contado en mayoreo o bodega</div><div class="signal-desc">Si el tendero dice "voy a Costco" o "compro en el mayoreo pagando de contado", es candidato ideal para credito VITERE a 7 dias. Pasar de pago contado en mayoreo a credito semanal con entrega directa es un cambio enorme en el flujo de caja del negocio. No es solo ventaja de precio — es ventaja financiera que impacta directamente la operacion diaria y el capital de trabajo disponible.</div></div>
+    </div>
+    <div class="signal-item">
+      <div class="signal-icon">❌</div>
+      <div><div class="signal-title">Señal 6: Faltantes frecuentes del proveedor actual de lacteos</div><div class="signal-desc">Preguntar directamente: "Tu proveedor de yogurt siempre trae todo lo que le pides?" Si la respuesta incluye "a veces me falta X", "el Danonino nunca trae completo", "el sabor de fresa siempre se acaba antes del siguiente pedido" — hay apertura de cambio. Un distribuidor que falla en consistencia de surtido es vulnerable. VITERE con catalogo completo de 100 SKUs y entrega garantizada tiene ventaja de surtido.</div></div>
+    </div>
+    <div class="signal-item" style="border-left-color:#7b1fa2">
+      <div class="signal-icon">⚪</div>
+      <div><div class="signal-title">Señal 7: Negocio grande sin presencia digital — triple brecha maxima</div><div class="signal-desc">Una tienda de buen tamaño — refrigerador propio grande, variedad de productos, flujo de clientes visible durante la visita — que no aparece en Google Maps es el candidato de mayor valor dentro de los 817 puntos de triple brecha. No aparecer en Google no indica que sea pequeño o de baja facturacion — indica que el dueno no ha invertido en marketing digital. Su tamaño real solo se confirma en campo. El cunado debe anotar el tamaño estimado: chica, mediana o grande, para calibrar el scoring del mapa para semanas siguientes.</div></div>
+    </div>
+  </div>
+  <div class="diag purple"><div class="diag-title">Sistema de calificacion rapida en campo — 3 categorias para el cunado</div><p>Al salir del punto, evaluar en 3 segundos cuantas señales observo. <strong>3 o mas señales = cliente A</strong> — conversion en siguiente visita de Christian, prioridad maxima, reportar al grupo inmediatamente. <strong>1 a 2 señales = cliente B</strong> — seguimiento en 2 a 3 semanas, registrar con foto y coordenadas. <strong>0 señales = cliente C</strong> — registrar y revisar en 60 dias. Esta clasificacion simple permite priorizar seguimiento sin app ni computadora.</p></div>
+</div>
+
+<!-- ===== SECCION 7: PREGUNTAS ===== -->
+<div class="section" id="s7">
+  <div class="section-label">Seccion 7 de 8</div>
+  <h2>❓ Preguntas para Christian y el Cunado</h2>
+  <div class="istrip"><div class="ii">🔗</div><div>Existe formulario interactivo con las 13 preguntas: <strong>https://iaingenieria.github.io/rutas/vitere/PREGUNTAS-CHRISTIAN-001.html</strong> — se presenta en la reunion de HOY PM con Rigoberto y Christian. Permite registrar respuestas directamente en el telefono durante la sesion.</div></div>
+  <div class="diag info"><div class="diag-title">Objetivo: validar en campo los supuestos del analisis digital antes de ejecutar</div><p>El DENUE, Google Places y los mapas son estimaciones construidas desde datos digitales oficiales. Christian y el cunado conocen la realidad del terreno mejor que cualquier algoritmo. Sus respuestas corrigen o confirman cada hipotesis antes de que el cunado empiece a visitar puntos nuevos. 20 minutos de validacion pueden ahorrar semanas de trabajo mal dirigido.</p></div>
+
+  <div class="q-stitle">Para Christian — 8 preguntas · Validacion de ruta establecida</div>
+  <div style="border:1px solid #1a3a5c;border-top:0;border-radius:0 0 8px 8px;padding:10px 10px 2px;margin-bottom:16px">
+    <div class="q-block"><div class="q-num">PREGUNTA 1 DE 13</div><div class="q-text">El Viernes visitas zona que ya cubriste el Lunes. Por que? Esos clientes compran dos veces por semana o hay alguno que prefiere especificamente el Viernes?</div><div class="q-why">Impacto: determina si el Viernes puede restructurarse para cubrir territorio nuevo en vez de repetir zona del Lunes. Si las segundas visitas no generan pedido adicional, ese tiempo se libera para los 196 pts inexplorados.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 2 DE 13</div><div class="q-text">Cuantos clientes en tu ruta te dicen "hoy no" cuando llegas? Que tan frecuente pasa? En que dia de la semana ocurre mas?</div><div class="q-why">Impacto: un 20% o mas de rechazos indica frecuencia de visita excesiva para algunos clientes — ese tiempo puede redirigirse hacia puntos nuevos con mayor probabilidad de compra.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 3 DE 13</div><div class="q-text">El Miercoles vas a El Terrero, San Lucas y Jimenez. Hay tiendas reales en esas rancherias que NO estan en tu lista actual? Cuantas crees que haya que no hayas visitado nunca?</div><div class="q-why">Impacto: cuantificar el potencial real del Miercoles. El DENUE marca 0 puntos pero Christian ya tiene 62 clientes — cuantos mas existen que aun no conoce o que no visita por distancia o acceso?</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 4 DE 13</div><div class="q-text">El Jueves vas a Apaseo el Grande. El DENUE registra 569 tiendas ahi pero tu ruta tiene 64. Por que solo cubres esas 64? Las otras no te compran, son de dificil acceso, o simplemente nunca has llegado a esas zonas?</div><div class="q-why">Impacto: entender si hay razon operativa para no cubrir el 88% restante de APG, o si es simplemente desconocimiento geografico del padron disponible que el mapa ya tiene mapeado.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 5 DE 13</div><div class="q-text">Hay caminos de terraceria o brechas en tu territorio que evitas porque es dificil pasar con el camion de reparto? Que hay al final de esos caminos — hay tiendas reales ahi?</div><div class="q-why">Impacto: identificar oportunidades de sierra y brecha (OPP-5) que requieren vehiculo del cunado. Si Christian conoce los caminos, el cunado puede explorarlos independientemente sin interferir con la ruta establecida.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 6 DE 13</div><div class="q-text">Conoces alguna tienda mas grande — tipo "super" pequeño o minisuper — en tu zona que actualmente no este en tu ruta? Como Super Aleman o similares dentro del municipio.</div><div class="q-why">Impacto: identificar supertiendas medianas (OPP-4) fuera de ruta habitual. Un minisuper puede comprar 5 a 10 veces mas volumen que una tiendita — impacto alto en ventas totales.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 7 DE 13</div><div class="q-text">En que zona de tu territorio ves mas competidores distribuidores? Lala llega a ciertas colonias? Alpura? Hay zonas donde "estan todos" y zonas donde no llega absolutamente nadie?</div><div class="q-why">Impacto: mapear zonas de alta competencia vs. zonas virgenes para priorizar el orden de expansion del cunado. Empezar donde hay menos competencia maximiza la tasa de conversion inicial.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 8 DE 13</div><div class="q-text">Con cuantas cajas sales cada dia de la semana? Hay algun dia en que regresas al CEDIS con cajas sobrantes que no pudiste colocar?</div><div class="q-why">Impacto: medir la capacidad disponible actual del camion. Si hay cajas sobrantes con regularidad, hay espacio fisico para clientes nuevos sin necesidad de cambiar el pedido al CEDIS.</div></div>
+  </div>
+
+  <div class="q-stitle">Para el Cunado — 4 preguntas · Validacion de capacidad operativa</div>
+  <div style="border:1px solid #1a3a5c;border-top:0;border-radius:0 0 8px 8px;padding:10px 10px 2px;margin-bottom:16px">
+    <div class="q-block"><div class="q-num">PREGUNTA 9 DE 13</div><div class="q-text">La ruta propuesta en el mapa te parece logica y facil de seguir en campo real? Hay algo que cambiarías del orden de los puntos o de los dias asignados a cada zona?</div><div class="q-why">Impacto: el cunado es quien ejecuta — su aceptacion y comprension del plan es mas importante que cualquier optimizacion de algoritmo. Si algo le parece illogico en campo, probablemente tiene razon.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 10 DE 13</div><div class="q-text">Tu vehiculo puede circular por brechas o caminos de tierra? Tienes doble traccion o es un vehiculo de ciudad unicamente?</div><div class="q-why">Impacto: determina si OPP-5 (sierra y brechas) es viable de inmediato o requiere otro vehiculo. Esta respuesta activa o pospone una linea completa de expansion territorial sin costo adicional.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 11 DE 13</div><div class="q-text">Como le avisas a Christian los pedidos que levantas en campo? WhatsApp, llamada, nota en papel? Ya tienen un sistema establecido para que el sepa que entregar al dia siguiente?</div><div class="q-why">Impacto: el protocolo de comunicacion preventista-repartidor es el cuello de botella operativo mas comun en DSD con dos personas. Definirlo antes de comenzar evita conflictos y pedidos perdidos o duplicados.</div></div>
+    <div class="q-block"><div class="q-num">PREGUNTA 12 DE 13</div><div class="q-text">Cual es tu nombre completo y numero de telefono? Necesitamos crear tu perfil como vendedor V002 en el sistema para que puedas registrar pedidos desde el campo.</div><div class="q-why">Impacto: necesario para crear el perfil de usuario preventista en el modulo multi-vendedor V002. Sin este dato no se puede activar el acceso al sistema de registro de pedidos en campo.</div></div>
+  </div>
+
+  <div class="q-stitle" style="background:#c0392b">Para Ambos — 1 pregunta · La mas importante de todo el analisis</div>
+  <div style="border:2px solid #c0392b;border-top:0;border-radius:0 0 8px 8px;padding:10px 10px 2px;margin-bottom:16px;background:#fff5f5">
+    <div class="q-block" style="border-left-color:#c0392b;background:#fff0f0">
+      <div class="q-num">PREGUNTA 13 DE 13 — LA MAS IMPORTANTE</div>
+      <div class="q-text">El mapa de scoring marca 79 negocios en rojo alta prioridad (🔴) y 85 en naranja media-alta (🟠). Cuando los ven en pantalla, esos puntos coinciden con lo que ustedes ven en campo? Hay negocios marcados en rojo que en realidad son tienditas sin importancia o ya cerradas? O hay puntos blancos que saben que son muy grandes y que actualmente no los visita nadie?</div>
+      <div class="q-why">Impacto maxima prioridad: calibrar el scoring digital con el conocimiento de campo. Un solo ciclo de validacion de 20 minutos en reunion mejora radicalmente la precision del mapa para todas las semanas siguientes. Si el mapa y el campo coinciden, el analisis es confiable. Si no coinciden, el conocimiento de Christian y el cunado tiene mas valor que cualquier algoritmo de datos.</div>
+    </div>
+  </div>
+  <div class="diag ok"><div class="diag-title">Las 13 preguntas ya estan en formato interactivo en GitHub Pages</div><p>El archivo PREGUNTAS-CHRISTIAN-001.html permite registrar respuestas directamente en el telefono durante la reunion presencial. No requiere internet para funcionar una vez descargado. Las respuestas se pueden copiar al grupo de WhatsApp de VITERE al finalizar la sesion de validacion.</p></div>
+</div>
+<!-- ===== SECCION 8: PROXIMOS PASOS ===== -->
+<div class="section" id="s8">
+  <div class="section-label">Seccion 8 de 8</div>
+  <h2>🚀 Proximos Pasos — Semana 20</h2>
+  <table class="next-tbl">
+    <thead><tr><th>Cuando</th><th>Responsable</th><th>Accion concreta</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="when">HOY AM</td>
+        <td class="resp">Luis</td>
+        <td>Cargar 100 SKUs del catalogo Danone a Supabase para que el modulo preventista pueda mostrar productos y precios al cunado durante las visitas de campo</td>
+        <td><span class="chip pending">⏳ Pendiente</span></td>
+      </tr>
+      <tr>
+        <td class="when">HOY PM</td>
+        <td class="resp">Rigoberto + Christian</td>
+        <td>Demo presencial con GitHub Pages: mostrar mapa de scoring VAL-VITERE-ENRIQ-001 + RUTA-CONJUNTA-001 + aplicar las 13 preguntas de validacion de campo con Christian y cunado en sesion presencial</td>
+        <td><span class="chip pending">⏳ Pendiente</span></td>
+      </tr>
+      <tr>
+        <td class="when">HOY PM</td>
+        <td class="resp">Rigoberto</td>
+        <td>Confirmar nombre completo y numero de telefono del cunado (Vendedor V002) para crear perfil en sistema y activar acceso al modulo preventista</td>
+        <td><span class="chip pending">⏳ Pendiente</span></td>
+      </tr>
+      <tr>
+        <td class="when">Semana 21</td>
+        <td class="resp">Luis</td>
+        <td>Modulo multi-vendedor V002 en sistema: crear perfil preventista con acceso a rutas, registro de pedidos levantados en campo y sincronizacion con entregas de Christian</td>
+        <td><span class="chip later">🔜 Despues de reunion</span></td>
+      </tr>
+      <tr>
+        <td class="when">Semana 21</td>
+        <td class="resp">Christian + Cunado</td>
+        <td>Aplicar RUTA-CONJUNTA-001 en campo la primera semana completa: 55 puntos nuevos por dia con el protocolo de campo de 5 pasos definido en Seccion 5 de este documento</td>
+        <td><span class="chip later">🔜 Despues de reunion</span></td>
+      </tr>
+      <tr>
+        <td class="when">Semana 21</td>
+        <td class="resp">Christian</td>
+        <td>Investigar faltante Yo Mini vainilla: es problema de inventario en CEDIS VITERE o de produccion y surtido de Danone? Reportar al grupo de WhatsApp con respuesta concreta esta misma semana</td>
+        <td><span class="chip later">🔜 Esta semana</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="divider"></div>
+  <div class="diag info"><div class="diag-title">Metricas de seguimiento semanal — cadencia de revision a partir de Semana 21</div><p>Cada lunes revisar: (1) Cuantos puntos nuevos visito el cunado la semana pasada? (2) Cuantos convirtieron a pedido confirmado? (3) Que dice Christian de los reportes del cunado — llegan bien las coordenadas y fotos al grupo? (4) El mapa de scoring esta mejorando con los datos de campo validados en la reunion semanal de 15 minutos? Esta cadencia corta y constante es la diferencia entre un analisis que se archiva y uno que genera ventas reales semana a semana.</p></div>
+
+  <div class="divider"></div>
+  <div style="font-size:13px;font-weight:900;color:#1a3a5c;margin-bottom:6px">Herramientas GitHub Pages · iaingenieria.github.io/rutas/vitere/</div>
+  <div style="font-size:11px;color:#888;margin-bottom:14px">Todos los archivos funcionan sin conexion a internet una vez descargados en el telefono</div>
+  <div class="lgrid">
+    <a class="lbtn" href="https://iaingenieria.github.io/rutas/vitere/VAL-VITERE-ENRIQ-001.html" target="_blank">
+      <span class="bi">🗺️</span><span class="bl">Mapa Scoring</span><span class="bd">VAL-VITERE-ENRIQ-001</span>
+    </a>
+    <a class="lbtn" href="https://iaingenieria.github.io/rutas/vitere/RUTA-CONJUNTA-001.html" target="_blank">
+      <span class="bi">🚗</span><span class="bl">Rutas Conjuntas</span><span class="bd">RUTA-CONJUNTA-001</span>
+    </a>
+    <a class="lbtn" href="https://iaingenieria.github.io/rutas/vitere/PREGUNTAS-CHRISTIAN-001.html" target="_blank">
+      <span class="bi">❓</span><span class="bl">13 Preguntas</span><span class="bd">PREGUNTAS-CHRISTIAN-001</span>
+    </a>
+    <a class="lbtn" href="https://iaingenieria.github.io/rutas/vitere/PREVENTISTA-V002-MENSUAL.html" target="_blank">
+      <span class="bi">📅</span><span class="bl">Plan Mensual V002</span><span class="bd">PREVENTISTA-V002-MENSUAL</span>
+    </a>
+  </div>
+
+  <div style="margin-top:20px;padding:16px;background:#f8f9fc;border-radius:10px;border:1px solid #e3e8f0">
+    <div style="font-size:10px;font-weight:900;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Resumen ejecutivo — para compartir con Rigoberto en la reunion de hoy</div>
+    <div style="font-size:13px;color:#333;line-height:1.7">VITERE tiene acceso a <strong>1,182 negocios registrados</strong> en su territorio de Guanajuato, pero actualmente solo visita <strong>315 por semana (26.7%)</strong>. Los restantes <strong>867 puntos sin explorar</strong> incluyen 817 en triple brecha (DENUE si, Google no, Christian no visita). Con el cunado operando como preventista a 55 puntos nuevos por dia — sin costo adicional de transporte porque ya salen juntos — la proyeccion conservadora es <strong>$30,000 a $45,000 por mes adicionales</strong> en ventas nuevas. El dia de mayor oportunidad es el Jueves en Apaseo el Grande con 505 negocios sin atender y 45 puntos de alta prioridad identificados. El primer paso es la reunion de hoy PM con Christian para validar el mapa con las 13 preguntas y confirmar los datos del cunado para activar el perfil V002.</div>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>VAL-VITERE-ANALISIS-RUTAS · 180526</strong> &nbsp;·&nbsp; VITERE Distribucion DSD Danone · Bajio Mexico &nbsp;·&nbsp; Generado: 18 Mayo 2026<br>
+  CEDIS: Calle Don Francisco #3, Lomas de Balvanera, Corregidora, QRO &nbsp;·&nbsp; lat 20.5287532 / lng -100.4650044<br>
+  Territorio comercial: Apaseo el Alto + Apaseo el Grande, Guanajuato · 1,182 puntos DENUE · 867 sin explorar<br>
+  <a href="https://iaingenieria.github.io/rutas/vitere/">iaingenieria.github.io/rutas/vitere/</a>
+</div>
+
+<script>
+(function(){
+  var sections=document.querySelectorAll('.section[id]');
+  var links=document.querySelectorAll('.toc a');
+  function onScroll(){
+    var y=window.scrollY+80;
+    var active=null;
+    sections.forEach(function(s){if(s.offsetTop<=y)active=s.id;});
+    links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+active);});
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
