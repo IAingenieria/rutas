@@ -61,7 +61,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div style="font-size:13px;font-weight:800;margin-bottom:8px">🔭 Antes vs. Después</div>
     <div style="font-size:10px;opacity:.8;margin-bottom:12px">
       El distribuidor anterior no tenía esta visibilidad.<br>
-      DENUE sabe que existen. Google no las conoce. Christian tampoco las visita.<br>
+      El padrón oficial sabe que existen. Sin señal digital. Christian tampoco las visita.<br>
       <b>Triple brecha = oportunidad de VITERE.</b>
     </div>
     <div class="score-grid">
@@ -77,9 +77,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div style="background:white;border-radius:12px;padding:12px;margin:0 10px 10px;font-size:11px;color:#555;line-height:1.7;box-shadow:0 1px 4px rgba(0,0,0,.07)">
     <b style="color:#1a3a5c">Cómo usar este mapa:</b><br>
-    Los puntos <b style="color:#e74c3c">rojos</b> son negocios con rating ≥ 4.0 y ≥ 10 reseñas en Google.<br>
+    Los puntos <b style="color:#e74c3c">rojos</b> son negocios con índice de actividad ≥ 4.0 y 10 o más valoraciones de usuarios detectadas.<br>
     Son los prospectos de más alto tráfico que Christian aún no visita.<br>
-    Los <b style="color:#95a5a6">grises</b> son territorio virgen — nunca en Google, solo en INEGI.
+    Los <b style="color:#95a5a6">grises</b> son territorio virgen — sin señal digital, sin presencia en algoritmos.
   </div>
 </div>
 <div id="tab-lista">
@@ -1293,7 +1293,7 @@ PUNTOS.forEach(p=>{
     .bindPopup(`<b>${p.icon} ${p.nombre}</b><br>
       ${p.nombreGoogle?`<small style="color:#555">📍 ${p.nombreGoogle}</small><br>`:''}
       ${p.scoreLabel}<br>
-      ${p.rating?`★ ${p.rating} · ${p.reviews} reseñas`:'Sin datos Google'}<br>
+      ${p.rating?`★ ${p.rating} · ${p.reviews} valoraciones detectadas`:'Sin señal de actividad'}<br>
       <small>Ruta ${p.dia} · ${p.distCedis} km del CEDIS</small><br>
       <a href="https://maps.google.com/maps?q=&layer=c&cbll=${p.lat},${p.lng}" target="_blank" style="font-size:11px;color:#1a73e8">📷 Street View</a>`);
 });
