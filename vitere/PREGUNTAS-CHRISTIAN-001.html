@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Preguntas para Christian · VITERE · 180526</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;color:#1a1a2e;padding-bottom:40px}
+
+.header{background:#1a3a5c;color:white;padding:14px 16px;position:sticky;top:0;z-index:100}
+.header h1{font-size:16px;font-weight:800;line-height:1.2}
+.header p{font-size:11px;opacity:.75;margin-top:3px}
+.ver-badge{display:inline-block;font-size:9px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;font-weight:700;margin-top:5px}
+
+.progress-bar{background:#0d2540;height:6px}
+.progress-fill{height:100%;background:#3fa7ff;transition:width .4s;width:0%}
+
+.section-header{padding:16px 16px 6px;font-size:10px;font-weight:800;letter-spacing:.1em;color:#5a7fa8;text-transform:uppercase}
+
+.q-card{background:white;margin:8px 12px;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.q-card.respondida{border-left:4px solid #27ae60}
+.q-card.pendiente{border-left:4px solid #e0e0e0}
+
+.q-top{padding:14px 14px 10px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.q-num-badge{min-width:28px;height:28px;border-radius:50%;background:#1a3a5c;color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.q-num-badge.ok{background:#27ae60}
+.q-tag{font-size:9px;font-weight:700;color:#5a7fa8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.q-texto{font-size:14px;font-weight:700;color:#1a1a2e;line-height:1.4}
+
+.q-body{padding:0 14px 14px 54px}
+.datos-chip{display:inline-block;background:#eef5ff;color:#1a5ec8;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.q-why{font-size:11px;color:#666;line-height:1.5;margin-bottom:12px}
+.q-why strong{color:#1a3a5c}
+
+.respuesta-area{background:#f8fafc;border:1px solid #e0e8f0;border-radius:10px;padding:10px 12px}
+.respuesta-label{font-size:10px;font-weight:700;color:#5a7fa8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+textarea{width:100%;border:none;background:transparent;font-size:13px;color:#1a1a2e;font-family:inherit;resize:none;outline:none;min-height:60px}
+.respuesta-btns{display:flex;gap:8px;margin-top:10px}
+.btn-resp{flex:1;padding:9px;border-radius:10px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-resp.guardar{background:#1a3a5c;color:white}
+.btn-resp.limpiar{background:#f0f4f8;color:#666}
+
+.badge-nuevo{display:inline-block;background:#e74c3c;color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:6px;vertical-align:middle}
+
+.resumen-card{background:#1a3a5c;color:white;margin:16px 12px 8px;border-radius:14px;padding:16px}
+.resumen-card h3{font-size:13px;font-weight:800;margin-bottom:10px}
+.resumen-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.resumen-row:last-child{border-bottom:none}
+.resumen-row span:first-child{opacity:.7}
+.resumen-row span:last-child{font-weight:700}
+
+.export-btn{display:block;margin:16px 12px 0;background:#27ae60;color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:calc(100% - 24px);text-align:center}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>❓ Preguntas para Christian</h1>
+  <p>Reunión de validación de campo · VITERE</p>
+  <span class="ver-badge">PREGUNTAS-CHRISTIAN-001 · 180526</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- ───────── CHRISTIAN (REPARTO) ───────── -->
+<div class="section-header">🚚 Para Christian — Reparto</div>
+
+<!-- P1 -->
+<div class="q-card pendiente" id="card-1">
+  <div class="q-top" onclick="toggleBody(1)">
+    <div class="q-num-badge" id="badge-1">1</div>
+    <div>
+      <div class="q-tag">Viernes · Duplicación de ruta</div>
+      <div class="q-texto">¿El viernes repites la ruta del lunes por cobranza, porque esos clientes piden dos entregas por semana, o simplemente porque es la ruta que mejor conoces?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-1">
+    <div class="datos-chip">📊 Dato: Viernes comparte territorio con Lunes — 259 pts DENUE registrados, 14 🔴🟠 para preventista</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Si el viernes es cobranza, puede convertirse en media jornada de cobranza + media de territorio nuevo. Si el cliente pide dos entregas semanales, ese cliente tiene alto volumen y debe mapearse como cliente A prioritario.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-1" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(1)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(1)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P2 -->
+<div class="q-card pendiente" id="card-2">
+  <div class="q-top" onclick="toggleBody(2)">
+    <div class="q-num-badge" id="badge-2">2</div>
+    <div>
+      <div class="q-tag">Clientes actuales · Calidad de cartera</div>
+      <div class="q-texto">De los clientes que visitas cada semana, ¿cuántos te dan pedido consistente y cuántos te dicen "hoy no" con frecuencia?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-2">
+    <div class="datos-chip">📊 Dato: 315 visitas/semana registradas · 1,182 registros DENUE en el corredor</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Un cliente que dice "no" más del 30% de las visitas está ocupando un espacio en ruta que podría ser de alguien que siempre compra. Esto permite depurar la lista y hacer espacio para clientes nuevos sin aumentar el horario de trabajo.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-2" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(2)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(2)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P3 -->
+<div class="q-card pendiente" id="card-3">
+  <div class="q-top" onclick="toggleBody(3)">
+    <div class="q-num-badge" id="badge-3">3</div>
+    <div>
+      <div class="q-tag">Miércoles · Zona sin registros <span class="badge-nuevo">ACTUALIZADA</span></div>
+      <div class="q-texto">El miércoles cubres la zona de El Terrero / San Lucas / Jiménez. INEGI no tiene ningún negocio registrado ahí formalmente. ¿Hay tiendas reales que tú conozcas en esa zona? ¿A qué hora terminas ese día?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-3">
+    <div class="datos-chip">📊 Dato: Miércoles = 0 registros DENUE — zona de rancherías sin padrón formal</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Si existen tiendas reales que INEGI no tiene capturadas, son candidatos a "triple brecha" — el mejor argumento de VITERE. Además, si el miércoles termina antes de las 15:00, hay capacidad para 15–20 clientes nuevos sin afectar su horario.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-3" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(3)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(3)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P4 -->
+<div class="q-card pendiente" id="card-4">
+  <div class="q-top" onclick="toggleBody(4)">
+    <div class="q-num-badge" id="badge-4">4</div>
+    <div>
+      <div class="q-tag">Jueves · Oportunidad más grande <span class="badge-nuevo">ACTUALIZADA</span></div>
+      <div class="q-texto">El jueves es Apaseo el Grande. Tenemos 569 negocios registrados ahí pero solo 64 en tu ruta actual. ¿Por qué no se visitan más? ¿Es tiempo, carga, o hay algún acuerdo con el distribuidor anterior?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-4">
+    <div class="datos-chip">📊 Dato: Jueves tiene 569 pts DENUE · 97 🔴🟠 alta prioridad · solo 64 visitas actuales</div>
+    <div class="q-why"><strong>Por qué importa:</strong> El jueves es la zona con mayor oportunidad de todo el corredor. Con 3 semanas de preventista solo en ese día podríamos cubrir los 97 puntos de alta prioridad. Entender el bloqueo actual define la estrategia de expansión.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-4" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(4)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(4)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P5 -->
+<div class="q-card pendiente" id="card-5">
+  <div class="q-top" onclick="toggleBody(5)">
+    <div class="q-num-badge" id="badge-5">5</div>
+    <div>
+      <div class="q-tag">Caminos de acceso · Conocimiento de campo</div>
+      <div class="q-texto">¿Hay zonas o localidades que conoces y que sabes que tienen tiendas pero nunca has entrado porque el camino es malo o el acceso es complicado?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-5">
+    <div class="datos-chip">📊 Dato: 68.7% de los puntos son "triple brecha" — existen en INEGI pero nunca visitados</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Christian lleva años en el territorio y sabe exactamente qué hay en la sierra que no aparece en ningún mapa. Su conocimiento empírico vale más que cualquier base de datos.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-5" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(5)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(5)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P6 -->
+<div class="q-card pendiente" id="card-6">
+  <div class="q-top" onclick="toggleBody(6)">
+    <div class="q-num-badge" id="badge-6">6</div>
+    <div>
+      <div class="q-tag">Supertiendas · Clientes grandes <span class="badge-nuevo">NUEVA</span></div>
+      <div class="q-texto">¿Conoces supermercados o tiendas de autoservicio medianas en el corredor que no estén en tu ruta? Como Super Alemán u otros de ese tamaño.</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-6">
+    <div class="datos-chip">📊 Dato: Ahora incluimos supers de cualquier tamaño — antes se filtraban los de más de 5 empleados</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Un supertienda puede mover el mismo volumen que 10–15 misceláneas juntas. Son los clientes de mayor ticket y los primeros que debe visitar el preventista.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-6" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(6)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(6)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P7 -->
+<div class="q-card pendiente" id="card-7">
+  <div class="q-top" onclick="toggleBody(7)">
+    <div class="q-num-badge" id="badge-7">7</div>
+    <div>
+      <div class="q-tag">Competencia · Mapa mental</div>
+      <div class="q-texto">¿En qué zonas de tu ruta ves más presencia de Lala, Alpura u otros distribuidores? ¿Hay zonas donde no ves a nadie más?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-7">
+    <div class="datos-chip">📊 Dato: El mapa de scores muestra zonas sin Google = sin presencia digital de ningún proveedor</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Las zonas sin competencia son donde el preventista debe llegar primero, antes de que otro distribuidor las descubra.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-7" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(7)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(7)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P8 -->
+<div class="q-card pendiente" id="card-8">
+  <div class="q-top" onclick="toggleBody(8)">
+    <div class="q-num-badge" id="badge-8">8</div>
+    <div>
+      <div class="q-tag">Capacidad de carga · Logística</div>
+      <div class="q-texto">¿Con cuántas cajas sales en promedio cada día? ¿Hay días que te quedas sin producto antes de terminar o que regresas con mucho inventario?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-8">
+    <div class="datos-chip">📊 Dato: Si regresa con producto → el límite es la ruta, no la demanda</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Si regresa con producto sobrante, la restricción no es la demanda — es la ruta. Si se queda sin producto antes de terminar, el problema es de carga o logística desde el CEDIS en Corregidora.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta de Christian</div>
+      <textarea id="resp-8" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(8)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(8)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── CUÑADO (PREVENTISTA) ───────── -->
+<div class="section-header">🗺️ Para el Cuñado — Preventista</div>
+
+<!-- P9 -->
+<div class="q-card pendiente" id="card-9">
+  <div class="q-top" onclick="toggleBody(9)">
+    <div class="q-num-badge" id="badge-9">9</div>
+    <div>
+      <div class="q-tag">Ruta del preventista · Validación <span class="badge-nuevo">ACTUALIZADA</span></div>
+      <div class="q-texto">Armamos una ruta mensual para ti: Lunes en San Bartolomé, Martes en Apaseo el Alto centro, Jueves en Apaseo el Grande. ¿Te parece lógico o hay algo que no cuadra con cómo te mueves?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-9">
+    <div class="datos-chip">📊 Dato: PREVENTISTA-V002-MENSUAL.html — 164 puntos 🔴🟠 organizados en 3 semanas de jueves</div>
+    <div class="q-why"><strong>Por qué importa:</strong> La ruta está optimizada por datos pero el cuñado puede detectar ineficiencias reales (caminos cortados, zonas peligrosas en ciertos horarios, negocios que cierran en ciertas horas).</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta del cuñado</div>
+      <textarea id="resp-9" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(9)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(9)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P10 -->
+<div class="q-card pendiente" id="card-10">
+  <div class="q-top" onclick="toggleBody(10)">
+    <div class="q-num-badge" id="badge-10">10</div>
+    <div>
+      <div class="q-tag">Sierra y acceso · Vehículo</div>
+      <div class="q-texto">¿Has entrado a comunidades de sierra — brechas, caminos rurales — para prospectar? ¿Tu vehículo tiene capacidad para eso?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-10">
+    <div class="datos-chip">📊 Dato: Las zonas sin Google son las más rentables — pero pueden requerir acceso difícil</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Si el vehículo no permite acceso a caminos de sierra (brecha, terracería), la estrategia de prospectar esas zonas debe replantearse o asignarse a días específicos con vehículo adecuado.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta del cuñado</div>
+      <textarea id="resp-10" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(10)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(10)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P11 -->
+<div class="q-card pendiente" id="card-11">
+  <div class="q-top" onclick="toggleBody(11)">
+    <div class="q-num-badge" id="badge-11">11</div>
+    <div>
+      <div class="q-tag">Pedidos y traspaso · Sistema <span class="badge-nuevo">ACTUALIZADA</span></div>
+      <div class="q-texto">Cuando levantas un pedido nuevo, ¿cómo se lo avisas a Christian? ¿Lo anotas en papel, le mandas WhatsApp, o hay otra forma?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-11">
+    <div class="datos-chip">📊 Dato: El módulo V002 del preventista puede tener captura de pedidos directo desde el app</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Si el traspaso de pedidos no está sistematizado hay riesgo de pedidos perdidos, errores de entrega o duplicados. Esto daña la percepción del primer contacto con el cliente nuevo — el más difícil de recuperar.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta del cuñado</div>
+      <textarea id="resp-11" placeholder="Escribe la respuesta aquí..."></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(11)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(11)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P12 -->
+<div class="q-card pendiente" id="card-12">
+  <div class="q-top" onclick="toggleBody(12)">
+    <div class="q-num-badge" id="badge-12">12</div>
+    <div>
+      <div class="q-tag">Datos del preventista · Registro</div>
+      <div class="q-texto">¿Cuál es tu nombre completo y un teléfono de contacto para darte acceso al sistema?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-12">
+    <div class="datos-chip">📊 Dato: Necesario para crear perfil V002 y asignar rutas propias</div>
+    <div class="q-why"><strong>Por qué importa:</strong> Para crear el perfil de preventista en el sistema (módulo V002), asignarle sus rutas, reportes de prospectos y seguimiento diferenciado del reparto de Christian.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Nombre completo</div>
+      <textarea id="resp-12" placeholder="Nombre y teléfono..." style="min-height:40px"></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(12)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(12)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── AMBOS ───────── -->
+<div class="section-header">🤝 Para ambos</div>
+
+<!-- P13 -->
+<div class="q-card pendiente" id="card-13">
+  <div class="q-top" onclick="toggleBody(13)">
+    <div class="q-num-badge" id="badge-13">13</div>
+    <div>
+      <div class="q-tag">Top 3 zonas · Validación del mapa <span class="badge-nuevo">ACTUALIZADA</span></div>
+      <div class="q-texto">Les mostramos el mapa con 79 puntos rojos y 85 anaranjados en su territorio. ¿Coincide con lo que ven en campo? ¿Hay zonas que el mapa no está captando?</div>
+    </div>
+  </div>
+  <div class="q-body" id="body-13">
+    <div class="datos-chip">📊 Dato: 164 puntos 🔴🟠 detectados · Jueves concentra el 59% (97 pts)</div>
+    <div class="q-why"><strong>Por qué importa:</strong> La experiencia de campo de ambos supera cualquier análisis de datos. Sus respuestas permiten validar lo que el sistema detectó y añadir lo que ningún dato puede capturar: quién sí recibe, quién ya tiene distribuidor, quién paga mal.</div>
+    <div class="respuesta-area">
+      <div class="respuesta-label">Respuesta</div>
+      <textarea id="resp-13" placeholder="¿El mapa coincide? ¿Qué falta?"></textarea>
+      <div class="respuesta-btns">
+        <button class="btn-resp guardar" onclick="guardar(13)">✓ Guardar</button>
+        <button class="btn-resp limpiar" onclick="limpiar(13)">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Resumen -->
+<div class="resumen-card" id="resumenCard">
+  <h3>📋 Progreso de la reunión</h3>
+  <div class="resumen-row"><span>Preguntas para Christian</span><span id="res-christian">0 / 8</span></div>
+  <div class="resumen-row"><span>Preguntas para el cuñado</span><span id="res-cunado">0 / 4</span></div>
+  <div class="resumen-row"><span>Para ambos</span><span id="res-ambos">0 / 1</span></div>
+  <div class="resumen-row"><span>Total respondidas</span><span id="res-total">0 / 13</span></div>
+</div>
+
+<button class="export-btn" onclick="exportar()">📤 Exportar respuestas (.txt)</button>
+
+<script>
+const TOTAL = 13;
+const CHRISTIAN = [1,2,3,4,5,6,7,8];
+const CUNADO = [9,10,11,12];
+const AMBOS = [13];
+
+// Estado
+const estado = {};
+for(let i=1; i<=TOTAL; i++) estado[i] = {abierto: false, guardada: false};
+
+// Cargar guardadas del localStorage
+function cargarLS(){
+  for(let i=1;i<=TOTAL;i++){
+    const v = localStorage.getItem('vitere-q-'+i);
+    if(v){
+      document.getElementById('resp-'+i).value = v;
+      marcarRespondida(i);
+    }
+  }
+  actualizarProgreso();
+}
+
+function toggleBody(n){
+  const body = document.getElementById('body-'+n);
+  estado[n].abierto = !estado[n].abierto;
+  body.style.display = estado[n].abierto ? 'block' : 'none';
+}
+
+function guardar(n){
+  const val = document.getElementById('resp-'+n).value.trim();
+  if(!val) return;
+  localStorage.setItem('vitere-q-'+n, val);
+  marcarRespondida(n);
+  actualizarProgreso();
+  // Cerrar
+  document.getElementById('body-'+n).style.display = 'none';
+  estado[n].abierto = false;
+}
+
+function limpiar(n){
+  document.getElementById('resp-'+n).value = '';
+  localStorage.removeItem('vitere-q-'+n);
+  estado[n].guardada = false;
+  const card = document.getElementById('card-'+n);
+  card.className = 'q-card pendiente';
+  const badge = document.getElementById('badge-'+n);
+  badge.className = 'q-num-badge';
+  badge.textContent = n;
+  actualizarProgreso();
+}
+
+function marcarRespondida(n){
+  estado[n].guardada = true;
+  const card = document.getElementById('card-'+n);
+  card.className = 'q-card respondida';
+  const badge = document.getElementById('badge-'+n);
+  badge.className = 'q-num-badge ok';
+  badge.textContent = '✓';
+}
+
+function actualizarProgreso(){
+  const total = Object.values(estado).filter(e=>e.guardada).length;
+  const christian = CHRISTIAN.filter(n=>estado[n].guardada).length;
+  const cunado = CUNADO.filter(n=>estado[n].guardada).length;
+  const ambos = AMBOS.filter(n=>estado[n].guardada).length;
+
+  document.getElementById('res-total').textContent = total+' / '+TOTAL;
+  document.getElementById('res-christian').textContent = christian+' / 8';
+  document.getElementById('res-cunado').textContent = cunado+' / 4';
+  document.getElementById('res-ambos').textContent = ambos+' / 1';
+  document.getElementById('progressFill').style.width = (total/TOTAL*100)+'%';
+}
+
+function exportar(){
+  const LABELS = {
+    1:'Viernes / duplicación de ruta',2:'Clientes actuales / calidad',
+    3:'Miércoles / zona sin DENUE',4:'Jueves / oportunidad grande',
+    5:'Caminos de acceso',6:'Supertiendas',7:'Competencia',8:'Capacidad de carga',
+    9:'Ruta preventista',10:'Sierra y vehículo',11:'Pedidos y traspaso',
+    12:'Nombre y teléfono preventista',13:'Validación del mapa'
+  };
+  let txt = 'VITERE — Respuestas de reunión con Christian\n';
+  txt += '180526 · PREGUNTAS-CHRISTIAN-001\n';
+  txt += '='.repeat(50)+'\n\n';
+  for(let i=1;i<=TOTAL;i++){
+    const resp = localStorage.getItem('vitere-q-'+i);
+    txt += `P${i} — ${LABELS[i]}\n`;
+    txt += resp ? resp : '(sin respuesta)';
+    txt += '\n\n';
+  }
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vitere_respuestas_christian_180526.txt';
+  a.click();
+}
+
+// Inicializar: todos cerrados
+for(let i=1;i<=TOTAL;i++){
+  document.getElementById('body-'+i).style.display='none';
+}
+cargarLS();
+</script>
+</body>
+</html>

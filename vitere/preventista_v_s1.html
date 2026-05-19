@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Viernes Semana 1 — Preventista V002 · VITERE</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#f0f2f5;color:#333}
+    .hdr{background:#b71c1c;color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .hdr h1{font-size:17px;font-weight:bold}
+    .hdr p{font-size:12px;opacity:.85;margin-top:3px}
+    .nav{background:#b71c1c;opacity:.85;padding:6px 24px;font-size:13px;display:flex;gap:8px}
+    #map{height:400px}
+    .meta{background:white;padding:12px 24px;display:flex;gap:24px;flex-wrap:wrap;font-size:13px;border-bottom:1px solid #eee}
+    .meta span{color:#888} .meta strong{color:#333}
+    .btn{display:inline-flex;align-items:center;gap:8px;background:#b71c1c;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:bold;margin:12px 24px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+    table{width:100%;border-collapse:collapse;background:white}
+    thead tr{background:#f5f5f5;border-bottom:2px solid #e0e0e0}
+    thead th{padding:9px 12px;font-size:11px;text-transform:uppercase;color:#888;font-weight:600;text-align:left}
+    tbody tr:nth-child(even){background:#fafafa}
+    tbody tr:hover{background:#f0f4ff}
+    tbody tr{border-bottom:1px solid #f0f0f0}
+    .foot{padding:14px 24px;background:#f8f8f8;border-top:2px solid #eee;font-size:12px;color:#777;display:flex;gap:20px;flex-wrap:wrap}
+    .back{padding:12px 24px;background:white;border-top:1px solid #eee;font-size:13px}
+    .back a{color:#b71c1c;text-decoration:none;font-weight:bold}
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>🗺️ Viernes — Semana 1 &nbsp;·&nbsp; Preventista V002</h1>
+    <p>Sale 08:00 CEDIS Corregidora &nbsp;·&nbsp; 14 visitas &nbsp;·&nbsp; 59.6 km &nbsp;·&nbsp; Regresa ~11:21</p>
+  </div>
+  <div style="text-align:right;font-size:13px"><a href="preventista_v_s1.html" style="color:white;font-weight:bold;text-decoration:underline">S1</a></div>
+</div>
+
+<div id="map"></div>
+
+<div class="meta">
+  <div><span>Salida</span><br><strong>08:00 — CEDIS Corregidora</strong></div>
+  <div><span>Regreso estimado</span><br><strong>11:21</strong></div>
+  <div><span>Visitas</span><br><strong>14</strong></div>
+  <div><span>Distancia total</span><br><strong>59.6 km</strong></div>
+  <div><span>🔴 Alta prioridad</span><br><strong>6</strong></div>
+  <div><span>🟠 Media-alta</span><br><strong>8</strong></div>
+  <div><span>Zona del día</span><br><strong style="font-size:11px">2ª visita — San Bartolo, San Vicente, Ojo de Agua, Salto de …</strong></div>
+</div>
+
+<a class="btn" href="https://www.google.com/maps/dir/20.5287532,-100.4650044/20.53521468,-100.52383335/20.53826155,-100.52507707/20.5398003,-100.52663964/20.53991967,-100.52674367/20.53486119,-100.53214805/20.54936085,-100.58818229/20.55729358,-100.505248/20.53672976,-100.5239637/20.53598717,-100.52441666/20.53657333,-100.5289017/20.53665976,-100.52899295/20.53491762,-100.53291294/20.51348325,-100.54105502/20.45740862,-100.63357881/20.5287532,-100.4650044" target="_blank">
+  ▶ INICIAR — Abrir en Google Maps
+  <span style="font-size:11px;opacity:.8">(primeros 23 stops)</span>
+</a>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:center">#</th>
+      <th>Negocio</th>
+      <th>Prioridad</th>
+      <th style="text-align:center">Google Rating</th>
+      <th style="text-align:center">Llegada estimada</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">1</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">CARNICERIA CENTENO</td>
+        <td style="padding:8px 12px"><span style="background:#c0392b;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🔴 Alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.4 (11 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">08:09</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">2</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">TIENDA DE ABARROTES SUPER FUENTES</td>
+        <td style="padding:8px 12px"><span style="background:#c0392b;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🔴 Alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.8 (11 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">08:17</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">3</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">FRUTERIA HERMANOS GONZALES</td>
+        <td style="padding:8px 12px"><span style="background:#c0392b;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🔴 Alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.9 (10 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">08:26</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">4</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">CARNICERIASAN JUDAS TADEO</td>
+        <td style="padding:8px 12px"><span style="background:#c0392b;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🔴 Alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.9 (10 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">08:34</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">5</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">TIENDA DE ABARROTES Y CREMERIA</td>
+        <td style="padding:8px 12px"><span style="background:#c0392b;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🔴 Alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.7 (13 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">08:43</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">6</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">VINOS Y ABARROTES EL AGAVE</td>
+        <td style="padding:8px 12px"><span style="background:#c0392b;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🔴 Alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.2 (25 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">09:00</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">7</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">TIENDA LA PRIVADITA</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.8 (6 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">09:21</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">8</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">CREMERIA RIOJA</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 3.7 (477 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">09:33</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">9</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">MISCELANEA MADIFER</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 3.7 (477 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">09:42</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">10</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">CARNICERIA MAXI CARNE</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 3.8 (9 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">09:50</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">11</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">MICELANEA BUENOS AIRES</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.2 (5 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">09:58</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">12</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">TIENDA DE ABARROTES DON JUAN</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 3.6 (24 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">10:07</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">13</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">TIENDA DE ABARROTES PLAZA HIDALGO #7</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.8 (6 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">10:19</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;text-align:center;color:#aaa;font-size:12px">14</td>
+        <td style="padding:8px 12px;font-size:13px;font-weight:500">ABARROTES GARCIA</td>
+        <td style="padding:8px 12px"><span style="background:#d35400;color:white;padding:2px 8px;border-radius:10px;font-size:11px">🟠 Media-alta</span></td>
+        <td style="padding:8px 12px;text-align:center;color:#555;font-size:12px">⭐ 4.8 (5 reseñas)</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:bold;color:#b71c1c">10:44</td>
+      </tr>
+  </tbody>
+</table>
+
+<div class="foot">
+  <span>📋 Muchos de estos puntos ya son clientes — el cuñado refrenda el pedido</span>
+  <span>🆕 Los nuevos: levanta pedido sugerido → Christian entrega 1-2 días después</span>
+  <span>⚠️ Lo que no alcance hoy → aparece en Viernes (ciclo completado)</span>
+</div>
+
+<div class="back">
+  <a href="PREVENTISTA-V002-MENSUAL.html">← Plan mensual preventista</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="RESUMEN_VITERE.html">← Resumen rutas Christian</a>
+</div>
+
+<script>
+const map = L.map('map').setView([20.5287532,-100.4650044], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {attribution:'© OpenStreetMap'}).addTo(map);
+
+const cedisIco = L.divIcon({
+  html:'<div style="background:#f39c12;border:3px solid white;border-radius:50%;width:20px;height:20px;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>',
+  iconSize:[20,20],iconAnchor:[10,10]
+});
+L.marker([20.5287532,-100.4650044],{icon:cedisIco}).addTo(map)
+  .bindPopup('<b>🏭 CEDIS — Corregidora, Qro.</b><br>Salida 08:00 · Regreso 11:21');
+
+const pts = [
+  [20.53521468,-100.52383335,'CARNICERIA CENTENO','08:09','🔴','#c0392b','⭐4.4 (11 reseñas)'],
+        [20.53826155,-100.52507707,'TIENDA DE ABARROTES SUPER FUENTES','08:17','🔴','#c0392b','⭐4.8 (11 reseñas)'],
+        [20.5398003,-100.52663964,'FRUTERIA HERMANOS GONZALES','08:26','🔴','#c0392b','⭐4.9 (10 reseñas)'],
+        [20.53991967,-100.52674367,'CARNICERIASAN JUDAS TADEO','08:34','🔴','#c0392b','⭐4.9 (10 reseñas)'],
+        [20.53486119,-100.53214805,'TIENDA DE ABARROTES Y CREMERIA','08:43','🔴','#c0392b','⭐4.7 (13 reseñas)'],
+        [20.54936085,-100.58818229,'VINOS Y ABARROTES EL AGAVE','09:00','🔴','#c0392b','⭐4.2 (25 reseñas)'],
+        [20.55729358,-100.505248,'TIENDA LA PRIVADITA','09:21','🟠','#d35400','⭐4.8 (6 reseñas)'],
+        [20.53672976,-100.5239637,'CREMERIA RIOJA','09:33','🟠','#d35400','⭐3.7 (477 reseñas)'],
+        [20.53598717,-100.52441666,'MISCELANEA MADIFER','09:42','🟠','#d35400','⭐3.7 (477 reseñas)'],
+        [20.53657333,-100.5289017,'CARNICERIA MAXI CARNE','09:50','🟠','#d35400','⭐3.8 (9 reseñas)'],
+        [20.53665976,-100.52899295,'MICELANEA BUENOS AIRES','09:58','🟠','#d35400','⭐4.2 (5 reseñas)'],
+        [20.53491762,-100.53291294,'TIENDA DE ABARROTES DON JUAN','10:07','🟠','#d35400','⭐3.6 (24 reseñas)'],
+        [20.51348325,-100.54105502,'TIENDA DE ABARROTES PLAZA HIDALGO #7','10:19','🟠','#d35400','⭐4.8 (6 reseñas)'],
+        [20.45740862,-100.63357881,'ABARROTES GARCIA','10:44','🟠','#d35400','⭐4.8 (5 reseñas)']
+];
+const line = [[20.5287532,-100.4650044]];
+pts.forEach(function(p,i){
+  const ico = L.divIcon({
+    html:'<div style="background:'+p[5]+';color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,.35);border:2px solid white">'+(i+1)+'</div>',
+    iconSize:[24,24],iconAnchor:[12,12]
+  });
+  L.marker([p[0],p[1]],{icon:ico}).addTo(map)
+    .bindPopup('<b>'+p[4]+' '+p[2]+'</b><br>🕐 Llegada: <b>'+p[3]+'</b><br>'+p[6]);
+  line.push([p[0],p[1]]);
+});
+line.push([20.5287532,-100.4650044]);
+L.polyline(line,{color:'#b71c1c',weight:2.5,opacity:.75,dashArray:'6,4'}).addTo(map);
+map.fitBounds(L.polyline(line).getBounds().pad(0.12));
+</script>
+</body>
+</html>
