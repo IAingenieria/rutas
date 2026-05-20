@@ -875,7 +875,7 @@ function abrirVisita(id){
   document.getElementById('v-mun-inline').textContent = p.m;
   document.getElementById('v-badges').innerHTML = `
     <span class="tag tag-verde">Check-in OK</span>
-    ${p.r ? `<span class="tag tag-verde">★${p.r} Google</span>` : ''}
+    ${p.r ? `<span class="tag tag-verde">★${p.r} valoración</span>` : ''}
     <span class="tag tag-grey">${p.m.split(',')[0]}</span>
   `;
   document.getElementById('total-val').textContent = '$0.00';
@@ -1128,6 +1128,7 @@ function showScreen(name){
   if(navMap[name]) document.getElementById(navMap[name]).classList.add('act');
   if(name==='inventario') renderInventario();
   if(name==='corte') actualizarCorte();
+  if(name==='home') renderPuntos();
 }
 
 // INIT
